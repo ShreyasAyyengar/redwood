@@ -1,0 +1,40 @@
+{
+  "name": "@fullstack-template/electron",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build && electron-builder",
+    "lint": "biome check .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@better-auth/electron": "v1.5.0-beta.13",
+    "@fullstack-template/api": "workspace:*",
+    "@fullstack-template/contracts": "workspace:*",
+    "@fullstack-template/shad-ui": "workspace:*",
+    "@orpc/tanstack-query": "^1.13.5",
+    "@tailwindcss/vite": "^4.2.0",
+    "@tanstack/react-query": "^5.90.21",
+    "better-auth": "^1.5.0-beta.16",
+    "conf": "^15.1.0",
+    "framer-motion": "^12.34.2",
+    "lucide-react": "^0.563.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.4",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "electron": "^40.6.0",
+    "electron-builder": "^26.8.1",
+    "vite-plugin-electron": "^0.29.0",
+    "vite-plugin-electron-renderer": "^0.14.6"
+  },
+  "main": "dist-electron/main.js"
+}

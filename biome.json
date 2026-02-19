@@ -1,0 +1,67 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["ultracite/core", "ultracite/react", "ultracite/next"],
+  "files": {
+    "includes": ["!packages/ui"]
+  },
+  "javascript": {
+    "formatter": {
+      "lineWidth": 145
+    }
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "useSortedAttributes": "off"
+      }
+    }
+  },
+  "json": {
+    "parser": {
+      "allowComments": true
+    }
+  },
+  "linter": {
+    "rules": {
+      "security": {
+        "noDangerouslySetInnerHtml": "warn"
+      },
+      "a11y": {
+        "noNoninteractiveElementInteractions": "off",
+        "noStaticElementInteractions": "off"
+      },
+      "correctness": {
+        "noUnusedFunctionParameters": "warn",
+        "noUnusedLabels": "warn",
+        "noUnusedPrivateClassMembers": "warn",
+        "noUnusedVariables": "warn",
+        "useExhaustiveDependencies": "warn"
+      },
+      "style": {
+        "useBlockStatements": "off",
+        "noMagicNumbers": "warn",
+        "noUselessElse": "warn",
+        "noNegationElse": "off"
+      },
+      "suspicious": {
+        "useAwait": "warn",
+        "noConsole": "warn"
+      },
+      "complexity": {
+        "useSimplifiedLogicExpression": "warn",
+        "useOptionalChain": "warn",
+        "noExcessiveCognitiveComplexity": {
+          "options": {
+            "maxAllowedComplexity": 20
+          },
+          "level": "warn"
+        },
+        "noForEach": "off"
+      },
+      "nursery": {
+        "useConsistentArrowReturn": "warn",
+        "useSortedClasses": "warn"
+      }
+    }
+  }
+}

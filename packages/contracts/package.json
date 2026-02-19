@@ -1,0 +1,11 @@
+{
+  "name": "@fullstack-template/contracts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "private": true
+}
