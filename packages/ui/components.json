@@ -11,11 +11,11 @@
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@fullstack-template/shad-ui/components",
-    "utils": "@fullstack-template/shad-ui/lib/utils",
-    "ui": "@fullstack-template/shad-ui/components",
-    "lib": "@fullstack-template/shad-ui/lib",
-    "hooks": "@fullstack-template/shad-ui/hooks"
+    "components": "@redwood/shad-ui/components",
+    "utils": "@redwood/shad-ui/lib/utils",
+    "ui": "@redwood/shad-ui/components",
+    "lib": "@redwood/shad-ui/lib",
+    "hooks": "@redwood/shad-ui/hooks"
   },
   "registries": {
     "@wds": "https://wds-shadcn-registry.netlify.app/r/{name}.json"

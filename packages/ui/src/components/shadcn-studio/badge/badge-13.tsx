@@ -2,8 +2,8 @@
 
 import { useId, useState } from 'react'
 
-import { Badge } from '@fullstack-template/shad-ui/components/badge'
-import { Checkbox } from '@fullstack-template/shad-ui/components/checkbox'
+import { Badge } from '@redwood/shad-ui/components/badge'
+import { Checkbox } from '@redwood/shad-ui/components/checkbox'
 
 const BadgeSelectableDemo = ({value}: {value: string}) => {
   const [selected, setSelected] = useState(false)

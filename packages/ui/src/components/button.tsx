@@ -1,5 +1,5 @@
 import { Slot } from "@radix-ui/react-slot";
-import { cn } from "@fullstack-template/shad-ui/lib/utils";
+import { cn } from "@redwood/shad-ui/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
 

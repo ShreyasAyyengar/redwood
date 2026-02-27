@@ -1,5 +1,5 @@
 {
-  "extends": "@fullstack-template/typescript-config/react-library.json",
+  "extends": "@redwood/typescript-config/react-library.json",
   "compilerOptions": {
     "outDir": "dist"
   },

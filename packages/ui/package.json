@@ -1,5 +1,5 @@
 {
-  "name": "@fullstack-template/shad-ui",
+  "name": "@redwood/shad-ui",
   "version": "0.0.0",
   "type": "module",
   "private": true,
@@ -34,7 +34,7 @@
     "@turbo/gen": "^2.5.5",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
-    "@fullstack-template/typescript-config": "workspace:*",
+    "@redwood/typescript-config": "workspace:*",
     "tailwindcss": "^4.1.11"
   },
   "exports": {

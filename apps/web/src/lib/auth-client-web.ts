@@ -1,5 +1,5 @@
 import { electronProxyClient } from "@better-auth/electron/proxy";
-import type { authServer } from "@fullstack-template/api/auth-server";
+import type { authServer } from "@redwood/api/auth-server";
 import { inferAdditionalFields } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { env } from "../env";
@@ -13,7 +13,7 @@ export const authClientWeb = createAuthClient({
     inferAdditionalFields<typeof authServer>(),
     electronProxyClient({
       protocol: {
-        scheme: "fullstack.template", // TODO
+        scheme: "redwood", // TODO
       },
     }),
   ],

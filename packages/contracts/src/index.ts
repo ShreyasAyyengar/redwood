@@ -1,2 +1,4 @@
-export * from "./http/http-contract";
-export * from "./ws/ws-contract";
+export * from "./classroom-contract";
+export * from "./http-contract";
+export * from "./maintenance-schema";
+export * from "./user-contract";

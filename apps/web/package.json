@@ -1,5 +1,5 @@
 {
-  "name": "@fullstack-template/web",
+  "name": "@redwood/web",
   "version": "0.1.0",
   "type": "module",
   "private": true,
@@ -11,9 +11,9 @@
   },
   "dependencies": {
     "@better-auth/electron": "v1.5.0-beta.13",
-    "@fullstack-template/api": "workspace:*",
-    "@fullstack-template/contracts": "workspace:*",
-    "@fullstack-template/shad-ui": "workspace:*",
+    "@redwood/api": "workspace:*",
+    "@redwood/contracts": "workspace:*",
+    "@redwood/shad-ui": "workspace:*",
     "@orpc/client": "^1.13.5",
     "@orpc/openapi": "^1.13.5",
     "@orpc/server": "^1.13.5",
@@ -31,7 +31,7 @@
     "zustand": "^5.0.11"
   },
   "devDependencies": {
-    "@fullstack-template/typescript-config": "workspace:*",
+    "@redwood/typescript-config": "workspace:*",
     "@types/node": "^22.19.11",
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",

@@ -3,7 +3,7 @@
 import * as React from "react"
 import * as SeparatorPrimitive from "@radix-ui/react-separator"
 
-import { cn } from "@fullstack-template/shad-ui/lib/utils"
+import { cn } from "@redwood/shad-ui/lib/utils"
 
 function Separator({
   className,

@@ -1,5 +1,5 @@
 {
-  "extends": "@fullstack-template/typescript-config/nextjs.json",
+  "extends": "@redwood/typescript-config/nextjs.json",
   "compilerOptions": {
     "plugins": [
       {

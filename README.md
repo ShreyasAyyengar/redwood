@@ -71,7 +71,7 @@ bun dev
 Or run a specific application:
 
 ```bash
-bun dev --filter=@fullstack-template/web
+bun dev --filter=@redwood/web
 ```
 
 ### Build

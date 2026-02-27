@@ -1,11 +1,11 @@
 "use client"
 
 import { CheckIcon, ChevronsUpDownIcon, XIcon } from "lucide-react"
-import { cn } from "@fullstack-template/shad-ui/lib/utils"
+import { cn } from "@redwood/shad-ui/lib/utils"
 import { type ComponentPropsWithoutRef, createContext, type ReactNode, useCallback, useContext, useEffect, useRef, useState, } from "react"
-import { Button } from "@fullstack-template/shad-ui/components/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@fullstack-template/shad-ui/components/popover";
-import { Badge } from "@fullstack-template/shad-ui/components/badge";
+import { Button } from "@redwood/shad-ui/components/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@redwood/shad-ui/components/popover";
+import { Badge } from "@redwood/shad-ui/components/badge";
 import {
   Command,
   CommandEmpty,
@@ -14,7 +14,7 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator
-} from "@fullstack-template/shad-ui/components/command";
+} from "@redwood/shad-ui/components/command";
 
 type MultiSelectContextType = {
   open: boolean

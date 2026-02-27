@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { XIcon } from 'lucide-react'
 
-import { Badge } from '@fullstack-template/shad-ui/components/badge'
+import { Badge } from '@redwood/shad-ui/components/badge'
 
 const BadgeClosableDemo = ({name, handleDelete}: {name: string, handleDelete: (hashtag: string) => void}) => {
   const [isActive, setIsActive] = useState(true)

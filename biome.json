@@ -58,6 +58,9 @@
         },
         "noForEach": "off"
       },
+      "performance": {
+        "noBarrelFile": "warn"
+      },
       "nursery": {
         "useConsistentArrowReturn": "warn",
         "useSortedClasses": "warn"

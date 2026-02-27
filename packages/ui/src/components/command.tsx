@@ -4,8 +4,8 @@ import * as React from "react"
 import { Command as CommandPrimitive } from "cmdk"
 import { SearchIcon } from "lucide-react"
 
-import { cn } from "@fullstack-template/shad-ui/lib/utils"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, } from "@fullstack-template/shad-ui/components/dialog"
+import { cn } from "@redwood/shad-ui/lib/utils"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, } from "@redwood/shad-ui/components/dialog"
 
 function Command({
   className,

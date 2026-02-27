@@ -1,5 +1,5 @@
-import { counterRouter } from "../core/counter-router";
+import { classroomRouter } from "../core/classroom-router";
 
 export const httpRouter = {
-  counter: counterRouter,
+  classrooms: classroomRouter,
 };

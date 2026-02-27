@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { cn } from "@fullstack-template/shad-ui/lib/utils"
+import { cn } from "@redwood/shad-ui/lib/utils"
 
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (

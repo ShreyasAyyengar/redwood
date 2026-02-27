@@ -1,8 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    // TODO<init> config
-    remotePatterns: [{ protocol: "https", hostname: "cdn.fullstack-template.app" }],
+    remotePatterns: [{ protocol: "https", hostname: "cdn.redwood.app" }],
   },
 };
 

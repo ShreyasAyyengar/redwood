@@ -1,5 +1,5 @@
 {
-  "name": "@fullstack-template/contracts",
+  "name": "@redwood/contracts",
   "type": "module",
   "devDependencies": {
     "@types/bun": "latest"
