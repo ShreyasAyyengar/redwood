@@ -1,9 +1,10 @@
 import { electron } from "@better-auth/electron";
 import { expo } from "@better-auth/expo";
-import { betterAuth } from "better-auth";
+import { APIError, betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { databaseConnection } from "../database/database";
 import { env } from "../env";
+import { hasCredentials } from "../util/user-util";
 
 const database = databaseConnection.getClient().db(env.DATABASE_NAME);
 
@@ -21,17 +22,13 @@ export const authServer = betterAuth({
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
       accessType: "offline",
-      mapProfileToUser: (profile) => {
-        // const email = profile.email;
-        // if (!email?.endsWith("@ucsc.edu")) {
-        //   // TODO emails must be whitelisted
-        //   const headers = new Headers();
-        //   headers.set("location", `${env.WEBSITE_URL}/auth/error?message=invalid_email`);
-        //   throw new APIError("FOUND", undefined, headers);
-        //   // status must be FOUND so that the redirect goes to WEBSITE_URL and not API_URL
-        // }
-
-        return profile;
+      mapProfileToUser: async (profile) => {
+        const email = profile.email;
+        if (await hasCredentials(email)) return profile;
+        const headers = new Headers();
+        headers.set("location", `${env.WEBSITE_URL}/auth/error`);
+        throw new APIError("FOUND", undefined, headers);
+        // status must be FOUND so that the redirect goes to WEBSITE_URL and not API_URL
       },
     },
   },
@@ -45,9 +42,8 @@ export const authServer = betterAuth({
       },
     },
   },
-  // THIS IS USELESS UNLESS BETTERAUTH CAN FIX THEIR ROUTING. IF WORKS, MOVE DOMAIN LOGIC TO mapProfileToUser
-  // onAPIError: {
-  //   errorURL: "http://localhost:3000/error",
-  //   throw: true,
-  // },
+  session: {
+    expiresIn: 60 * 60 * 4,
+    updateAge: 60 * 60 * 2,
+  },
 });

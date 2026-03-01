@@ -16,4 +16,4 @@ const UserSchemaMongoose = toMongooseSchema(
 
 export interface IUserSchemaMongoose extends z.infer<typeof UserSchemaMongooseZod> {}
 
-export const UserCollection = databaseConnection.model<IUserSchemaMongoose>("user", UserSchemaMongoose, "user");
+export const UserService = databaseConnection.model<IUserSchemaMongoose>("user", UserSchemaMongoose, "user");

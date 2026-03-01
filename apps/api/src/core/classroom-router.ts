@@ -1,9 +1,9 @@
-import { classroomContract, classroomSchema } from "@redwood/contracts";
+import { classroomSchema } from "@redwood/contracts";
 import { parse } from "csv-parse/sync";
 import { v7 as uuidv7 } from "uuid";
 import type { z } from "zod";
 import { ClassroomService } from "../database/classroom-service";
-import { publicProcedure } from "../libs/orpc-procedures";
+import { protectedProcedure, publicProcedure } from "../libs/orpc-procedures";
 import { emptySchedule, processTimeRanges, rowSchema } from "../util/csv-util";
 
 export const classroomRouter = {
@@ -61,6 +61,7 @@ export const classroomRouter = {
           schedule,
           openTasksCount: existingRoom?.openTasksCount ?? 0,
           lastMaintenance: existingRoom?.lastMaintenance,
+          roomStatus: existingRoom?.roomStatus ?? "GOOD",
           captioning: existingRoom?.captioning,
         };
 
@@ -104,7 +105,16 @@ export const classroomRouter = {
       throw INTERNAL_SERVER_ERROR({ message: e.toString() });
     }
   }),
-  getClassroom: classroomContract.getRoom,
-  addMaintenanceEntry: classroomContract.addMaintenanceEntry,
-  editMaintenanceEntry: classroomContract.editMaintenanceEntry,
+  getRooms: protectedProcedure.classrooms.getRooms.handler(async ({ errors: { INTERNAL_SERVER_ERROR } }) => {
+    try {
+      return await ClassroomService.find({ isActive: true });
+    } catch (e) {
+      console.error(e);
+      throw INTERNAL_SERVER_ERROR({
+        data: {
+          message: e.toString(),
+        },
+      });
+    }
+  }),
 };

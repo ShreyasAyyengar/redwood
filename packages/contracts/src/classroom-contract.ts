@@ -2,51 +2,34 @@ import { oc } from "@orpc/contract";
 import { z } from "zod";
 import { maintenanceEntrySchema } from "./maintenance-schema";
 
+const blockSchema = z
+  .object({
+    startTimeMin: z.number().int().min(0).max(1439),
+    endTimeMin: z.number().int().min(1).max(1440),
+  })
+  .refine((b) => b.endTimeMin > b.startTimeMin, { message: "endTimeMin must be > startTimeMin" });
+
+export const scheduleSchema = z.object({
+  monday: z.array(blockSchema),
+  tuesday: z.array(blockSchema),
+  wednesday: z.array(blockSchema),
+  thursday: z.array(blockSchema),
+  friday: z.array(blockSchema),
+});
+
 export const classroomSchema = z.object({
   _id: z.uuidv7(),
   sourceRoomName: z.string(),
   groupKey: z.string().default("Miscellaneous"),
   displayName: z.string(), // by default will be sourceRoomName
   number: z.string(),
-  isActive: z.boolean().default(true),
-  schedule: z
-    .object({
-      monday: z.array(
-        z.object({
-          startTime: z.string(),
-          endTime: z.string(),
-        })
-      ),
-      tuesday: z.array(
-        z.object({
-          startTime: z.string(),
-          endTime: z.string(),
-        })
-      ),
-      wednesday: z.array(
-        z.object({
-          startTime: z.string(),
-          endTime: z.string(),
-        })
-      ),
-      thursday: z.array(
-        z.object({
-          startTime: z.string(),
-          endTime: z.string(),
-        })
-      ),
-      friday: z.array(
-        z.object({
-          startTime: z.string(),
-          endTime: z.string(),
-        })
-      ),
-    })
-    .optional(),
+  schedule: scheduleSchema.optional(),
+
   openTasksCount: z.number(), // denormalized -> derived by updates by writes
+
   lastMaintenance: z
     .object({
-      date: z.date(),
+      date: z.coerce.date(),
       by: z.email(),
     })
     .optional(),
@@ -57,6 +40,9 @@ export const classroomSchema = z.object({
       ip: z.string(),
     })
     .optional(),
+  roomStatus: z.enum(["GOOD", "NEEDS ATTENTION", "NEEDS URGENT ATTENTION"]).default("GOOD"),
+
+  isActive: z.boolean().default(true),
 });
 
 export const classroomContract = {
@@ -86,6 +72,19 @@ export const classroomContract = {
           message: z.string(),
         }),
       },
+      INTERNAL_SERVER_ERROR: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+    }),
+
+  getRooms: oc
+    .route({
+      method: "GET",
+    })
+    .output(z.array(classroomSchema))
+    .errors({
       INTERNAL_SERVER_ERROR: {
         data: z.object({
           message: z.string(),

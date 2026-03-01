@@ -1,14 +1,11 @@
+import { basicUserSchema } from "@redwood/contracts";
 import { toMongooseSchema } from "mongoose-zod";
 import { z } from "zod";
 import { databaseConnection } from "./database";
 
-const basicUserSchema = z.object({
-  email: z.email(),
-  role: z.enum(["employee", "supervisor", "admin"]),
-});
-
 const configurationSchema = z.object({
   users: z.array(basicUserSchema),
+  roomGroups: z.array(z.string()),
 });
 
 const ConfigurationSchemaMongoose = toMongooseSchema(
@@ -22,7 +19,7 @@ const ConfigurationSchemaMongoose = toMongooseSchema(
 
 export interface IConfigurationSchemaMongoose extends z.infer<typeof configurationSchema> {}
 
-export const ConfigurationCollection = databaseConnection.model<IConfigurationSchemaMongoose>(
+export const ConfigService = databaseConnection.model<IConfigurationSchemaMongoose>(
   "configuration",
   ConfigurationSchemaMongoose,
   "configuration"

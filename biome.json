@@ -41,14 +41,21 @@
         "useBlockStatements": "off",
         "noMagicNumbers": "warn",
         "noUselessElse": "warn",
-        "noNegationElse": "off"
+        "noNegationElse": "off",
+        "useConsistentTypeDefinitions": {
+          "options": {
+            "style": "type"
+          },
+          "level": "warn"
+        },
+        "noNestedTernary": "off"
       },
       "suspicious": {
         "useAwait": "warn",
         "noConsole": "warn"
       },
       "complexity": {
-        "useSimplifiedLogicExpression": "warn",
+        "useSimplifiedLogicExpression": "off",
         "useOptionalChain": "warn",
         "noExcessiveCognitiveComplexity": {
           "options": {

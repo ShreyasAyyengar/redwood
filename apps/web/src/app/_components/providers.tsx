@@ -1,5 +1,6 @@
 "use client";
 
+import { TooltipProvider } from "@redwood/shad-ui/components/tooltip";
 import { isServer, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NuqsAdapter } from "nuqs/adapters/next";
 
@@ -27,7 +28,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <NuqsAdapter>{children}</NuqsAdapter>
+      <NuqsAdapter>
+        <TooltipProvider>{children}</TooltipProvider>
+      </NuqsAdapter>
     </QueryClientProvider>
   );
 }
