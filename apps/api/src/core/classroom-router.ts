@@ -42,28 +42,28 @@ export const classroomRouter = {
       for (const [roomName, rows] of Object.entries(uploadedRooms)) {
         const schedule = processTimeRanges(rows);
 
-        const numberMatch = roomName.match(/\d+$/);
-        const number = numberMatch ? numberMatch[0] : "";
-
-        const displayName = roomName.replace(/\s+(Clrm|Com|Acad|Engr)\s+/, " ").trim();
-
-        const groupKey = roomName.split(/\s+/)[0] || "Miscellaneous";
+        const groupKey = roomName.split(/\s+/)[0] || "Ungrouped";
 
         const existingRoom = existingByName.get(roomName);
 
-        const roomData: z.infer<typeof classroomSchema> = {
-          _id: existingRoom?._id ?? uuidv7(), // Keep existing ID or generate new
-          sourceRoomName: roomName,
-          groupKey,
-          displayName,
-          number,
-          isActive: true,
-          schedule,
-          openTasksCount: existingRoom?.openTasksCount ?? 0,
-          lastMaintenance: existingRoom?.lastMaintenance,
-          roomStatus: existingRoom?.roomStatus ?? "GOOD",
-          captioning: existingRoom?.captioning,
-        };
+        // if existingRoom exists, spread and only change schedule
+        const roomData: z.infer<typeof classroomSchema> = existingRoom
+          ? { ...existingRoom, schedule, isActive: true }
+          : {
+              _id: uuidv7(),
+              sourceRoomName: roomName,
+              displayName: roomName,
+              groupKey,
+              schedule,
+              openTasksCount: 0,
+              roomStatus: "GOOD" as const,
+              isActive: true,
+              attributes: {
+                touchPanel: false,
+                permanentSeating: false,
+                lecturnFan: false,
+              },
+            };
 
         // Validate against schema
         const validatedRoom = classroomSchema.parse(roomData);
@@ -94,15 +94,12 @@ export const classroomRouter = {
         },
       }));
 
-      if (ops.length > 0) {
-        const result = await ClassroomService.bulkWrite(ops, { ordered: false });
-        console.log("Bulk write completed:", result);
-      }
+      if (ops.length > 0) await ClassroomService.bulkWrite(ops, { ordered: false });
 
       return true;
     } catch (e) {
       console.error(e);
-      throw INTERNAL_SERVER_ERROR({ message: e.toString() });
+      throw INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
     }
   }),
   getRooms: protectedProcedure.classrooms.getRooms.handler(async ({ errors: { INTERNAL_SERVER_ERROR } }) => {
@@ -110,11 +107,9 @@ export const classroomRouter = {
       return await ClassroomService.find({ isActive: true });
     } catch (e) {
       console.error(e);
-      throw INTERNAL_SERVER_ERROR({
-        data: {
-          message: e.toString(),
-        },
-      });
+      throw INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
     }
   }),
+
+  // addMockData: adminProcedure.classrooms.addMockData.handler(async ({ errors: { INTERNAL_SERVER_ERROR } }) => {}),
 };

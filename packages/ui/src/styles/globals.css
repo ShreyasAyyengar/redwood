@@ -142,7 +142,6 @@
   --color-primary-800: var(--primary-800);
   --color-primary-900: var(--primary-900);
   --color-primary-950: var(--primary-950);
-  --color-primary-foreground: var(--primary-foreground);
 
   --color-secondary: var(--secondary);
   --color-secondary-50: var(--secondary-50);
@@ -156,7 +155,6 @@
   --color-secondary-800: var(--secondary-800);
   --color-secondary-900: var(--secondary-900);
   --color-secondary-950: var(--secondary-950);
-  --color-secondary-foreground: var(--secondary-foreground);
 
   --color-accent: var(--accent);
   --color-accent-50: var(--accent-50);

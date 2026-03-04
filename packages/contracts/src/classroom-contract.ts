@@ -1,6 +1,5 @@
 import { oc } from "@orpc/contract";
 import { z } from "zod";
-import { maintenanceEntrySchema } from "./maintenance-schema";
 
 const blockSchema = z
   .object({
@@ -15,34 +14,43 @@ export const scheduleSchema = z.object({
   wednesday: z.array(blockSchema),
   thursday: z.array(blockSchema),
   friday: z.array(blockSchema),
+  saturday: z.array(blockSchema),
+  sunday: z.array(blockSchema),
 });
 
 export const classroomSchema = z.object({
   _id: z.uuidv7(),
   sourceRoomName: z.string(),
-  groupKey: z.string().default("Miscellaneous"),
   displayName: z.string(), // by default will be sourceRoomName
-  number: z.string(),
+  groupKey: z.string().default("Ungrouped"),
   schedule: scheduleSchema.optional(),
-
-  openTasksCount: z.number(), // denormalized -> derived by updates by writes
-
   lastMaintenance: z
     .object({
       date: z.coerce.date(),
       by: z.email(),
     })
     .optional(),
-  captioning: z
-    .object({
-      type: z.enum(["DTEN", "MAC"]),
-      name: z.string(),
-      ip: z.string(),
-    })
-    .optional(),
   roomStatus: z.enum(["GOOD", "NEEDS ATTENTION", "NEEDS URGENT ATTENTION"]).default("GOOD"),
-
+  openTasksCount: z.number(), // denormalized -> derived by updates from writes
   isActive: z.boolean().default(true),
+  attributes: z
+    .object({
+      captioning: z
+        .object({
+          type: z.enum(["DTEN", "MAC"]),
+          name: z.string(),
+          ip: z.string(),
+        })
+        .optional(),
+      touchPanel: z.boolean(),
+      permanentSeating: z.boolean(),
+      lecturnFan: z.boolean(),
+    })
+    .default({
+      touchPanel: false,
+      permanentSeating: false,
+      lecturnFan: false,
+    }),
 });
 
 export const classroomContract = {
@@ -85,60 +93,6 @@ export const classroomContract = {
     })
     .output(z.array(classroomSchema))
     .errors({
-      INTERNAL_SERVER_ERROR: {
-        data: z.object({
-          message: z.string(),
-        }),
-      },
-    }),
-
-  addMaintenanceEntry: oc
-    .route({
-      method: "POST",
-    })
-    .input(
-      z.object({
-        classroomId: classroomSchema.shape._id,
-        maintenanceEntry: maintenanceEntrySchema,
-      })
-    )
-    .output(z.boolean())
-    .errors({
-      NOT_FOUND: {
-        data: z.object({
-          message: z.string(),
-        }),
-      },
-      INTERNAL_SERVER_ERROR: {
-        data: z.object({
-          message: z.string(),
-        }),
-      },
-    }),
-
-  editMaintenanceEntry: oc
-    .route({
-      method: "PUT",
-    })
-    .input(
-      z.object({
-        maintenanceEntryId: maintenanceEntrySchema.shape.id,
-        maintenanceEntry: maintenanceEntrySchema,
-      })
-    )
-    .output(z.boolean())
-    .errors({
-      FORBIDDEN: {
-        // TODO in router, if not original email and not admin
-        data: z.object({
-          message: z.string(),
-        }),
-      },
-      NOT_FOUND: {
-        data: z.object({
-          message: z.string(),
-        }),
-      },
       INTERNAL_SERVER_ERROR: {
         data: z.object({
           message: z.string(),

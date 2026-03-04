@@ -1,6 +1,6 @@
 import type { classroomSchema } from "@redwood/contracts";
 import type { Column } from "@tanstack/react-table";
-import { Info, SlidersHorizontal, ThumbsUp, TriangleAlert } from "lucide-react";
+import { SlidersHorizontal, ThumbsUp, TriangleAlert } from "lucide-react";
 import type { z } from "zod";
 
 // TODO figure out what <any> can be replaced with
@@ -28,13 +28,12 @@ export default function StatusHeader({ column }: { column: Column<z.infer<typeof
           }
         }}
       >
-        <Info className="mr-2 h-6 w-6" />
         <p className="text-lg">Status</p>
         {column.getIsSorted() ? (
           column.getIsSorted() === "asc" ? (
             <TriangleAlert className="ml-2 h-6 w-6 text-red-500" />
           ) : (
-            <ThumbsUp className="ml-2 h-6 w-6 text-green-500" />
+            <ThumbsUp className="ml-2 h-6 w-6" />
           )
         ) : (
           <SlidersHorizontal className="ml-2 h-6 w-6 rotate-90" />

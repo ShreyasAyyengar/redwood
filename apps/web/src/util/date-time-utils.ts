@@ -1,11 +1,27 @@
 import type { scheduleSchema } from "@redwood/contracts";
 import type { z } from "zod";
 
+export const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+export const nth = (d: number) => {
+  if (d > 3 && d < 21) return "th";
+  switch (d % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+};
+
 const WEEKDAY_KEYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
 type WeekdayKey = (typeof WEEKDAY_KEYS)[number];
 
 export function getCaliClock() {
-  const now = new Date(2026, 1, 26, 16, 0);
+  const now = new Date();
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "America/Los_Angeles",
     weekday: "long",
@@ -57,10 +73,6 @@ export function dayAvailability(blocks: Block[], nowMinTime: number): DayAvailab
 }
 
 export function getBlocksForToday(schedule: z.infer<typeof scheduleSchema>, weekdayKey: WeekdayKey): Block[] {
-  // TODO don't know how weekend availability is handled - all classrooms are open from 7:00 AM to 11:00 PM on sat/sun
-  if (weekdayKey === "saturday" || weekdayKey === "sunday") {
-    return [{ startTimeMin: 7 * 60, endTimeMin: 23 * 60 }]; // 7:00 AM - 11:00 PM
-  }
   return schedule?.[weekdayKey] ?? [];
 }
 

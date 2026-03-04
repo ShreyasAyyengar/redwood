@@ -2,27 +2,12 @@ import type { classroomSchema } from "@redwood/contracts";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import type { Row } from "@tanstack/react-table";
 import type { z } from "zod";
-
-const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const endings = ["st", "nd", "rd", "th"];
-
-const nth = (d: number) => {
-  if (d > 3 && d < 21) return "th";
-  switch (d % 10) {
-    case 1:
-      return "st";
-    case 2:
-      return "nd";
-    case 3:
-      return "rd";
-    default:
-      return "th";
-  }
-};
+import { monthNames, nth } from "../../../../util/date-time-utils";
+import { urgencyStyle } from "../../../../util/style-util";
 
 export default function LastServicedCell({ row }: { row: Row<z.infer<typeof classroomSchema>> }) {
   const lastMaintenance = row.original.lastMaintenance;
-  if (!lastMaintenance) return <div className="text-center text-indigo-400 text-lg">No Record Yet</div>;
+  if (!lastMaintenance) return <div className="text-center text-foreground text-lg">No Record Yet</div>;
 
   const date = new Date(lastMaintenance.date);
 
@@ -35,19 +20,27 @@ export default function LastServicedCell({ row }: { row: Row<z.infer<typeof clas
 
   return (
     <div className="flex flex-col">
+      <div className="mt-1 flex items-center justify-center">
+        <span
+          className={cn(
+            "rounded-full px-2 py-0.5 text-lg",
+            // daysAgo <= 14 && "bg-[#2b462f] text-[#B4F7AB]",
+            // daysAgo > 14 && daysAgo <= 30 && "bg-[#463a2b] text-[#FCD34D]",
+            // daysAgo > 21 && "bg-[#5a1f24] text-[#FCA5A5]"
+            daysAgo <= 14 && urgencyStyle("green"),
+            daysAgo > 14 && daysAgo <= 21 && urgencyStyle("orange"),
+            daysAgo > 21 && urgencyStyle("red")
+          )}
+        >
+          {`${daysAgo} day${daysAgo === 1 ? "" : "s"} ago • ${daysAgo <= 14 ? "Up to Date" : daysAgo <= 21 ? "Pending" : "Overdue"}`}
+        </span>
+      </div>
+
       <div
         // under 14, green, between 14 and 21, orange, over 21, red
-        className={cn("text-center text-lg")}
+        className={cn("mt-1 text-center")}
       >
         {`${monthName} ${day}${dayEnding} ${daysAgo > 0 ? `• ${lastMaintenance.by.split("@")[0]}` : ""}`}
-      </div>
-      <div className="mt-2 flex items-center justify-center gap-1">
-        <div className="text-center text-neutral-400 text-sm">{daysAgo} days ago •</div>
-        <div className="text-center text-neutral-400 text-sm">
-          {daysAgo <= 14 && <span className="text rounded-full bg-[#2b462f] px-2 py-0.5 text-foreground">Up to Date</span>}
-          {daysAgo > 14 && daysAgo <= 21 && <span className="text rounded-full bg-[#5a442e] px-2 py-0.5 text-foreground">Needs Attention</span>}
-          {daysAgo > 21 && <span className="text rounded-full bg-[#6A242A] px-2 py-0.5 text-foreground">Overdue</span>}
-        </div>
       </div>
     </div>
   );

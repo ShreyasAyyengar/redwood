@@ -3,7 +3,7 @@
 import type { classroomSchema } from "@redwood/contracts";
 import { type ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import type { z } from "zod";
-import { dayAvailability, getBlocksForToday, getCaliClock, toSortKey } from "../../../util/util";
+import { dayAvailability, getBlocksForToday, getCaliClock, toSortKey } from "../../../util/date-time-utils";
 import AvailabilityCell from "./availability/availability-cell";
 import AvailabilityHeader from "./availability/availability-header";
 import LastServicedCell from "./last-serviced/last-serviced-cell";
@@ -24,10 +24,31 @@ const statusOrder: Record<string, number> = {
 const columnHelper = createColumnHelper<z.infer<typeof classroomSchema>>();
 // TODO find better type for `any`
 export const columns: ColumnDef<z.infer<typeof classroomSchema>, any>[] = [
+  columnHelper.accessor("roomStatus", {
+    header: ({ column }) => <StatusHeader column={column} />,
+    cell: ({ row }) => <StatusCell row={row} />,
+    // biome-ignore lint/style/noNonNullAssertion: everything is strongly typed
+    sortingFn: (rowA, rowB) => statusOrder[rowA.original.roomStatus]! - statusOrder[rowB.original.roomStatus]!,
+  }),
+
   columnHelper.accessor("displayName", {
     header: ({ column }) => <NameHeader column={column} />,
     cell: ({ row }) => <NameCell row={row} />,
     sortingFn: (rowA, rowB) => rowA.original.displayName.localeCompare(rowB.original.displayName),
+  }),
+
+  columnHelper.accessor("lastMaintenance", {
+    header: ({ column }) => <LastServicedHeader column={column} />,
+    cell: ({ row }) => <LastServicedCell row={row} />,
+    sortingFn: (rowA, rowB) => {
+      // prioritise rows with undefined lastMaintenance
+      const a = rowA.original.lastMaintenance?.date;
+      const b = rowB.original.lastMaintenance?.date;
+      if (!a && !b) return 0;
+      if (!a) return 1;
+      if (!b) return -1;
+      return new Date(a).getTime() - new Date(b).getTime();
+    },
   }),
 
   columnHelper.accessor("schedule", {
@@ -47,26 +68,6 @@ export const columns: ColumnDef<z.infer<typeof classroomSchema>, any>[] = [
       if (aKey.time !== bKey.time) return aKey.time - bKey.time;
       return rowA.original.displayName.localeCompare(rowB.original.displayName);
     },
-  }),
-
-  columnHelper.accessor("lastMaintenance", {
-    header: ({ column }) => <LastServicedHeader column={column} />,
-    cell: ({ row }) => <LastServicedCell row={row} />,
-    sortingFn: (rowA, rowB) => {
-      const a = rowA.original.lastMaintenance?.date;
-      const b = rowB.original.lastMaintenance?.date;
-      if (!a && !b) return 0;
-      if (!a) return 1;
-      if (!b) return -1;
-      return a.getTime() - b.getTime();
-    },
-  }),
-
-  columnHelper.accessor("roomStatus", {
-    header: ({ column }) => <StatusHeader column={column} />,
-    cell: ({ row }) => <StatusCell row={row} />,
-    // biome-ignore lint/style/noNonNullAssertion: everything is strongly typed
-    sortingFn: (rowA, rowB) => statusOrder[rowA.original.roomStatus]! - statusOrder[rowB.original.roomStatus]!,
   }),
 
   columnHelper.accessor("openTasksCount", {

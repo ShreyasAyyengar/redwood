@@ -1,4 +1,9 @@
-# Fullstack Monorepo Template
+# Redwood Classroom Maintenance Management
+
+### Before Deployment
+- Optimise Google OAuth configuration for production
+- Database migrations for production
+- Database and Cloudflare R2 setup for production
 
 A comprehensive, high-performance fullstack monorepo template powered by **Bun**, **Turborepo**, and **oRPC**. This project provides a unified architecture for building Web, Desktop (Electron), and Mobile (Expo) applications with a shared backend and type-safe contracts.
 

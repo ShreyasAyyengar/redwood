@@ -1,0 +1,114 @@
+import type { classroomSchema } from "@redwood/contracts";
+import { cn } from "@redwood/shad-ui/lib/utils";
+import { Bug, Building2, CalendarCheck2, ClipboardList, Info, Wrench } from "lucide-react";
+import type { z } from "zod";
+import { monthNames, nth } from "../../../../util/date-time-utils";
+import { urgencyStyle } from "../../../../util/style-util";
+
+export default function RoomSummary({
+  room,
+  issueCount,
+  taskCount,
+}: {
+  room: z.infer<typeof classroomSchema>;
+  issueCount: number;
+  taskCount: number;
+}) {
+  let lastServiced: string | undefined;
+  let lastServicedDaysAgo: number | undefined;
+  if (room.lastMaintenance) {
+    const date = new Date(room.lastMaintenance.date);
+    const monthName = monthNames[date.getMonth()];
+    const day = date.getDate();
+    const dayEnding = nth(day);
+    lastServiced = `${monthName} ${day}${dayEnding}`;
+    lastServicedDaysAgo = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+  }
+
+  const roomStateBadge = (
+    <div
+      className={cn(
+        "rounded-2xl px-2 text-center font-bold font-mono text-sm",
+        room.roomStatus === "GOOD" && urgencyStyle("green"),
+        room.roomStatus === "NEEDS ATTENTION" && urgencyStyle("orange"),
+        room.roomStatus === "NEEDS URGENT ATTENTION" && urgencyStyle("red")
+      )}
+    >
+      {room.roomStatus}
+    </div>
+  );
+
+  return (
+    <div
+      className={cn(
+        "flex h-auto flex-col rounded-2xl rounded-r-none p-5 font-bold text-3xl text-zinc-300/80",
+        room.roomStatus === "GOOD" && "bg-green-500/10 shadow-green-500/70",
+        room.roomStatus === "NEEDS ATTENTION" && "bg-yellow-500/10 shadow-yellow-500/70",
+        room.roomStatus === "NEEDS URGENT ATTENTION" && "bg-red-500/10 shadow-red-500/70"
+      )}
+    >
+      {room.displayName}
+
+      <div className="flex items-center gap-2">
+        <Building2 className="h-5 w-5" />
+        <div className="mt-2 flex flex-col">
+          <div className="flex items-center font-bold text-neutral-400 text-sm">Building Group</div>
+          <div className="flex items-center font-normal text-sm text-white/80">{room.groupKey}</div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Wrench className="h-5 w-5" />
+        <div className="mt-2 flex flex-col">
+          <div className="flex items-center font-bold text-neutral-400 text-sm">Last Serviced</div>
+          <div className="flex items-center font-normal text-sm text-white/80">
+            <div className="flex gap-1">
+              {lastServiced &&
+                `${lastServiced} ${lastServicedDaysAgo && `• ${lastServicedDaysAgo} day${lastServicedDaysAgo === 1 ? "" : "s"} ago`}`}
+              {!lastServiced && "No Record Yet"}
+              {lastServiced && <div className="flex items-center text-sm">• {room.lastMaintenance?.by.split("@")[0]}</div>}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-2 flex items-center gap-2">
+        <Info className="h-5 w-5" />
+        <div className="flex gap-2">
+          <div className="flex font-bold text-neutral-400 text-sm">Classroom Status</div>
+          <div className="flex font-normal text-sm text-white/80">{roomStateBadge}</div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Bug className="h-5 w-5" />
+        <div className="mt-2 flex flex-col">
+          <div className="flex items-center font-bold text-neutral-400 text-sm">Active Issues</div>
+          <div className="flex items-center font-normal text-sm text-white/80">
+            {issueCount} issue{issueCount !== 1 ? "s" : ""}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <ClipboardList className="h-5 w-5" />
+        <div className="mt-2 flex flex-col">
+          <div className="flex items-center font-bold text-neutral-400 text-sm">Open Tasks</div>
+          <div className="flex items-center font-normal text-sm text-white/80">
+            {taskCount} task{taskCount !== 1 ? "s" : ""}
+          </div>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        className="mt-5 flex w-fit cursor-pointer items-center gap-2 font-normal text-base text-neutral-400 transition-colors hover:text-neutral-200"
+      >
+        <span className="font-normal text-sm">See Room Availability</span>
+        <CalendarCheck2 className="h-5 w-5" />
+      </button>
+
+      {/* TODO: open dialog */}
+    </div>
+  );
+}

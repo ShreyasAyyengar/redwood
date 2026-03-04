@@ -7,6 +7,8 @@ const weekdayMap = {
   Wednesday: "wednesday",
   Thursday: "thursday",
   Friday: "friday",
+  Saturday: "saturday",
+  Sunday: "sunday",
 } as const;
 
 type WeekdayIn = keyof typeof weekdayMap;
@@ -20,12 +22,14 @@ export function emptySchedule(): WeeklySchedule {
     wednesday: [],
     thursday: [],
     friday: [],
+    saturday: [],
+    sunday: [],
   };
 }
 
 export const rowSchema = z.object({
   Room: z.string().min(1),
-  Weekday: z.enum(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]),
+  Weekday: z.enum(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]),
   Start_Time: z.string(),
   End_Time: z.string(),
 });
