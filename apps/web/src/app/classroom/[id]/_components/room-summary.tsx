@@ -100,6 +100,21 @@ export default function RoomSummary({
         </div>
       </div>
 
+      <div
+        className="mt-5 flex w-fit items-center self-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg transition-all duration-150 hover:bg-neutral-400 active:scale-95 active:transform"
+        onClick={() => alert("Perform Maintenance")}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            e.stopPropagation();
+            alert("Perform Maintenance");
+          }
+        }}
+      >
+        <Wrench className="mr-2 h-5 w-5" />
+        Perform Maintenance
+      </div>
+
       {/* TODO: open dialog */}
     </div>
   );
