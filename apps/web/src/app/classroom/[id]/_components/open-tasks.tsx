@@ -79,10 +79,10 @@ export default function OpenTasks({ tasks }: { tasks?: z.infer<typeof taskSchema
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3 text-xs text-zinc-500">
-                        <span>Reported 5 days ago</span>
+                      <div className="flex items-center gap-1 text-xs text-zinc-500">
+                        <span>Created 5 days ago</span>
                         <span className="text-zinc-700">•</span>
-                        <span>by {task.task.createdBy}</span>
+                        <span>by {task.task.createdBy.split("@")[0]}</span>
                       </div>
                     </div>
                   </div>

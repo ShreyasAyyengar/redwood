@@ -71,10 +71,10 @@ export default function ActiveIssues({ issues }: { issues?: z.infer<typeof issue
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 text-xs text-zinc-500">
+                    <div className="flex items-center gap-1 text-xs text-zinc-500">
                       <span>Reported 5 days ago</span>
                       <span className="text-zinc-700">•</span>
-                      <span>by {issue.issue.reportedBy}</span>
+                      <span>by {issue.issue.reportedBy.split("@")[0]}</span>
                     </div>
                   </div>
                 </div>
