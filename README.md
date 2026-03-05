@@ -4,6 +4,7 @@
 - Optimise Google OAuth configuration for production
 - Database migrations for production
 - Database and Cloudflare R2 setup for production
+- Add PPDO numbers to each classroom
 
 A comprehensive, high-performance fullstack monorepo template powered by **Bun**, **Turborepo**, and **oRPC**. This project provides a unified architecture for building Web, Desktop (Electron), and Mobile (Expo) applications with a shared backend and type-safe contracts.
 
