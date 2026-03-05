@@ -3,7 +3,8 @@ import { Checkbox } from "@redwood/shad-ui/components/checkbox";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@redwood/shad-ui/components/tabs";
 import { cn } from "@redwood/shad-ui/lib/utils";
-import { useState } from "react";
+import { CalendarClock } from "lucide-react";
+import { useEffect, useState } from "react";
 import type { z } from "zod";
 import { convertMinutesToReadable } from "../../../../util/date-time-utils";
 
@@ -13,6 +14,16 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
   // get short break preference from local storage
   const storedOmitShortBreaks = localStorage.getItem("omittingShortBreaks");
   const [omitShortBreaks, setOmitShortBreaks] = useState(storedOmitShortBreaks === "true" || false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update current time every minute to keep the UI fresh
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60_000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, []);
 
   const dayToday = new Date().getDay();
   const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
@@ -29,10 +40,49 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
     return m === 0 ? `${h}h` : `${h}h ${m}m`;
   };
 
+  // Helper to get current time in minutes since midnight
+  const getCurrentMinutes = () => {
+    const now = currentTime;
+    return now.getHours() * 60 + now.getMinutes();
+  };
+
+  // Determine block status
+  const getBlockStatus = (day: string, startMin: number, endMin: number) => {
+    const currentDayIndex = currentTime.getDay();
+    const blockDayIndex = dayNames.indexOf(day as any);
+
+    // Only check time status if it's today
+    if (currentDayIndex !== blockDayIndex) {
+      return "future";
+    }
+
+    const currentMinutes = getCurrentMinutes();
+
+    // Block is happening right now
+    if (currentMinutes >= startMin && currentMinutes < endMin) {
+      return "current";
+    }
+
+    // Block is coming up in the next 15 minutes
+    if (currentMinutes < startMin && startMin - currentMinutes <= 15) {
+      return "upcoming";
+    }
+
+    // Block has already passed
+    if (currentMinutes >= endMin) {
+      return "past";
+    }
+
+    return "future";
+  };
+
   // TODO add scroll indicator for availability
   return (
-    <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/80 sm:text-2xl">
-      <div>Availability</div>
+    <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/80 sm:text-2xl">
+      <div className="flex items-center">
+        <CalendarClock className="mr-2 h-6 w-6" />
+        <div>Availability</div>
+      </div>
 
       <Tabs defaultValue={todayName} orientation="vertical" className="mt-3 flex min-h-0 flex-1 gap-4">
         {/* Left rail */}
@@ -118,26 +168,89 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
                             const duration = omitShortBreaks && end - start < 60 ? 0 : end - start;
                             if (duration < SHORT_BREAK_MINUTES) return null;
 
+                            const status = getBlockStatus(day, start, end);
+                            const isPast = status === "past";
+                            const isCurrent = status === "current";
+                            const isUpcoming = status === "upcoming";
+                            const isActive = isCurrent || isUpcoming;
+
                             return (
                               <div
                                 key={id}
                                 className={cn(
-                                  "group relative overflow-hidden rounded-lg border border-white/5 bg-zinc-800/40 px-3 py-2",
-                                  "transition hover:border-white/10 hover:bg-zinc-900/60"
+                                  "group relative overflow-hidden rounded-lg border px-3 py-2",
+                                  "transition",
+                                  // Past blocks - greyed out
+                                  isPast && "border-zinc-800/50 bg-zinc-900/20 opacity-50",
+                                  // Current/upcoming blocks - highlighted with shimmy animation
+                                  isActive && "animate-shimmy border-emerald-500/40 bg-emerald-950/30",
+                                  // Future blocks - normal
+                                  !isPast && !isActive && "border-white/5 bg-zinc-800/40 hover:border-white/10 hover:bg-zinc-900/60"
                                 )}
                               >
-                                <div className="absolute inset-y-0 left-0 w-1 bg-white/10 group-hover:bg-white/15" />
+                                {/* Left accent bar */}
+                                <div
+                                  className={cn(
+                                    "absolute inset-y-0 left-0 w-1",
+                                    isPast && "bg-zinc-700/30",
+                                    isActive && "animate-pulse bg-emerald-500/70",
+                                    !isPast && !isActive && "bg-white/10 group-hover:bg-white/15"
+                                  )}
+                                />
 
                                 <div className="flex items-center justify-between gap-3 pl-2">
                                   <div className="flex items-center gap-2">
-                                    <span className="font-mono text-sm text-zinc-100/90">{convertMinutesToReadable(start)}</span>
-                                    <span className="text-zinc-500">→</span>
-                                    <span className="font-mono text-sm text-zinc-100/90">{convertMinutesToReadable(end)}</span>
+                                    <span
+                                      className={cn(
+                                        "text-lg",
+                                        isPast && "text-zinc-500/70",
+                                        isActive && "font-bold text-emerald-100",
+                                        !isPast && !isActive && "text-zinc-100/90"
+                                      )}
+                                    >
+                                      {convertMinutesToReadable(start)}
+                                    </span>
+                                    <span
+                                      className={cn(
+                                        isPast && "text-zinc-600/50",
+                                        isActive && "text-emerald-400",
+                                        !isPast && !isActive && "text-zinc-500"
+                                      )}
+                                    >
+                                      →
+                                    </span>
+                                    <span
+                                      className={cn(
+                                        "text-lg",
+                                        isPast && "text-zinc-500/70",
+                                        isActive && "font-bold text-emerald-100",
+                                        !isPast && !isActive && "text-zinc-100/90"
+                                      )}
+                                    >
+                                      {convertMinutesToReadable(end)}
+                                    </span>
                                   </div>
 
-                                  <span className="rounded-md bg-white/5 px-2 py-0.5 font-mono text-xs text-zinc-300/80">
-                                    {durationLabel(start, end)}
-                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    {/* Status badge for current/upcoming */}
+                                    {isCurrent && (
+                                      <span className="rounded-md bg-emerald-500/20 px-2 py-0.5 font-bold text-emerald-300 text-xs">NOW</span>
+                                    )}
+                                    {isUpcoming && (
+                                      <span className="rounded-md bg-amber-500/20 px-2 py-0.5 font-bold text-amber-300 text-xs">SOON</span>
+                                    )}
+
+                                    <span
+                                      className={cn(
+                                        "rounded-md px-2 py-0.5 font-mono text-xs",
+                                        isPast && "bg-zinc-800/30 text-zinc-500/70",
+                                        isActive && "bg-emerald-500/15 text-emerald-300",
+                                        !isPast && !isActive && "bg-white/5 text-zinc-300/80"
+                                      )}
+                                    >
+                                      {durationLabel(start, end)}
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
                             );
@@ -152,6 +265,55 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
           })}
         </div>
       </Tabs>
+
+      {/* Add shimmy animation styles */}
+      <style jsx>{`
+          @keyframes shimmy {
+              0%, 100% {
+                  transform: translateX(0);
+              }
+
+              10% {
+                  transform: translateX(-1px);
+              }
+
+              20% {
+                  transform: translateX(-2px);
+              }
+
+              30% {
+                  transform: translateX(-3px);
+              }
+
+              40% {
+                  transform: translateX(-2px);
+              }
+
+              50% {
+                  transform: translateX(0);
+              }
+
+              60% {
+                  transform: translateX(2px);
+              }
+
+              70% {
+                  transform: translateX(3px);
+              }
+
+              80% {
+                  transform: translateX(2px);
+              }
+
+              90% {
+                  transform: translateX(1px);
+              }
+          }
+        
+        .animate-shimmy {
+          animation: shimmy 1s linear infinite;
+        }
+      `}</style>
     </div>
   );
 }
