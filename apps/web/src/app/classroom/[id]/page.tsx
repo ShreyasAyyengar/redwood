@@ -7,7 +7,10 @@ import { useEffect, useState } from "react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../lib/orpc-web-client";
 import { useFetchedRoomsStore } from "../../_components/room-store";
+import ActiveIssues from "./_components/active-issues";
 import Availability from "./_components/availability";
+import MaintenanceHistory from "./_components/maintenance-history";
+import OpenTasks from "./_components/open-tasks";
 import RoomSummary from "./_components/room-summary";
 
 export default function RoomPage() {
@@ -46,22 +49,24 @@ export default function RoomPage() {
   if (!room) return <div>Room not found</div>;
 
   return (
-    <div className="mt-20 mr-30 ml-30 flex h-[40dvh] rounded-2xl border border-zinc-600">
-      <RoomSummary room={room} issueCount={issues?.length ?? 0} taskCount={tasks?.length ?? 0} />
-      <Availability room={room} />
-      {/*<MaintenanceHistory history={maintenanceHistory} />*/}
-
-      {/*<div className="1 grid min-h-0 grid-cols-1 gap-5 lg:grid-cols-12">*/}
-      {/*  /!* Room summary *!/*/}
-      {/*  <div className="0 flex min-h-0 w-auto flex-col gap-5 border border-red-500 lg:col-span-5">*/}
-      {/*    <RoomSummary room={room} />*/}
-      {/*    <ActiveIssues issues={issues} />*/}
-      {/*    <MaintenanceHistory history={maintenanceHistory} />*/}
-      {/*  </div>*/}
-
-      {/*  /!* Right column stack (desktop) / below (mobile) *!/*/}
-      {/*  <div className="flex min-h-0 flex-col gap-5 lg:col-span-5" />*/}
-      {/*</div>*/}
+    <div className="mt-10 mr-30 ml-30">
+      <div className="flex flex-col rounded-2xl shadow-xl/80">
+        <div className="flex h-[40dvh] w-full">
+          <RoomSummary
+            room={room}
+            issueCount={issues?.filter((issue) => !issue.resolution).length ?? 0}
+            taskCount={tasks?.filter((task) => !task.completion).length ?? 0}
+          />
+          <div className="flex w-1/2">
+            <Availability room={room} />
+          </div>
+          <MaintenanceHistory history={maintenanceHistory} />
+        </div>
+      </div>
+      <div className="mt-10 flex h-[50dvh] gap-10">
+        <ActiveIssues issues={issues} />
+        <OpenTasks tasks={tasks} />
+      </div>
     </div>
   );
 }

@@ -7,7 +7,7 @@ export function urgencyStyle(style: "red" | "orange" | "green" | "purple"): stri
     case "green":
       return "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border-emerald-500/30 transition-all duration-100";
     case "purple":
-      return "bg-purple-500/20 text-purple-400 border-purple-500/30 transition-all duration-100";
+      return "bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 border-purple-500/30 transition-all duration-100";
     default:
       return "";
   }

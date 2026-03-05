@@ -1,6 +1,6 @@
 import type { classroomSchema } from "@redwood/contracts";
 import { cn } from "@redwood/shad-ui/lib/utils";
-import { Bug, Building2, CalendarCheck2, ClipboardList, Info, Wrench } from "lucide-react";
+import { Bug, Building2, ClipboardList, Info, Wrench } from "lucide-react";
 import type { z } from "zod";
 import { monthNames, nth } from "../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../util/style-util";
@@ -99,14 +99,6 @@ export default function RoomSummary({
           </div>
         </div>
       </div>
-
-      <button
-        type="button"
-        className="mt-5 flex w-fit cursor-pointer items-center gap-2 font-normal text-base text-neutral-400 transition-colors hover:text-neutral-200"
-      >
-        <span className="font-normal text-sm">See Room Availability</span>
-        <CalendarCheck2 className="h-5 w-5" />
-      </button>
 
       {/* TODO: open dialog */}
     </div>

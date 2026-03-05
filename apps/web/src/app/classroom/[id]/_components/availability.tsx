@@ -3,10 +3,17 @@ import { Checkbox } from "@redwood/shad-ui/components/checkbox";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@redwood/shad-ui/components/tabs";
 import { cn } from "@redwood/shad-ui/lib/utils";
+import { useState } from "react";
 import type { z } from "zod";
 import { convertMinutesToReadable } from "../../../../util/date-time-utils";
 
+const SHORT_BREAK_MINUTES = 15;
+
 export default function Availability({ room }: { room: z.infer<typeof classroomSchema> }) {
+  // get short break preference from local storage
+  const storedOmitShortBreaks = localStorage.getItem("omittingShortBreaks");
+  const [omitShortBreaks, setOmitShortBreaks] = useState(storedOmitShortBreaks === "true" || false);
+
   const dayToday = new Date().getDay();
   const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
   const todayName = dayNames[dayToday];
@@ -22,8 +29,9 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
     return m === 0 ? `${h}h` : `${h}h ${m}m`;
   };
 
+  // TODO add scroll indicator for availability
   return (
-    <div className="flex flex-1 flex-col overflow-hidden rounded-2xl rounded-l-none border border-zinc-800 bg-zinc-900/50 p-5 font-bold text-xl text-zinc-300/80 sm:text-2xl">
+    <div className="flex flex-1 flex-col overflow-hidden border border-zinc-800 bg-zinc-900/50 p-5 font-bold text-xl text-zinc-300/80 sm:text-2xl">
       <div>Availability</div>
 
       <Tabs defaultValue={todayName} orientation="vertical" className="mt-3 flex min-h-0 flex-1 gap-4">
@@ -59,8 +67,35 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
                     <div className="flex items-center gap-5">
                       <div className="font-bold text-base text-zinc-200/90 sm:text-lg">{day[0]!.toUpperCase() + day.slice(1)}</div>
                       <div className="flex items-center gap-2">
-                        <Checkbox id="terms-checkbox" name="terms-checkbox" />
-                        <span className="text-sm text-zinc-400">Omit short Breaks</span>
+                        <div
+                          className="flex cursor-pointer items-center gap-1"
+                          onClick={() => setOmitShortBreaks(!omitShortBreaks)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setOmitShortBreaks(!omitShortBreaks);
+                            }
+                          }}
+                        >
+                          <Checkbox
+                            id="terms-checkbox"
+                            name="terms-checkbox"
+                            checked={omitShortBreaks}
+                            onCheckedChange={(checked) => {
+                              setOmitShortBreaks(!!checked);
+                              localStorage.setItem("omittingShortBreaks", checked ? "true" : "false");
+                            }}
+                          />
+                          <span
+                            className={cn(
+                              "font-normal text-sm text-zinc-400 transition-all duration-150",
+                              omitShortBreaks && "font-bold text-zinc-300"
+                            )}
+                          >
+                            Omit short breaks
+                          </span>
+                        </div>
                       </div>
                     </div>
                     <div className="font-mono text-xs text-zinc-400">
@@ -69,7 +104,7 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
                   </div>
 
                   {/* ONLY scroller - takes remaining space */}
-                  <ScrollArea className="h-full flex-1">
+                  <ScrollArea className="mb-2 h-full min-h-0 flex-1">
                     <div className="p-3">
                       {blocks.length === 0 ? (
                         <div className="rounded-lg border border-zinc-800 border-dashed bg-zinc-950/20 p-4 font-medium text-sm text-zinc-400">
@@ -80,12 +115,14 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
                           {blocks.map((block: any, id: number) => {
                             const start = block.startTimeMin;
                             const end = block.endTimeMin;
+                            const duration = omitShortBreaks && end - start < 60 ? 0 : end - start;
+                            if (duration < SHORT_BREAK_MINUTES) return null;
 
                             return (
                               <div
                                 key={id}
                                 className={cn(
-                                  "group relative overflow-hidden rounded-lg border border-white/5 bg-zinc-900/40 px-3 py-2",
+                                  "group relative overflow-hidden rounded-lg border border-white/5 bg-zinc-800/40 px-3 py-2",
                                   "transition hover:border-white/10 hover:bg-zinc-900/60"
                                 )}
                               >
