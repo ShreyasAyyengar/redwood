@@ -6,13 +6,27 @@ export default function MainPage() {
   const { fetchedRooms } = useFetchedRoomsStore();
 
   return (
-    <div className="flex h-screen flex-col items-center justify-center bg-background font-sans text-white">
-      <p className="mt-5 text-center font-bold text-3xl">Redwood — Classroom Maintenance </p>
+    <>
+      {/* Mobile Layout - Hidden on md and above */}
+      <div className="flex h-screen flex-col bg-background p-4 font-sans text-white md:hidden">
+        <h1 className="mb-4 text-center font-bold text-xl">Redwood</h1>
+        <p className="mb-4 text-center text-sm">Classroom Maintenance</p>
 
-      <div className="flex w-full flex-1 items-center justify-center overflow-hidden p-5">
-        <RoomTable data={fetchedRooms} columns={columns} />
+        {/*<div className="flex-1 overflow-auto">*/}
+        {/*  /!* Your mobile-specific layout here *!/*/}
+        {/*  <RoomTable data={fetchedRooms} columns={columns} />*/}
+        {/*</div>*/}
       </div>
-    </div>
+
+      {/* Desktop Layout - Hidden below md */}
+      <div className="hidden h-screen flex-col items-center justify-center bg-background font-sans text-white md:flex">
+        <p className="mt-5 text-center font-bold text-3xl">Redwood — Classroom Maintenance</p>
+
+        <div className="flex w-full flex-1 items-center justify-center overflow-hidden p-5">
+          <RoomTable data={fetchedRooms} columns={columns} />
+        </div>
+      </div>
+    </>
   );
 }
 
