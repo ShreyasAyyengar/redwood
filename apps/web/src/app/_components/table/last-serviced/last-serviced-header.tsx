@@ -8,7 +8,7 @@ export default function LastServicedHeader({ column }: { column: Column<z.infer<
   return (
     <div>
       <div
-        className="flex items-center justify-center rounded-md bg-neutral-700/50 p-1"
+        className="flex cursor-pointer items-center justify-center rounded-md border border-black/0 bg-neutral-700/50 px-5 py-1 transition-all duration-100 hover:border hover:border-neutral-700/50 hover:bg-neutral-700/75 hover:shadow-xl/100 active:scale-95 active:transform"
         onClick={() => {
           // cycle between asd, desc, and default
           const currentSort = column.getIsSorted();
