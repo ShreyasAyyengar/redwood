@@ -45,41 +45,47 @@ export default function ActiveIssues({ issues }: { issues?: z.infer<typeof issue
           {/* TODO open dialog */}
         </button>
 
-        <ScrollArea className="mt-5 min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
-          {openIssues?.map((issue) => (
-            <Card key={issue._id} className="mb-3 border-zinc-800 bg-zinc-900/50 p-4 transition-colors hover:border-zinc-700">
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5">
-                  {issue.issue.urgent ? <AlertTriangle className="size-5 text-red-400" /> : <AlertCircle className="size-5 text-amber-400" />}
-                </div>
+        {openIssues && openIssues.length > 0 ? (
+          <ScrollArea className="mt-5 min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
+            {openIssues?.map((issue) => (
+              <Card key={issue._id} className="mb-3 border-zinc-800 bg-zinc-900/50 p-4 transition-colors hover:border-zinc-700">
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5">
+                    {issue.issue.urgent ? <AlertTriangle className="size-5 text-red-400" /> : <AlertCircle className="size-5 text-amber-400" />}
+                  </div>
 
-                <div className="min-w-0 flex-1">
-                  <div className="mb-2 flex items-start justify-between gap-2">
-                    <p className="flex-1 font-normal text-sm text-zinc-200">{issue.issue.description}</p>
-                    <div className="flex shrink-0 gap-1.5">
-                      {issue.issue.urgent && (
-                        <Badge variant="outline" className={urgencyStyle("red")}>
-                          Urgent
-                        </Badge>
-                      )}
-                      {issue.issue.supervisorNeeded && (
-                        <Badge variant="outline" className="border-purple-500/30 bg-purple-500/20 text-purple-400 hover:bg-purple-500/30">
-                          Supervisor Needed
-                        </Badge>
-                      )}
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-2 flex items-start justify-between gap-2">
+                      <p className="flex-1 font-normal text-sm text-zinc-200">{issue.issue.description}</p>
+                      <div className="flex shrink-0 gap-1.5">
+                        {issue.issue.urgent && (
+                          <Badge variant="outline" className={urgencyStyle("red")}>
+                            Urgent
+                          </Badge>
+                        )}
+                        {issue.issue.supervisorNeeded && (
+                          <Badge variant="outline" className="border-purple-500/30 bg-purple-500/20 text-purple-400 hover:bg-purple-500/30">
+                            Supervisor Needed
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 text-xs text-zinc-500">
+                      <span>Reported 5 days ago</span>
+                      <span className="text-zinc-700">•</span>
+                      <span>by {issue.issue.reportedBy}</span>
                     </div>
                   </div>
-
-                  <div className="flex items-center gap-3 text-xs text-zinc-500">
-                    <span>Reported 5 days ago</span>
-                    <span className="text-zinc-700">•</span>
-                    <span>by {issue.issue.reportedBy}</span>
-                  </div>
                 </div>
-              </div>
-            </Card>
-          ))}
-        </ScrollArea>
+              </Card>
+            ))}
+          </ScrollArea>
+        ) : (
+          <div className="flex flex-1 items-center justify-center font-semibold text-3xl text-zinc-300">
+            <span className="rounded-md bg-zinc-950/85 p-5">No Active Issues!</span>
+          </div>
+        )}
       </div>
     </div>
   );

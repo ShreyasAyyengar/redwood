@@ -45,50 +45,56 @@ export default function OpenTasks({ tasks }: { tasks?: z.infer<typeof taskSchema
           {/* TODO open dialog */}
         </button>
 
-        <ScrollArea className="mt-5 min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
-          {openTasks?.map((task) => {
-            const isOverdue = task.task.completeBy && Date.now() > new Date(task.task.completeBy).getTime();
+        {openTasks && openTasks.length > 0 ? (
+          <ScrollArea className="mt-5 min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
+            {openTasks?.map((task) => {
+              const isOverdue = task.task.completeBy && Date.now() > new Date(task.task.completeBy).getTime();
 
-            return (
-              <Card key={task._id} className="mb-3 border-zinc-800 bg-zinc-900/50 p-4 transition-colors hover:border-zinc-700">
-                <div className="flex items-start gap-3">
-                  <div className="mt-0.5">
-                    {task.task.urgent ? (
-                      <AlertTriangle className="size-5 text-red-400" />
-                    ) : (
-                      <AlertCircle className={cn("size-5", isOverdue ? "text-amber-400" : "text-zinc-400")} />
-                    )}
-                  </div>
+              return (
+                <Card key={task._id} className="mb-3 border-zinc-800 bg-zinc-900/50 p-4 transition-colors hover:border-zinc-700">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5">
+                      {task.task.urgent ? (
+                        <AlertTriangle className="size-5 text-red-400" />
+                      ) : (
+                        <AlertCircle className={cn("size-5", isOverdue ? "text-amber-400" : "text-zinc-400")} />
+                      )}
+                    </div>
 
-                  <div className="min-w-0 flex-1">
-                    <div className="mb-2 flex items-start justify-between gap-2">
-                      <p className="flex-1 font-normal text-sm text-zinc-200">{task.task.description}</p>
-                      <div className="flex shrink-0 gap-1.5">
-                        {task.task.urgent && (
-                          <Badge variant="outline" className="border-red-500/30 bg-red-500/20 text-red-400">
-                            Urgent
-                          </Badge>
-                        )}
-                        {/* TODO use this box for overdue tasks */}
-                        {isOverdue && (
-                          <Badge variant="outline" className={urgencyStyle("orange")}>
-                            Overdue
-                          </Badge>
-                        )}
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-2 flex items-start justify-between gap-2">
+                        <p className="flex-1 font-normal text-sm text-zinc-200">{task.task.description}</p>
+                        <div className="flex shrink-0 gap-1.5">
+                          {task.task.urgent && (
+                            <Badge variant="outline" className="border-red-500/30 bg-red-500/20 text-red-400">
+                              Urgent
+                            </Badge>
+                          )}
+                          {/* TODO use this box for overdue tasks */}
+                          {isOverdue && (
+                            <Badge variant="outline" className={urgencyStyle("orange")}>
+                              Overdue
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 text-xs text-zinc-500">
+                        <span>Reported 5 days ago</span>
+                        <span className="text-zinc-700">•</span>
+                        <span>by {task.task.createdBy}</span>
                       </div>
                     </div>
-
-                    <div className="flex items-center gap-3 text-xs text-zinc-500">
-                      <span>Reported 5 days ago</span>
-                      <span className="text-zinc-700">•</span>
-                      <span>by {task.task.createdBy}</span>
-                    </div>
                   </div>
-                </div>
-              </Card>
-            );
-          })}
-        </ScrollArea>
+                </Card>
+              );
+            })}
+          </ScrollArea>
+        ) : (
+          <div className="flex flex-1 items-center justify-center font-semibold text-3xl text-zinc-300">
+            <span className="rounded-md bg-zinc-950/85 p-5">No Open Tasks!</span>
+          </div>
+        )}
       </div>
     </div>
   );
