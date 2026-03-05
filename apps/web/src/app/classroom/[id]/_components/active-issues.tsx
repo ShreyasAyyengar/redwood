@@ -27,7 +27,7 @@ export default function ActiveIssues({ issues }: { issues?: z.infer<typeof issue
               className={cn(
                 "flex h-6 w-6 items-center justify-center rounded-full text-sm transition-all duration-100",
                 openIssues.length > 0
-                  ? "border-red-500/30 bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                  ? "border-yellow-500/30 bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30"
                   : "border-zinc-500/30 bg-zinc-500/20 text-zinc-400 hover:bg-zinc-500/30"
               )}
             >
@@ -38,14 +38,14 @@ export default function ActiveIssues({ issues }: { issues?: z.infer<typeof issue
 
         <button
           type="button"
-          className="mt-1 flex w-full cursor-pointer items-center gap-2 font-normal transition-colors hover:text-neutral-200 sm:text-lg"
+          className="mt-1 flex w-full cursor-pointer items-center gap-3 font-normal transition-colors hover:text-neutral-200 sm:text-lg"
         >
-          <span className="font-normal text-sm">See Issue History</span>
-          {/* TODO open dialog */}
           <BookAlert className="h-5 w-5" />
+          <span className="font-normal text-md">See Issue History</span>
+          {/* TODO open dialog */}
         </button>
 
-        <ScrollArea className="mt-5 min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-2">
+        <ScrollArea className="mt-5 min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
           {openIssues?.map((issue) => (
             <Card key={issue._id} className="mb-3 border-zinc-800 bg-zinc-900/50 p-4 transition-colors hover:border-zinc-700">
               <div className="flex items-start gap-3">

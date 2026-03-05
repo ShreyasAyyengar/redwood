@@ -21,7 +21,7 @@ export default function OpenTasks({ tasks }: { tasks?: z.infer<typeof taskSchema
       <div className="relative mb-10 flex min-h-0 w-auto flex-1 flex-col overflow-hidden rounded-2xl bg-zinc-900 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/50 sm:text-2xl">
         <div className="flex items-center gap-2">
           <CircleAlert className="h-6 w-6 text-blue-500" />
-          <div>Active Issues</div>
+          <div>Open Tasks</div>
           {openTasks && (
             <span
               className={cn(
@@ -38,14 +38,14 @@ export default function OpenTasks({ tasks }: { tasks?: z.infer<typeof taskSchema
 
         <button
           type="button"
-          className="mt-1 flex w-full cursor-pointer items-center gap-2 font-normal transition-colors hover:text-neutral-200 sm:text-lg"
+          className="mt-1 flex w-full cursor-pointer items-center gap-3 font-normal transition-colors hover:text-neutral-200 sm:text-lg"
         >
-          <span className="font-normal text-sm">See Task History</span>
-          {/* TODO open dialog */}
           <BookAlert className="h-5 w-5" />
+          <span className="font-normal text-md">See Task History</span>
+          {/* TODO open dialog */}
         </button>
 
-        <ScrollArea className="mt-5 min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-2">
+        <ScrollArea className="mt-5 min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
           {openTasks?.map((task) => {
             const isOverdue = task.task.completeBy && Date.now() > new Date(task.task.completeBy).getTime();
 
