@@ -18,7 +18,7 @@ export function RoomRow({ row }: { row: Row<z.infer<typeof classroomSchema>> }) 
   return (
     <>
       <TableRow
-        className="transition-all duration-150 hover:-translate-y-0.5 hover:cursor-pointer hover:bg-zinc-800 hover:shadow-xl/70"
+        className="transition-all duration-150 hover:-translate-y-0.5 hover:cursor-pointer hover:bg-zinc-800 hover:shadow-xl/70 active:scale-95 active:transform"
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
         onClick={handleRowClick}
