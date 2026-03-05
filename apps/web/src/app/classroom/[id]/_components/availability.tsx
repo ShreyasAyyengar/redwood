@@ -31,7 +31,7 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
 
   // TODO add scroll indicator for availability
   return (
-    <div className="flex flex-1 flex-col overflow-hidden border border-zinc-800 bg-zinc-900/50 p-5 font-bold text-xl text-zinc-300/80 sm:text-2xl">
+    <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/80 sm:text-2xl">
       <div>Availability</div>
 
       <Tabs defaultValue={todayName} orientation="vertical" className="mt-3 flex min-h-0 flex-1 gap-4">
@@ -68,7 +68,7 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
                       <div className="font-bold text-base text-zinc-200/90 sm:text-lg">{day[0]!.toUpperCase() + day.slice(1)}</div>
                       <div className="flex items-center gap-2">
                         <div
-                          className="flex cursor-pointer items-center gap-1"
+                          className="flex cursor-pointer items-center gap-2"
                           onClick={() => setOmitShortBreaks(!omitShortBreaks)}
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {

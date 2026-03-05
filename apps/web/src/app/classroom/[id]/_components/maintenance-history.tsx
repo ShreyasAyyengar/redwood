@@ -7,7 +7,7 @@ import { monthNames, nth } from "../../../../util/date-time-utils";
 
 export default function MaintenanceHistory({ history }: { history?: z.infer<typeof maintenanceEntrySchema>[] }) {
   return (
-    <div className="flex w-1 flex-1 flex-col overflow-hidden rounded-2xl rounded-l-none bg-[#0a0521] p-5 font-bold text-xl text-zinc-300/80 sm:text-2xl">
+    <div className="flex w-1 flex-1 flex-col overflow-hidden rounded-2xl bg-[#0a0521] p-5 font-bold text-xl text-zinc-300/80 shadow-xl/80 sm:text-2xl">
       <div>Maintenance History</div>
 
       <ScrollArea className="mt-3 h-fit min-h-0">
