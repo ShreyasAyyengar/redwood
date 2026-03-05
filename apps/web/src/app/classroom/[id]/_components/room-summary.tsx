@@ -1,6 +1,6 @@
 import type { classroomSchema } from "@redwood/contracts";
 import { cn } from "@redwood/shad-ui/lib/utils";
-import { Bug, Building2, ClipboardList, Info, Wrench } from "lucide-react";
+import { Bug, Building2, Info, SquareCheckBig, Wrench } from "lucide-react";
 import type { z } from "zod";
 import { monthNames, nth } from "../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../util/style-util";
@@ -91,7 +91,7 @@ export default function RoomSummary({
       </div>
 
       <div className="flex items-center gap-2">
-        <ClipboardList className="h-5 w-5" />
+        <SquareCheckBig className="h-5 w-5" />
         <div className="mt-2 flex flex-col">
           <div className="flex items-center font-bold text-neutral-400 text-sm">Open Tasks</div>
           <div className="flex items-center font-normal text-sm text-white/80">
