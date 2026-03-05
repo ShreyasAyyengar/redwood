@@ -2,7 +2,8 @@
 
 import type { classroomSchema } from "@redwood/contracts";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
+import { CornerUpLeft } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../lib/orpc-web-client";
@@ -18,6 +19,7 @@ export default function RoomPage() {
   const roomId = params.id as string;
   const { isFetching, fetchedRooms } = useFetchedRoomsStore();
   const [room, setRoom] = useState<z.infer<typeof classroomSchema> | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const foundRoom = fetchedRooms.find((room) => room._id === roomId);
@@ -49,21 +51,32 @@ export default function RoomPage() {
   if (!room) return <div>Room not found</div>;
 
   return (
-    <div className="mt-10 mr-30 ml-30">
-      <div className="flex flex-col rounded-2xl shadow-xl/80">
-        <div className="flex h-[40dvh] w-full">
-          <RoomSummary
-            room={room}
-            issueCount={issues?.filter((issue) => !issue.resolution).length ?? 0}
-            taskCount={tasks?.filter((task) => !task.completion).length ?? 0}
-          />
-          <div className="flex w-1/2">
-            <Availability room={room} />
-          </div>
-          <MaintenanceHistory history={maintenanceHistory} />
-        </div>
+    <div className="mt-5 mr-30 ml-30">
+      <div
+        className="mb-5 flex w-fit cursor-pointer items-center gap-3 rounded-xl p-2 text-zinc-400 transition-all duration-150 hover:bg-zinc-900"
+        onClick={() => router.back()}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            e.stopPropagation();
+            router.back();
+          }
+        }}
+      >
+        <CornerUpLeft className="h-6 w-6" />
+        Back to Classrooms
       </div>
-      <div className="mt-10 flex h-[50dvh] gap-10">
+
+      <div className="flex h-[40dvh] gap-10">
+        <RoomSummary
+          room={room}
+          issueCount={issues?.filter((issue) => !issue.resolution).length ?? 0}
+          taskCount={tasks?.filter((task) => !task.completion).length ?? 0}
+        />
+        <Availability room={room} />
+        <MaintenanceHistory history={maintenanceHistory} />
+      </div>
+      <div className="mt-10 flex h-[45dvh] gap-10">
         <ActiveIssues issues={issues} />
         <OpenTasks tasks={tasks} />
       </div>
