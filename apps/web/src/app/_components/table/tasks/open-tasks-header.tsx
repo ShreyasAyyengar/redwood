@@ -1,6 +1,6 @@
 import type { classroomSchema } from "@redwood/contracts";
 import type { Column } from "@tanstack/react-table";
-import { ArrowDown01, ArrowDown10, ClipboardList, SlidersHorizontal } from "lucide-react";
+import { ArrowDown01, ArrowDown10, SlidersHorizontal, SquareCheckBig } from "lucide-react";
 import type { z } from "zod";
 
 // TODO figure out what <any> can be replaced with
@@ -28,7 +28,7 @@ export default function OpenTasksHeader({ column }: { column: Column<z.infer<typ
           }
         }}
       >
-        <ClipboardList className="mr-2 h-6 w-6" />
+        <SquareCheckBig className="mr-2 h-6 w-6" />
         <p className="text-lg">Tasks</p>
         {column.getIsSorted() ? (
           column.getIsSorted() === "asc" ? (
