@@ -54,11 +54,12 @@ export default function RoomPage() {
     <div className="mt-5 mr-30 ml-30">
       <div
         className="mb-5 flex w-fit cursor-pointer items-center gap-3 rounded-xl p-2 text-zinc-400 transition-all duration-150 hover:bg-zinc-900 active:scale-90 active:transform"
+        onClick={() => router.push("/")}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();
             e.stopPropagation();
-            router.back();
+            router.push("/");
           }
         }}
       >
