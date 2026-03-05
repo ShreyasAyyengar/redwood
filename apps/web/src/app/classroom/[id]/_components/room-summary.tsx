@@ -41,10 +41,10 @@ export default function RoomSummary({
   return (
     <div
       className={cn(
-        "flex h-auto flex-col rounded-2xl rounded-r-none p-5 font-bold text-3xl text-zinc-300/80",
-        room.roomStatus === "GOOD" && "bg-green-500/10 shadow-green-500/70",
-        room.roomStatus === "NEEDS ATTENTION" && "bg-yellow-500/10 shadow-yellow-500/70",
-        room.roomStatus === "NEEDS URGENT ATTENTION" && "bg-red-500/10 shadow-red-500/70"
+        "flex h-auto flex-col rounded-2xl p-5 font-bold text-3xl text-zinc-300/80 shadow-xl/80",
+        room.roomStatus === "GOOD" && "bg-green-500/10",
+        room.roomStatus === "NEEDS ATTENTION" && "bg-yellow-500/10",
+        room.roomStatus === "NEEDS URGENT ATTENTION" && "bg-red-500/10"
       )}
     >
       {room.displayName}
