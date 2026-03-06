@@ -8,6 +8,7 @@ type FetchedRoomsStore = {
   setFetchedRooms: (rooms: z.infer<typeof classroomSchema>[]) => void;
   setIsFetching: (isFetching: boolean) => void;
   setRoomsAndFetching: (rooms: z.infer<typeof classroomSchema>[], isFetching: boolean) => void;
+  updateRoom: (roomId: z.infer<typeof classroomSchema.shape._id>) => void;
 };
 
 export const useFetchedRoomsStore = create<FetchedRoomsStore>((set) => ({
@@ -16,4 +17,6 @@ export const useFetchedRoomsStore = create<FetchedRoomsStore>((set) => ({
   setFetchedRooms: (rooms) => set({ fetchedRooms: rooms }),
   setIsFetching: (isFetching) => set({ isFetching }),
   setRoomsAndFetching: (rooms, isFetching) => set({ fetchedRooms: rooms, isFetching }),
+  // updateRoom: (roomId) => set((state) => ({ fetchedRooms: state.fetchedRooms.map((r) => (r._id === roomId ? room : r)) })),
+  updateRoom: (roomId) => {},
 }));
