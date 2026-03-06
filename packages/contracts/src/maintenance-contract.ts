@@ -34,6 +34,7 @@ export const issueSchema = z.object({
     .optional(),
 
   adminNotes: z.array(z.union([commonAdminNotesSchema, z.string()])),
+  files: z.array(z.uuid()).optional(), // UUIDs of uploaded files to R2
 });
 
 // TODO if issue has no resolution, cannot edit resolution in payload, must resolve first
@@ -95,12 +96,14 @@ export const maintenanceEntrySchema = z.object({
       signPresent: z.boolean(),
       microphoneWorking: z.boolean(),
       speakerWorking: z.boolean(),
+      screenWiped: z.boolean(),
     })
     .optional(),
   surfacesWiped: z.boolean(),
   equipmentChecked: z.boolean(), // TODO maybe expand this into fields for each piece of equipment
-  files: z.array(z.uuid()).optional(), // UUIDs of uploaded files to R2
 });
+
+export const maintenanceFormSchema = maintenanceEntrySchema.omit({ _id: true, completedBy: true });
 
 export const maintenanceContract = {
   addMaintenanceEntry: oc
