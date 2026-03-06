@@ -48,7 +48,8 @@
           },
           "level": "warn"
         },
-        "noNestedTernary": "off"
+        "noNestedTernary": "off",
+        "useConsistentArrowReturn": "warn"
       },
       "suspicious": {
         "useAwait": "warn",
@@ -69,7 +70,6 @@
         "noBarrelFile": "warn"
       },
       "nursery": {
-        "useConsistentArrowReturn": "warn",
         "useSortedClasses": "warn"
       }
     }
