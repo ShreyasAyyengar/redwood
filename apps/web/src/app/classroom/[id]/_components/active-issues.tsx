@@ -11,14 +11,14 @@ export default function ActiveIssues({ issues }: { issues?: z.infer<typeof issue
   const openIssues = issues?.filter((issue) => !issue.resolution);
 
   return (
-    <div className="group relative flex min-h-0 flex-1">
+    <div className="group relative flex h-full flex-1">
       {/* gradient blur background */}
       {openIssues && openIssues.filter((issue) => issue.issue.urgent).length > 0 && (
-        <div className="absolute -inset-2 mb-10 flex min-h-0 flex-1 rounded-2xl bg-red-800 opacity-50 blur-md transition duration-1000 group-hover:opacity-75 group-hover:duration-200" />
+        <div className="absolute inset-0 flex h-full flex-1 scale-102 rounded-2xl bg-red-800 opacity-50 blur-md transition duration-1000 group-hover:opacity-75 group-hover:duration-200" />
       )}
 
       {/* actual content - now with 'relative' to sit above the blur */}
-      <div className="relative mb-10 flex min-h-0 w-auto flex-1 flex-col overflow-hidden rounded-2xl bg-zinc-900 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/50 sm:text-2xl">
+      <div className="relative flex h-full w-full flex-1 flex-col overflow-hidden rounded-2xl bg-zinc-900 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/50 sm:text-2xl">
         <div className="flex items-center gap-2">
           <TriangleAlert className="h-6 w-6 text-yellow-500" />
           <div>Active Issues</div>
@@ -46,7 +46,7 @@ export default function ActiveIssues({ issues }: { issues?: z.infer<typeof issue
         </button>
 
         {openIssues && openIssues.length > 0 ? (
-          <ScrollArea className="mt-5 min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
+          <ScrollArea className="mt-5 h-full min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
             {openIssues?.map((issue) => (
               <Card key={issue._id} className="mb-3 border-zinc-800 bg-zinc-900/50 p-4 transition-colors hover:border-zinc-700">
                 <div className="flex items-start gap-3">

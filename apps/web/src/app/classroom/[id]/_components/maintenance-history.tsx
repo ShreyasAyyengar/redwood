@@ -8,13 +8,13 @@ import { monthNames, nth } from "../../../../util/date-time-utils";
 
 export default function MaintenanceHistory({ history }: { history?: z.infer<typeof maintenanceEntrySchema>[] }) {
   return (
-    <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/80 sm:text-2xl">
+    <div className="flex h-full flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/80 sm:text-2xl">
       <div className="flex items-center">
         <ClipboardClock className="mr-2 h-6 w-6 text-amber-400" />
         <div>Maintenance History</div>
       </div>
 
-      <ScrollArea className="mt-3 h-fit min-h-0">
+      <ScrollArea className="mt-3 h-full min-h-0 flex-1">
         <TooltipProvider skipDelayDuration={0}>
           <div className="space-y-2">
             {history?.map((entry) => {

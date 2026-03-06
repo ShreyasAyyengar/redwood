@@ -77,14 +77,16 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
   };
 
   // TODO add scroll indicator for availability
+  // TODO add scroll indicator for availability
   return (
-    <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/80 sm:text-2xl">
+    <div className="flex h-full flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/80 sm:text-2xl">
       <div className="flex items-center">
         <CalendarClock className="mr-2 h-6 w-6" />
         <div>Availability</div>
       </div>
 
-      <Tabs defaultValue={todayName} orientation="vertical" className="mt-3 flex min-h-0 flex-1 gap-4">
+      {/* Desktop View */}
+      <Tabs defaultValue={todayName} orientation="vertical" className="mt-3 hidden min-h-0 flex-1 gap-2 xl:flex">
         {/* Left rail */}
         <TabsList className="h-full! rounded-xl border bg-zinc-950/40">
           {dayNames.map((day) => (
@@ -103,7 +105,197 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
           ))}
         </TabsList>
 
-        {/* Right side MUST match TabsList height */}
+        <div className="min-h-0 flex-1">
+          {dayNames.map((day) => {
+            const blocks = getBlocks(day);
+
+            return (
+              // TabsContent must be h-full to match parent
+              <TabsContent key={day} value={day} className="m-0 h-full">
+                <div className="flex h-full flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950/30">
+                  {/* header */}
+                  <div className="flex shrink-0 items-center justify-between border-zinc-800 border-b px-4 py-3">
+                    <div className="flex items-center gap-5">
+                      <div className="font-bold text-base text-zinc-200/90 sm:text-lg">{day[0]!.toUpperCase() + day.slice(1)}</div>
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="flex cursor-pointer items-center gap-2"
+                          onClick={() => setOmitShortBreaks(!omitShortBreaks)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setOmitShortBreaks(!omitShortBreaks);
+                            }
+                          }}
+                        >
+                          <Checkbox
+                            id="terms-checkbox"
+                            name="terms-checkbox"
+                            checked={omitShortBreaks}
+                            onCheckedChange={(checked) => {
+                              setOmitShortBreaks(!!checked);
+                              localStorage.setItem("omittingShortBreaks", checked ? "true" : "false");
+                            }}
+                          />
+                          <span
+                            className={cn(
+                              "font-normal text-sm text-zinc-400 transition-all duration-150",
+                              omitShortBreaks && "font-bold text-zinc-300"
+                            )}
+                          >
+                            Omit short breaks
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="font-mono text-xs text-zinc-400">
+                      {blocks.length ? `${blocks.length} block${blocks.length === 1 ? "" : "s"}` : "No blocks"}
+                    </div>
+                  </div>
+
+                  {/* ONLY scroller - takes remaining space */}
+                  <ScrollArea className="mb-2 h-full min-h-0 flex-1">
+                    <div className="p-3">
+                      {blocks.length === 0 ? (
+                        <div className="rounded-lg border border-zinc-800 border-dashed bg-zinc-950/20 p-4 font-medium text-sm text-zinc-400">
+                          No availability for this day.
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {blocks.map((block: any, id: number) => {
+                            const start = block.startTimeMin;
+                            const end = block.endTimeMin;
+                            const duration = omitShortBreaks && end - start < 60 ? 0 : end - start;
+                            if (duration < SHORT_BREAK_MINUTES) return null;
+
+                            const status = getBlockStatus(day, start, end);
+                            const isPast = status === "past";
+                            const isCurrent = status === "current";
+                            const isUpcoming = status === "upcoming";
+                            const isActive = isCurrent || isUpcoming;
+
+                            return (
+                              <div
+                                key={id}
+                                className={cn(
+                                  "group relative overflow-hidden rounded-lg border px-3 py-2",
+                                  "transition",
+                                  // Past blocks - greyed out
+                                  isPast && "border-zinc-800/50 bg-zinc-900/20 opacity-50",
+                                  // Current/upcoming blocks - highlighted with shimmy animation
+                                  isActive && "animate-shimmy border-emerald-500/40 bg-emerald-950/30",
+                                  // Future blocks - normal
+                                  !isPast && !isActive && "border-white/5 bg-zinc-800/40 hover:border-white/10 hover:bg-zinc-900/60"
+                                )}
+                              >
+                                {/* Left accent bar */}
+                                <div
+                                  className={cn(
+                                    "absolute inset-y-0 left-0 w-1",
+                                    isPast && "bg-zinc-700/30",
+                                    isActive && "animate-pulse bg-emerald-500/70",
+                                    !isPast && !isActive && "bg-white/10 group-hover:bg-white/15"
+                                  )}
+                                />
+
+                                <div className="flex items-center justify-between gap-3 pl-2">
+                                  <div className="flex items-center gap-2">
+                                    <span
+                                      className={cn(
+                                        "text-lg",
+                                        isPast && "text-zinc-500/70",
+                                        isActive && "font-bold text-emerald-100",
+                                        !isPast && !isActive && "text-zinc-100/90"
+                                      )}
+                                    >
+                                      {convertMinutesToReadable(start)}
+                                    </span>
+                                    <span
+                                      className={cn(
+                                        isPast && "text-zinc-600/50",
+                                        isActive && "text-emerald-400",
+                                        !isPast && !isActive && "text-zinc-500"
+                                      )}
+                                    >
+                                      →
+                                    </span>
+                                    <span
+                                      className={cn(
+                                        "text-lg",
+                                        isPast && "text-zinc-500/70",
+                                        isActive && "font-bold text-emerald-100",
+                                        !isPast && !isActive && "text-zinc-100/90"
+                                      )}
+                                    >
+                                      {convertMinutesToReadable(end)}
+                                    </span>
+                                  </div>
+
+                                  <div className="flex flex-col items-center gap-2">
+                                    {/* Status badge for current/upcoming */}
+                                    {isCurrent && (
+                                      <span className="rounded-md bg-emerald-500/20 px-2 py-0.5 font-bold text-emerald-300 text-xs">NOW</span>
+                                    )}
+                                    {isUpcoming && (
+                                      <span className="rounded-md bg-amber-500/20 px-2 py-0.5 font-bold text-amber-300 text-xs">SOON</span>
+                                    )}
+
+                                    <span
+                                      className={cn(
+                                        "rounded-md px-2 py-0.5 font-mono text-xs",
+                                        isPast && "bg-zinc-800/30 text-zinc-500/70",
+                                        isActive && "bg-emerald-500/15 text-emerald-300",
+                                        !isPast && !isActive && "bg-white/5 text-zinc-300/80"
+                                      )}
+                                    >
+                                      {durationLabel(start, end)}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </ScrollArea>
+                </div>
+              </TabsContent>
+            );
+          })}
+        </div>
+      </Tabs>
+
+      {/* Mobile View */}
+      <Tabs defaultValue={todayName} className="mt-3 flex min-h-0 flex-1 flex-col gap-4 xl:hidden">
+        {/* Left rail */}
+        <TabsList
+          className={cn(
+            // Mobile/tablet: tabs on top, horizontal scroll if needed
+            "w-full flex-row items-stretch gap-1 overflow-x-auto rounded-xl border bg-zinc-950/40 p-2",
+            // Desktop (xl+): tabs on the left, full height
+            "xl:h-full xl:w-40 xl:flex-col xl:overflow-visible"
+          )}
+        >
+          {dayNames.map((day) => (
+            <TabsTrigger
+              key={day}
+              value={day}
+              className={cn(
+                // Mobile: centered pill tabs; Desktop: left-aligned
+                "shrink-0 justify-center capitalize xl:justify-start",
+                "rounded-lg px-3 py-2 font-semibold text-sm text-zinc-300/80",
+                "data-[state=active]:bg-white/10 data-[state=active]:text-zinc-100",
+                "hover:bg-white/5"
+              )}
+            >
+              {day}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+
+        {/* Content area */}
         <div className="min-h-0 flex-1">
           {dayNames.map((day) => {
             const blocks = getBlocks(day);

@@ -12,13 +12,13 @@ export default function OpenTasks({ tasks }: { tasks?: z.infer<typeof taskSchema
   const openTasks = tasks?.filter((task) => !task.completion && (!task.task.visibleAt || new Date(task.task.visibleAt).getTime() <= now));
 
   return (
-    <div className="group relative flex min-h-0 flex-1">
+    <div className="group relative flex h-full flex-1">
       {/* gradient blur background */}
       {openTasks && openTasks.filter((task) => task.task.urgent).length > 0 && (
-        <div className="absolute -inset-2 mb-10 flex min-h-0 flex-1 rounded-2xl bg-blue-800 opacity-50 blur-md transition duration-1000 group-hover:opacity-75 group-hover:duration-200" />
+        <div className="absolute inset-0 flex h-full flex-1 scale-102 rounded-2xl bg-blue-800 opacity-50 blur-md transition duration-1000 group-hover:opacity-75 group-hover:duration-200" />
       )}
 
-      <div className="relative mb-10 flex min-h-0 w-auto flex-1 flex-col overflow-hidden rounded-2xl bg-zinc-900 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/50 sm:text-2xl">
+      <div className="relative flex h-full w-full flex-1 flex-col overflow-hidden rounded-2xl bg-zinc-900 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/50 sm:text-2xl">
         <div className="flex items-center gap-2">
           <CircleAlert className="h-6 w-6 text-blue-500" />
           <div>Open Tasks</div>
@@ -46,7 +46,7 @@ export default function OpenTasks({ tasks }: { tasks?: z.infer<typeof taskSchema
         </button>
 
         {openTasks && openTasks.length > 0 ? (
-          <ScrollArea className="mt-5 min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
+          <ScrollArea className="mt-5 h-full min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
             {openTasks?.map((task) => {
               const isOverdue = task.task.completeBy && Date.now() > new Date(task.task.completeBy).getTime();
 

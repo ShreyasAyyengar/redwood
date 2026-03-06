@@ -52,9 +52,9 @@ export default function RoomPage() {
 
   return (
     <>
-      <div className="mx-5 xl:hidden">
+      <div className="mx-5 mt-5 xl:hidden">
         <div
-          className="mb-5 flex w-fit cursor-pointer items-center gap-3 rounded-xl p-2 text-zinc-400 transition-all duration-150 hover:bg-zinc-900 active:scale-90 active:transform"
+          className="mb-2 flex w-fit cursor-pointer items-center gap-3 rounded-xl p-2 text-zinc-400 transition-all duration-150 hover:bg-zinc-900 active:scale-90 active:transform"
           onClick={() => router.push("/")}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
@@ -67,20 +67,30 @@ export default function RoomPage() {
           <CornerUpLeft className="h-6 w-6" />
           Back to Classrooms
         </div>
-        <RoomSummary
-          room={room}
-          issueCount={issues?.filter((issue) => !issue.resolution).length ?? 0}
-          taskCount={tasks?.filter((task) => !task.completion).length ?? 0}
-        />
-        <Availability room={room} />
-        <MaintenanceHistory history={maintenanceHistory} />
-        <ActiveIssues issues={issues} />
-        <OpenTasks tasks={tasks} />
+        <div className="mb-10 flex flex-col gap-10">
+          <RoomSummary
+            room={room}
+            issueCount={issues?.filter((issue) => !issue.resolution).length ?? 0}
+            taskCount={tasks?.filter((task) => !task.completion).length ?? 0}
+          />
+          <div className="h-[50dvh]">
+            <Availability room={room} />
+          </div>
+          <div className="h-[45dvh]">
+            <ActiveIssues issues={issues} />
+          </div>
+          <div className="h-[45dvh]">
+            <OpenTasks tasks={tasks} />
+          </div>
+          <div className="h-[40dvh]">
+            <MaintenanceHistory history={maintenanceHistory} />
+          </div>
+        </div>
       </div>
 
       <div className="mt-5 mr-30 ml-30 hidden xl:block">
         <div
-          className="mb-5 flex w-fit cursor-pointer items-center gap-3 rounded-xl p-2 text-zinc-400 transition-all duration-150 hover:bg-zinc-900 active:scale-90 active:transform"
+          className="mb-2 flex w-fit cursor-pointer items-center gap-3 rounded-xl p-2 text-zinc-400 transition-all duration-150 hover:bg-zinc-900 active:scale-90 active:transform"
           onClick={() => router.push("/")}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
