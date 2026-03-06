@@ -31,9 +31,10 @@ export default function RootLayout({
       <Providers>
         <AuthLayer />
         <head>{reactScanEnabled && <script crossOrigin="anonymous" src="//unpkg.com/react-scan/dist/auto.global.js" />}</head>
-
         <body className={`${geistSans.variable} ${geistMono.variable}`}>{children}</body>
       </Providers>
     </html>
   );
 }
+
+// TODO change favicon.ico to existing Redwood FileMaker icon
