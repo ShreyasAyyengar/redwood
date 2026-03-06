@@ -1,3 +1,4 @@
+import RoomList from "./list/room-list";
 import { useFetchedRoomsStore } from "./room-store";
 import { columns } from "./table/columns";
 import { RoomTable } from "./table/room-table";
@@ -7,19 +8,15 @@ export default function MainPage() {
 
   return (
     <>
-      {/* Mobile Layout - Hidden on md and above */}
-      <div className="flex h-screen flex-col bg-background p-4 font-sans text-white md:hidden">
+      {/* Mobile Layout - Hidden on xl and above */}
+      <div className="flex h-screen flex-col bg-background p-4 font-sans text-white xl:hidden">
         <h1 className="mb-4 text-center font-bold text-xl">Redwood</h1>
         <p className="mb-4 text-center text-sm">Classroom Maintenance</p>
-
-        {/*<div className="flex-1 overflow-auto">*/}
-        {/*  /!* Your mobile-specific layout here *!/*/}
-        {/*  <RoomTable data={fetchedRooms} columns={columns} />*/}
-        {/*</div>*/}
+        <RoomList data={fetchedRooms} />
       </div>
 
-      {/* Desktop Layout - Hidden below md */}
-      <div className="hidden h-screen flex-col items-center justify-center bg-background font-sans text-white md:flex">
+      {/* Desktop Layout - Hidden below xl */}
+      <div className="hidden h-screen flex-col items-center justify-center bg-background font-sans text-white xl:flex">
         <p className="mt-5 text-center font-bold text-3xl">Redwood — Classroom Maintenance</p>
 
         <div className="flex w-full flex-1 items-center justify-center overflow-hidden p-5">
