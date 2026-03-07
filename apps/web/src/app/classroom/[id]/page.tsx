@@ -104,7 +104,7 @@ export default function RoomPage() {
           Back to Classrooms
         </div>
 
-        <div className="flex h-[40dvh] gap-10">
+        <div className="flex h-[40dvh] gap-5">
           <RoomSummary
             room={room}
             issueCount={issues?.filter((issue) => !issue.resolution).length ?? 0}

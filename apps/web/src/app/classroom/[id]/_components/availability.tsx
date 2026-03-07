@@ -10,6 +10,7 @@ import { convertMinutesToReadable } from "../../../../util/date-time-utils";
 
 const SHORT_BREAK_MINUTES = 15;
 
+// TODO red
 export default function Availability({ room }: { room: z.infer<typeof classroomSchema> }) {
   // get short break preference from local storage
   const storedOmitShortBreaks = localStorage.getItem("omittingShortBreaks");
@@ -115,11 +116,11 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
                 <div className="flex h-full flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950/30">
                   {/* header */}
                   <div className="flex shrink-0 items-center justify-between border-zinc-800 border-b px-4 py-3">
-                    <div className="flex items-center gap-5">
+                    <div className="flex flex-col items-start gap-1">
                       <div className="font-bold text-base text-zinc-200/90 sm:text-lg">{day[0]!.toUpperCase() + day.slice(1)}</div>
                       <div className="flex items-center gap-2">
                         <div
-                          className="flex cursor-pointer items-center gap-2"
+                          className="flex cursor-pointer items-center gap-1"
                           onClick={() => setOmitShortBreaks(!omitShortBreaks)}
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {
@@ -423,7 +424,7 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
                                     </span>
                                   </div>
 
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex flex-col items-center gap-2">
                                     {/* Status badge for current/upcoming */}
                                     {isCurrent && (
                                       <span className="rounded-md bg-emerald-500/20 px-2 py-0.5 font-bold text-emerald-300 text-xs">NOW</span>
