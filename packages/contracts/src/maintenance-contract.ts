@@ -103,14 +103,14 @@ export const maintenanceEntrySchema = z.object({
   equipmentChecked: z.boolean(), // TODO maybe expand this into fields for each piece of equipment
 });
 
-export const maintenanceFormSchema = maintenanceEntrySchema.omit({ _id: true, completedBy: true });
+export const maintenanceFormSchema = maintenanceEntrySchema.omit({ _id: true, completedBy: true, classroomId: true });
 
 export const maintenanceContract = {
   addMaintenanceEntry: oc
     .route({
       method: "POST",
     })
-    .input(maintenanceEntrySchema.omit({ _id: true, files: true }).extend({ files: z.array(fileUploadSchema) }))
+    .input(maintenanceEntrySchema.omit({ _id: true, completedBy: true }))
     .output(z.boolean())
     .errors({
       NOT_FOUND: {
