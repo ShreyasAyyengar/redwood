@@ -38,7 +38,7 @@ export const publicProcedure = implement(httpContract)
   );
 
 export const protectedProcedure = publicProcedure.use(({ context, next }) => {
-  if (!context.session) {
+  if (!context.session || !context.user) {
     throw new ORPCError("UNAUTHORIZED", {
       message: "Authentication required",
       cause: "No session",
@@ -46,12 +46,16 @@ export const protectedProcedure = publicProcedure.use(({ context, next }) => {
   }
 
   return next({
-    context,
+    context: {
+      ...context,
+      session: context.session,
+      user: context.user,
+    },
   });
 });
 
 export const adminProcedure = protectedProcedure.use(({ context, next }) => {
-  if (!context.user.admin) {
+  if (context.user.role !== "admin") {
     throw new ORPCError("FORBIDDEN", {
       message: "Admin access required",
       cause: "Not admin",
