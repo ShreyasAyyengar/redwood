@@ -22,16 +22,16 @@ export const { useAppForm } = createFormHook({
 });
 
 export default function MaintenanceForm({
-  room,
+  roomId,
   maintenanceEntry,
 }: {
-  room: z.infer<typeof classroomSchema>;
+  roomId: z.infer<typeof classroomSchema>["_id"];
   maintenanceEntry?: z.infer<typeof maintenanceEntrySchema>;
 }) {
   const { updateRoom } = useFetchedRoomsStore();
   const createMaintenanceLog = useMutation(
     webClientORPC.maintenance.addMaintenanceEntry.mutationOptions({
-      onSuccess: (data) => updateRoom(room._id),
+      onSuccess: (data) => updateRoom(roomId),
     })
   );
 
@@ -43,7 +43,7 @@ export default function MaintenanceForm({
     onSubmit: async ({ value }) => {
       await createMaintenanceLog.mutateAsync({
         ...value,
-        classroomId: room._id,
+        classroomId: roomId,
         date: value.date ?? new Date(),
       });
     },
@@ -51,7 +51,7 @@ export default function MaintenanceForm({
 
   return (
     <div>
-      <form.AppField name="date">{(field) => <field.DateField maintenanceEntry={maintenanceEntry} />}</form.AppField>
+      <form.AppField name="date">{(field) => <field.DateField existingDate={maintenanceEntry?.date} />}</form.AppField>
     </div>
   );
 }

@@ -20,7 +20,6 @@ export const maintenanceRouter = {
       classroomId: input.classroomId,
       date: new Date(),
       completedBy: context.user.email,
-      files: undefined, // TODO handle the conversion and upload to R2, return the UUID here
     };
 
     try {

@@ -6,11 +6,11 @@ import MaintenanceForm from "./maintenance/maintenance-form";
 
 export default function NewMaintenanceDialog({
   children,
-  room,
+  roomId,
   maintenanceEntry,
 }: {
   children: React.ReactNode;
-  room: z.infer<typeof classroomSchema>;
+  roomId: z.infer<typeof classroomSchema>["_id"];
   maintenanceEntry?: z.infer<typeof maintenanceEntrySchema>;
 }) {
   return (
@@ -21,7 +21,7 @@ export default function NewMaintenanceDialog({
           <DialogHeader>
             <DialogTitle>{maintenanceEntry ? `${maintenanceEntry.completedBy.split("@")[0]}'s` : "New"} Maintenance Log</DialogTitle>
           </DialogHeader>
-          <MaintenanceForm room={room} maintenanceEntry={maintenanceEntry} />
+          <MaintenanceForm roomId={roomId} maintenanceEntry={maintenanceEntry} />
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>

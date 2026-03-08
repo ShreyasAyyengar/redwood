@@ -4,6 +4,11 @@ import { classroomSchema } from "./classroom-contract";
 
 export const commonAdminNotesSchema = z.enum(["Escalated to MSE"]);
 
+
+// TODO if issue has no resolution, cannot edit resolution in payload, must resolve first
+// anyone can edit the issue, and can edit the resolution if it exists
+// show: created by, resolved by, last edited byi
+
 export const issueSchema = z.object({
   _id: z.uuidv7(),
   classroomId: z.uuidv7(),
@@ -37,9 +42,6 @@ export const issueSchema = z.object({
   files: z.array(z.uuid()).optional(), // UUIDs of uploaded files to R2
 });
 
-// TODO if issue has no resolution, cannot edit resolution in payload, must resolve first
-// anyone can edit the issue, and can edit the resolution if it exists
-// show: created by, resolved by, last edited by
 
 export const VALID_MIME_TYPES = ["image/jpeg", "image/png", "image/heic", "image/heif", "video/mp4", "video/quicktime"] as const;
 

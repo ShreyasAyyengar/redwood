@@ -83,7 +83,7 @@ export default function RoomPage() {
             <OpenTasks tasks={tasks} />
           </div>
           <div className="h-[40dvh]">
-            <MaintenanceHistory history={maintenanceHistory} />
+            <MaintenanceHistory history={maintenanceHistory} room={room} />
           </div>
         </div>
       </div>
@@ -111,7 +111,7 @@ export default function RoomPage() {
             taskCount={tasks?.filter((task) => !task.completion).length ?? 0}
           />
           <Availability room={room} />
-          <MaintenanceHistory history={maintenanceHistory} />
+          <MaintenanceHistory history={maintenanceHistory} room={room} />
         </div>
         <div className="mt-10 flex h-[45dvh] gap-10">
           <ActiveIssues issues={issues} />

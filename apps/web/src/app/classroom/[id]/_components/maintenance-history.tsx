@@ -34,7 +34,7 @@ export default function MaintenanceHistory({
               return (
                 <Tooltip key={entry._id} delayDuration={500}>
                   <TooltipTrigger asChild>
-                    <NewMaintenanceDialog room={room} maintenanceEntry={entry}>
+                    <NewMaintenanceDialog roomId={room._id} maintenanceEntry={entry}>
                       <div
                         key={entry._id}
                         className={cn(
