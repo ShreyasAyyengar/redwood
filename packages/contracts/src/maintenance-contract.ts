@@ -4,6 +4,13 @@ import { classroomSchema } from "./classroom-contract";
 
 export const commonAdminNotesSchema = z.enum(["Escalated to MSE"]);
 
+export const VALID_MIME_TYPES = ["image/jpeg", "image/png", "image/heic", "image/heif", "video/mp4", "video/quicktime"] as const;
+
+export const fileUploadSchema = z.object({
+  id: z.uuid(),
+  file: z.file("Invalid file."),
+  mimeType: z.enum(VALID_MIME_TYPES, "Invalid file type."),
+});
 
 // TODO if issue has no resolution, cannot edit resolution in payload, must resolve first
 // anyone can edit the issue, and can edit the resolution if it exists
@@ -40,15 +47,6 @@ export const issueSchema = z.object({
 
   adminNotes: z.array(z.union([commonAdminNotesSchema, z.string()])),
   files: z.array(z.uuid()).optional(), // UUIDs of uploaded files to R2
-});
-
-
-export const VALID_MIME_TYPES = ["image/jpeg", "image/png", "image/heic", "image/heif", "video/mp4", "video/quicktime"] as const;
-
-export const fileUploadSchema = z.object({
-  id: z.uuid(),
-  file: z.file("Invalid file."),
-  mimeType: z.enum(VALID_MIME_TYPES, "Invalid file type."),
 });
 
 export const taskSchema = z.object({
