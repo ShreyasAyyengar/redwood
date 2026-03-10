@@ -17,9 +17,11 @@ export default function NewMaintenanceDialog({
     <Dialog>
       <form>
         <DialogTrigger asChild>{children}</DialogTrigger>
-        <DialogContent className="bg-zinc-900">
+        <DialogContent className="w-fit bg-zinc-800 sm:max-w-none">
           <DialogHeader>
-            <DialogTitle>{maintenanceEntry ? `${maintenanceEntry.completedBy.split("@")[0]}'s` : "New"} Maintenance Log</DialogTitle>
+            <DialogTitle className="mx-auto rounded-md bg-zinc-950/30 px-10 py-3 text-center text-2xl ring-1 ring-white/15">
+              {maintenanceEntry ? `${maintenanceEntry.completedBy.split("@")[0]}'s` : "New"} Maintenance Log:
+            </DialogTitle>
           </DialogHeader>
           <MaintenanceForm roomId={roomId} maintenanceEntry={maintenanceEntry} />
           <DialogFooter>
