@@ -83,22 +83,30 @@ export const maintenanceEntrySchema = z.object({
   classroomId: z.uuidv7(),
   date: z.coerce.date(),
   completedBy: z.email(),
-  greenStripe: z
+  microphone: z
     .object({
-      battery: z.boolean(),
-      charger: z.boolean(),
-      transmitter: z.boolean(),
+      batteryStripe: z.enum(["Yes", "Re-applied", "No, task created for completion", "No, issue preventing completion"]),
+      chargerStripe: z.enum(["Yes", "Re-painted", "No, task created for completion", "No, issue preventing completion"]),
+      transmitterStripe: z.enum(["Yes", "Re-painted", "No, task created for completion", "No, issue preventing completion"]),
+      aldBatteriesCharged: z.enum([
+        "Yes",
+        "Battery replaced",
+        "Found dead, now re-charging",
+        "No, task created for completion",
+        "No, issue preventing completion",
+      ]),
     })
     .optional(),
   dten: z
     .object({
-      licenced: z.boolean(),
-      signPresent: z.boolean(),
-      microphoneWorking: z.boolean(),
-      speakerWorking: z.boolean(),
-      screenWiped: z.boolean(),
+      licenced: z.enum(["Yes", "Re-licensed", "No, task created for completion", "No, issue preventing completion"]),
+      signPresent: z.enum(["Yes", "No, task created for completion"]),
+      microphoneWorking: z.enum(["Yes", "No, task created for completion", "No, issue preventing completion"]),
+      speakerWorking: z.enum(["Yes", "No, task created for completion", "No, issue preventing completion"]),
+      screenWiped: z.enum(["Yes", "No, task created for completion", "No, issue preventing completion"]),
     })
     .optional(),
+
   surfacesWiped: z.boolean(),
   equipmentChecked: z.boolean(), // TODO maybe expand this into fields for each piece of equipment
 });
