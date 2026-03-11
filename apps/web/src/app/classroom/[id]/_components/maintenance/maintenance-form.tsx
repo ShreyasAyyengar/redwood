@@ -10,6 +10,7 @@ import type { z } from "zod";
 import { webClientORPC } from "../../../../../lib/orpc-web-client";
 import { useFetchedRoomsStore } from "../../../../_components/room-store";
 import DateField from "./fields/date-field";
+import DTENField from "./fields/dten-field";
 import EquipmentCheckedField from "./fields/equipment-checked";
 import MicrophoneField from "./fields/microphone-field";
 import SurfacesWipedField from "./fields/surfaces-wiped";
@@ -21,8 +22,8 @@ export const { useAppForm } = createFormHook({
   formContext,
   fieldComponents: {
     DateField,
-    // DTENField,
-    GreenStripeField: MicrophoneField,
+    DTENField,
+    MicrophoneField,
     SurfacesWipedField,
     EquipmentCheckedField,
   },
@@ -70,6 +71,9 @@ export default function MaintenanceForm({
           <form.AppField name="microphone">{(field) => <field.MicrophoneField existingValues={maintenanceEntry?.microphone} />}</form.AppField>
 
           <Separator className="bg-indigo-500" />
+
+          {/* DTEN */}
+          <form.AppField name="dten">{(field) => <field.DTENField existingValue={maintenanceEntry?.dten} />}</form.AppField>
 
           <Separator className="bg-indigo-500" />
 
