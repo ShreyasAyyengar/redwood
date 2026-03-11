@@ -13,6 +13,24 @@ export default function DTENField({ existingValue }: { existingValue?: z.infer<t
   const [microphoneWorking, setMicrophoneWorking] = useState<boolean>(existingValue?.microphoneWorking ?? false);
   const [speakerWorking, setSpeakerWorking] = useState<boolean>(existingValue?.speakerWorking ?? false);
   const [screenWiped, setScreenWiped] = useState<boolean>(existingValue?.screenWiped ?? false);
+  const licensedSchema = maintenanceFormSchema.shape.dten.unwrap().shape.licenced;
+  const signPresentSchema = maintenanceFormSchema.shape.dten.unwrap().shape.signPresent;
+  const microphoneWorkingSchema = maintenanceFormSchema.shape.dten.unwrap().shape.microphoneWorking;
+  const speakerWorkingSchema = maintenanceFormSchema.shape.dten.unwrap().shape.speakerWorking;
+  const screenWipedSchema = maintenanceFormSchema.shape.dten.unwrap().shape.screenWiped;
+
+  type LicencedSchema = z.infer<typeof licensedSchema>;
+  type SignPresentSchema = z.infer<typeof signPresentSchema>;
+  type MicrophoneWorkingSchema = z.infer<typeof microphoneWorkingSchema>;
+  type SpeakerWorkingSchema = z.infer<typeof speakerWorkingSchema>;
+  type ScreenWipedSchema = z.infer<typeof screenWipedSchema>;
+
+  const [equipped, setEquipped] = useState<boolean>(false);
+  const [licenced, setLicenced] = useState<LicencedSchema>("");
+  const [signPresent, setSignPresent] = useState<SignPresentSchema>("");
+  const [microphoneWorking, setMicrophoneWorking] = useState<MicrophoneWorkingSchema>("");
+  const [speakerWorking, setSpeakerWorking] = useState<SpeakerWorkingSchema>("");
+  const [screenWiped, setScreenWiped] = useState<ScreenWipedSchema>("");
 
   useEffect(() => {
     field.handleChange({ licenced, signPresent, microphoneWorking, speakerWorking, screenWiped });

@@ -12,11 +12,21 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
   const field = useFieldContext<FormValues["microphone"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 
-  const [equipped, setEquipped] = useState<boolean>();
+  const batteryStripeSchema = maintenanceFormSchema.shape.microphone.unwrap().shape.batteryStripe;
+  const chargerStripeSchema = maintenanceFormSchema.shape.microphone.unwrap().shape.chargerStripe;
+  const transmitterStripeSchema = maintenanceFormSchema.shape.microphone.unwrap().shape.transmitterStripe;
+  const aldBatteriesChargedSchema = maintenanceFormSchema.shape.microphone.unwrap().shape.aldBatteriesCharged;
 
-  const [transmitter, setTransmitter] = useState<boolean>(existingValues?.transmitterStripe ?? false);
-  const [charger, setCharger] = useState<boolean>(existingValues?.chargerStripe ?? false);
-  const [battery, setBattery] = useState<boolean>(existingValues?.batteryStripe ?? false);
+  type BatteryStripe = z.infer<typeof batteryStripeSchema>;
+  type ChargerStripe = z.infer<typeof chargerStripeSchema>;
+  type TransmitterStripe = z.infer<typeof transmitterStripeSchema>;
+  type AldBatteriesCharged = z.infer<typeof aldBatteriesChargedSchema>;
+
+  const [equipped, setEquipped] = useState<boolean>(false);
+  const [batteryStripe, setBatteryStripe] = useState<BatteryStripe>("");
+  const [chargerStripe, setChargerStripe] = useState<ChargerStripe>("");
+  const [transmitterStripe, setTransmitterStripe] = useState<TransmitterStripe>("");
+  const [aldBatteriesCharged, setAldBatteriesCharged] = useState<AldBatteriesCharged>("");
 
   useEffect(() => {
     field.handleChange({ transmitter, charger, battery });

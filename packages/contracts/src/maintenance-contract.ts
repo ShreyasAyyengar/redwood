@@ -85,16 +85,13 @@ export const maintenanceEntrySchema = z.object({
   completedBy: z.email(),
   microphone: z
     .object({
-      batteryStripe: z.enum(["Yes", "Re-applied", "No, task created for completion", "No, issue preventing completion"]),
-      chargerStripe: z.enum(["Yes", "Re-painted", "No, task created for completion", "No, issue preventing completion"]),
-      transmitterStripe: z.enum(["Yes", "Re-painted", "No, task created for completion", "No, issue preventing completion"]),
-      aldBatteriesCharged: z.enum([
-        "Yes",
-        "Battery replaced",
-        "Found dead, now re-charging",
-        "No, task created for completion",
-        "No, issue preventing completion",
-      ]),
+      batteryStripe: z.enum(["Yes", "Re-applied", "No, task created for completion", "No, issue preventing completion"], "Invalid status"),
+      chargerStripe: z.enum(["Yes", "Re-applied", "No, task created for completion", "No, issue preventing completion"], "Invalid status"),
+      transmitterStripe: z.enum(["Yes", "Re-applied", "No, task created for completion", "No, issue preventing completion"], "Invalid status"),
+      aldBatteriesCharged: z.enum(
+        ["Yes", "Battery replaced", "Found dead, now re-charging", "No, task created for completion", "No, issue preventing completion"],
+        "Invalid status"
+      ),
     })
     .optional(),
   dten: z
