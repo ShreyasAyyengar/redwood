@@ -1,7 +1,6 @@
 import type { classroomSchema } from "@redwood/contracts";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { Bug, Building2, Info, SquareCheckBig, Wrench } from "lucide-react";
-import { useState } from "react";
 import type { z } from "zod";
 import { monthNames, nth } from "../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../util/style-util";
@@ -26,8 +25,6 @@ export default function RoomSummary({
     lastServiced = `${monthName} ${day}${dayEnding}`;
     lastServicedDaysAgo = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
   }
-
-  const [newMaintOpen, setNewMaintOpen] = useState(false);
 
   const roomStateBadge = (
     <div
@@ -106,17 +103,7 @@ export default function RoomSummary({
 
       <div className="flex justify-start lg:justify-center">
         <NewMaintenanceDialog roomId={room._id}>
-          <div
-            className="mt-5 flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg transition-all duration-150 hover:bg-neutral-400 active:scale-95 active:transform"
-            onClick={() => setNewMaintOpen(true)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                e.stopPropagation();
-                setNewMaintOpen(true);
-              }
-            }}
-          >
+          <div className="mt-5 flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg transition-all duration-150 hover:bg-neutral-400 active:scale-95 active:transform">
             <Wrench className="mr-2 h-5 w-5" />
             Perform Maintenance
           </div>
