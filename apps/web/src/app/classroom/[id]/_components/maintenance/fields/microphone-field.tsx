@@ -1,7 +1,7 @@
-import type { maintenanceFormSchema } from "@redwood/contracts";
-import { Checkbox } from "@redwood/shad-ui/components/checkbox";
+import { maintenanceFormSchema } from "@redwood/contracts";
+import { Field, FieldError } from "@redwood/shad-ui/components/field";
 import { Label } from "@redwood/shad-ui/components/label";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@redwood/shad-ui/components/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@redwood/shad-ui/components/select";
 import { Separator } from "@redwood/shad-ui/components/separator";
 import { Switch } from "@redwood/shad-ui/components/switch";
 import { useEffect, useState } from "react";
@@ -10,7 +10,7 @@ import { type FormValues, useFieldContext } from "../maintenance-form";
 
 export default function MicrophoneField({ existingValues }: { existingValues?: z.infer<typeof maintenanceFormSchema>["microphone"] }) {
   const field = useFieldContext<FormValues["microphone"]>();
-  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+  const isInvalid = !field.state.meta.isValid && field.state.meta.isTouched;
 
   const batteryStripeSchema = maintenanceFormSchema.shape.microphone.unwrap().shape.batteryStripe;
   const chargerStripeSchema = maintenanceFormSchema.shape.microphone.unwrap().shape.chargerStripe;
@@ -29,98 +29,111 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
   const [aldBatteriesCharged, setAldBatteriesCharged] = useState<AldBatteriesCharged>("");
 
   useEffect(() => {
-    field.handleChange({ transmitter, charger, battery });
-  }, [transmitter, charger, battery]);
+    if (!equipped) field.handleChange(undefined);
+    else field.handleChange({ batteryStripe, chargerStripe, transmitterStripe, aldBatteriesCharged });
+  }, [equipped, batteryStripe, chargerStripe, transmitterStripe, aldBatteriesCharged]);
 
   return (
-    <div className="flex flex-col">
-      <div className="flex items-center gap-3">
-        <Label htmlFor="microphone-equipped" className="font-semibold text-lg">
-          Is Room Microphone Equipped?
-        </Label>
-        <Switch
-          id="microphone-equipped"
-          className="data-[state=checked]:bg-amber-500"
-          checked={equipped}
-          onCheckedChange={(checked) => setEquipped(checked.valueOf() as boolean)}
-        />
-      </div>
+    <Field data-invalid={isInvalid}>
+      <div className="flex flex-col">
+        <div className="flex items-center gap-3">
+          <Label htmlFor="microphone-equipped" className="font-semibold text-lg">
+            Is Room Microphone Equipped?
+          </Label>
+          <Switch
+            id="microphone-equipped"
+            className="data-[state=checked]:bg-zinc-400"
+            checked={equipped}
+            onCheckedChange={(checked) => setEquipped(checked.valueOf() as boolean)}
+          />
+          {isInvalid && <span className="text-red-500">Invalid</span>}
+        </div>
 
-      {equipped && (
-        <div className="flex gap-4">
-          <Separator className="ml-3 h-45! w-0.5! bg-amber-500" orientation="vertical" />
-          <div>
-            <span>Painted Green Stripe Applied:</span>
-            <div className="ml-4 flex flex-col items-start space-y-1">
-              <div className="flex items-center gap-2">
-                <span>Battery: </span>
+        {equipped && (
+          <>
+            <div className="mt-3 flex w-full gap-4">
+              <Separator className="ml-3 h-35! w-0.5! bg-zinc-500" orientation="vertical" />
+              <div className="mr-3 w-full">
+                <span>Painted Green Stripe Visible:</span>
+                <div className="mt-1 ml-4 flex flex-col items-start space-y-1">
+                  <div className="flex w-full items-center justify-between gap-2">
+                    <span>Battery: </span>
 
-                <Select>
-                  <SelectTrigger className="w-full max-w-48">
-                    <SelectValue placeholder="Select a fruit" />
+                    <Select value={batteryStripe} onValueChange={(value) => setBatteryStripe(value as BatteryStripe)}>
+                      <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.values(batteryStripeSchema.enum).map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {status}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="mt-1 ml-4 flex flex-col items-start space-y-1">
+                  <div className="flex w-full items-center justify-between gap-2">
+                    <span>Charger: </span>
+
+                    <Select value={chargerStripe} onValueChange={(value) => setChargerStripe(value as ChargerStripe)}>
+                      <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.values(chargerStripeSchema.enum).map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {status}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="mt-1 ml-4 flex flex-col items-start space-y-1">
+                  <div className="flex w-full items-center justify-between gap-2">
+                    <span>Transmitter: </span>
+
+                    <Select value={transmitterStripe} onValueChange={(value) => setTransmitterStripe(value as TransmitterStripe)}>
+                      <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.values(transmitterStripeSchema.enum).map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {status}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-5 mr-3 flex space-y-1">
+              <div className="flex w-full items-center justify-between gap-2">
+                <span>ALD Batteries Charged: </span>
+
+                <Select value={aldBatteriesCharged} onValueChange={(value) => setAldBatteriesCharged(value)}>
+                  <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
+                    <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="apple">Apple</SelectItem>
-                      <SelectItem value="banana">Banana</SelectItem>
-                      <SelectItem value="blueberry">Blueberry</SelectItem>
-                      <SelectItem value="grapes">Grapes</SelectItem>
-                      <SelectItem value="pineapple">Pineapple</SelectItem>
-                    </SelectGroup>
+                    {Object.values(aldBatteriesChargedSchema.enum).map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {status}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
-
-              <div className="flex items-center gap-2">
-                <span>Charger: </span>
-                <Checkbox
-                  checked={charger}
-                  disabled={!!existingValues}
-                  onCheckedChange={(checked) => setCharger(checked.valueOf() as boolean)}
-                />
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span>Transmitter: </span>
-                <Checkbox
-                  checked={transmitter}
-                  disabled={!!existingValues}
-                  onCheckedChange={(checked) => setTransmitter(checked.valueOf() as boolean)}
-                />
-              </div>
             </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+          </>
+        )}
+      </div>
 
-  // return (
-  //   <div>
-  //     Room Microphone Equipped?
-  //     <Field
-  //       data-invalid={isInvalid}
-  //       className={cn("max-h-full w-fit rounded-md bg-zinc-950/30 p-3 ring-1 ring-white/15", existingValues && "cursor-not-allowed")}
-  //     >
-  //       <div className="flex flex-col items-start justify-start space-x-3">
-  //         <FieldLabel className="text-xl" htmlFor={field.name}>
-  //           Painted Green Stripe Visible:
-  //         </FieldLabel>
-  //
-  //         <span>Transmitter: </span>
-  //         <Checkbox
-  //           checked={transmitter}
-  //           disabled={!!existingValues}
-  //           onCheckedChange={(checked) => setTransmitter(checked.valueOf() as boolean)}
-  //         />
-  //         <span>Charger: </span>
-  //         <Checkbox checked={charger} disabled={!!existingValues} onCheckedChange={(checked) => setCharger(checked.valueOf() as boolean)} />
-  //         <span>Battery: </span>
-  //         <Checkbox checked={battery} disabled={!!existingValues} onCheckedChange={(checked) => setBattery(checked.valueOf() as boolean)} />
-  //       </div>
-  //
-  //       {isInvalid && <FieldError errors={field.state.meta.errors} />}
-  //     </Field>
-  //   </div>
-  // );
+      {isInvalid && <FieldError errors={field.state.meta.errors} />}
+    </Field>
+  );
 }

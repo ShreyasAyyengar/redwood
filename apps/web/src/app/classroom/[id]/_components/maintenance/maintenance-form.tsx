@@ -66,6 +66,9 @@ export default function MaintenanceForm({
           <form.AppField name="date">{(field) => <field.DateField existingDate={maintenanceEntry?.date} />}</form.AppField>
           <Separator className="bg-indigo-500" />
 
+          {/* Microphone */}
+          <form.AppField name="microphone">{(field) => <field.MicrophoneField existingValues={maintenanceEntry?.microphone} />}</form.AppField>
+
           <Separator className="bg-indigo-500" />
 
           <Separator className="bg-indigo-500" />
