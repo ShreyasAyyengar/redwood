@@ -9,6 +9,7 @@ import { protectedProcedure } from "../libs/orpc-procedures";
 
 export const maintenanceRouter = {
   addMaintenanceEntry: protectedProcedure.maintenance.addMaintenanceEntry.handler(async ({ input, errors, context }) => {
+    console.log("received");
     const classroom = await ClassroomService.findById(input.classroomId);
     if (!classroom) throw errors.NOT_FOUND({ data: { message: `Classroom with id ${input.classroomId} not found` } });
 
@@ -18,12 +19,12 @@ export const maintenanceRouter = {
       ...input,
       _id: uuidv7(),
       classroomId: input.classroomId,
-      date: new Date(),
+      date: input.date,
       completedBy: context.user.email,
     };
 
     try {
-      await ClassroomService.findByIdAndUpdate(input.classroomId, { lastMaintenance: newEntry });
+      await ClassroomService.findByIdAndUpdate(input.classroomId, { lastMaintenance: { date: input.date, by: context.user.email } });
       await MaintenanceService.insertOne(newEntry);
 
       return true;

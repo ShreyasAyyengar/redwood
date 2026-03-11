@@ -78,7 +78,7 @@ export default function RoomSummary({
 
       <div className="mt-2 flex items-center gap-2">
         <Info className="h-5 w-5" />
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <div className="flex font-bold text-neutral-400 text-sm">Classroom Status</div>
           <div className="flex font-normal text-sm text-white/80">{roomStateBadge}</div>
         </div>
@@ -104,22 +104,24 @@ export default function RoomSummary({
         </div>
       </div>
 
-      <NewMaintenanceDialog roomId={room._id}>
-        <div
-          className="mt-5 flex w-fit items-center self-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg transition-all duration-150 hover:bg-neutral-400 active:scale-95 active:transform"
-          onClick={() => setNewMaintOpen(true)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              e.stopPropagation();
-              setNewMaintOpen(true);
-            }
-          }}
-        >
-          <Wrench className="mr-2 h-5 w-5" />
-          Perform Maintenance
-        </div>
-      </NewMaintenanceDialog>
+      <div className="flex justify-start lg:justify-center">
+        <NewMaintenanceDialog roomId={room._id}>
+          <div
+            className="mt-5 flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg transition-all duration-150 hover:bg-neutral-400 active:scale-95 active:transform"
+            onClick={() => setNewMaintOpen(true)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                e.stopPropagation();
+                setNewMaintOpen(true);
+              }
+            }}
+          >
+            <Wrench className="mr-2 h-5 w-5" />
+            Perform Maintenance
+          </div>
+        </NewMaintenanceDialog>
+      </div>
 
       {/* TODO: open dialog */}
     </div>

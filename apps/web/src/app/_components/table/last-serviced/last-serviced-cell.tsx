@@ -24,9 +24,7 @@ export default function LastServicedCell({ row }: { row: Row<z.infer<typeof clas
         <span
           className={cn(
             "rounded-full px-2 py-0.5 text-lg",
-            // daysAgo <= 14 && "bg-[#2b462f] text-[#B4F7AB]",
-            // daysAgo > 14 && daysAgo <= 30 && "bg-[#463a2b] text-[#FCD34D]",
-            // daysAgo > 21 && "bg-[#5a1f24] text-[#FCA5A5]"
+            // under 14, green, between 14 and 21, orange, over 21, red
             daysAgo <= 14 && urgencyStyle("green"),
             daysAgo > 14 && daysAgo <= 21 && urgencyStyle("orange"),
             daysAgo > 21 && urgencyStyle("red")
@@ -36,12 +34,7 @@ export default function LastServicedCell({ row }: { row: Row<z.infer<typeof clas
         </span>
       </div>
 
-      <div
-        // under 14, green, between 14 and 21, orange, over 21, red
-        className={cn("mt-1 text-center")}
-      >
-        {`${monthName} ${day}${dayEnding} ${daysAgo > 0 ? `• ${lastMaintenance.by.split("@")[0]}` : ""}`}
-      </div>
+      <div className={cn("mt-1 text-center")}>{`${monthName} ${day}${dayEnding} • ${lastMaintenance.by.split("@")[0]}`}</div>
     </div>
   );
 }

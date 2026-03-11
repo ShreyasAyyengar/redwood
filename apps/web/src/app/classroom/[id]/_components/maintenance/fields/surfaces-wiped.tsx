@@ -18,8 +18,8 @@ export default function SurfacesWipedField({ existingValue }: { existingValue?: 
   return (
     <Field data-invalid={isInvalid}>
       <div className="flex items-center space-x-3">
-        <div className="flex items-center gap-2">
-          <FieldLabel htmlFor={field.name} className={cn("text-xl transition-all duration-150", value && "text-emerald-500")}>
+        <div className="flex items-center gap-1">
+          <FieldLabel htmlFor={field.name} className={cn("rounded-lg px-2 text-lg transition-all duration-150", value && "bg-emerald-800")}>
             Surfaces Wiped
           </FieldLabel>
           <HoverCard openDelay={500} closeDelay={50}>
