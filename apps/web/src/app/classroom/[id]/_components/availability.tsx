@@ -121,7 +121,10 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
                       <div className="flex items-center gap-2">
                         <div
                           className="flex cursor-pointer items-center gap-1"
-                          onClick={() => setOmitShortBreaks(!omitShortBreaks)}
+                          onClick={() => {
+                            setOmitShortBreaks(!omitShortBreaks);
+                            localStorage.setItem("omittingShortBreaks", omitShortBreaks ? "false" : "true");
+                          }}
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {
                               e.preventDefault();
@@ -130,15 +133,7 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
                             }
                           }}
                         >
-                          <Checkbox
-                            id="terms-checkbox"
-                            name="terms-checkbox"
-                            checked={omitShortBreaks}
-                            onCheckedChange={(checked) => {
-                              setOmitShortBreaks(!!checked);
-                              localStorage.setItem("omittingShortBreaks", checked ? "true" : "false");
-                            }}
-                          />
+                          <Checkbox id="terms-checkbox" name="terms-checkbox" checked={omitShortBreaks} />
                           <span
                             className={cn(
                               "font-normal text-sm text-zinc-400 transition-all duration-150",
