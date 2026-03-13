@@ -2,7 +2,7 @@ import type { classroomSchema } from "@redwood/contracts";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import type { Row } from "@tanstack/react-table";
 import type { z } from "zod";
-import { monthNames, nth } from "../../../../util/date-time-utils";
+import { daysAgo as daysAgoUtil, monthNames, nth } from "../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../util/style-util";
 
 export default function LastServicedCell({ row }: { row: Row<z.infer<typeof classroomSchema>> }) {
@@ -16,7 +16,7 @@ export default function LastServicedCell({ row }: { row: Row<z.infer<typeof clas
   const day = date.getDate();
   const dayEnding = nth(day);
 
-  const daysAgo = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+  const daysAgo = daysAgoUtil(date);
 
   return (
     <div className="flex flex-col">

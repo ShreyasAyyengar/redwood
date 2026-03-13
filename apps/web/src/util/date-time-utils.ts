@@ -83,3 +83,7 @@ export function convertMinutesToReadable(minutes: number): string {
   const displayHours = hours % 12 || 12;
   return `${displayHours}:${mins.toString().padStart(2, "0")} ${period}`;
 }
+
+export function daysAgo(date: Date): number {
+  return Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+}

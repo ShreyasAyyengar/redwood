@@ -3,7 +3,13 @@ import { cn } from "@redwood/shad-ui/lib/utils";
 import { CircleAlert, ThumbsUp, TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { z } from "zod";
-import { convertMinutesToReadable, dayAvailability, getBlocksForToday, getCaliClock } from "../../../util/date-time-utils";
+import {
+  convertMinutesToReadable,
+  dayAvailability,
+  daysAgo as daysAgoUtil,
+  getBlocksForToday,
+  getCaliClock,
+} from "../../../util/date-time-utils";
 import { urgencyStyle } from "../../../util/style-util";
 
 export default function RoomCard({ room }: { room: z.infer<typeof classroomSchema> }) {
@@ -12,7 +18,7 @@ export default function RoomCard({ room }: { room: z.infer<typeof classroomSchem
     if (!room.lastMaintenance) return <div className="text-center text-foreground text-lg">No Record Yet</div>;
 
     const date = new Date(room.lastMaintenance.date);
-    const daysAgo = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+    const daysAgo = daysAgoUtil(date);
 
     return (
       <span
