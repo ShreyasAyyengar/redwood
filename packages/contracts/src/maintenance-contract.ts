@@ -56,7 +56,7 @@ export const taskSchema = z.object({
   task: z.object({
     createdBy: z.email(),
     createdAt: z.coerce.date(),
-    description: z.string(),
+    description: z.string("Task description is required.").min(1, "Task description is required."),
     urgent: z.boolean(),
     visibleAt: z.coerce.date().optional(),
     completeBy: z.coerce.date().optional(),
