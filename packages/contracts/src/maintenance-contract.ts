@@ -80,7 +80,7 @@ export const taskSchema = z.object({
 
 export const taskFormSchema = taskSchema
   .omit({ _id: true, classroomId: true, completion: true, edited: true, task: true })
-  .extend({ task: taskSchema.shape.task.omit({ createdBy: true }) });
+  .extend({ task: taskSchema.shape.task.omit({ createdBy: true, createdAt: true }) });
 
 export const maintenanceEntrySchema = z.object({
   _id: z.uuidv7(),
