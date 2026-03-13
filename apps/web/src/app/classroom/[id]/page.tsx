@@ -80,7 +80,7 @@ export default function RoomPage() {
             <ActiveIssues issues={issues} />
           </div>
           <div className="h-[45dvh]">
-            <OpenTasks tasks={tasks} />
+            <OpenTasks tasks={tasks} roomId={roomId} />
           </div>
           <div className="h-[40dvh]">
             <MaintenanceHistory history={maintenanceHistory} room={room} />
@@ -115,7 +115,7 @@ export default function RoomPage() {
         </div>
         <div className="mt-10 flex h-[45dvh] gap-10">
           <ActiveIssues issues={issues} />
-          <OpenTasks tasks={tasks} />
+          <OpenTasks tasks={tasks} roomId={roomId} />
         </div>
       </div>
     </>
