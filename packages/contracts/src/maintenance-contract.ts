@@ -262,7 +262,7 @@ export const maintenanceContract = {
     .route({
       method: "POST",
     })
-    .input(taskSchema.omit({ _id: true }))
+    .input(taskSchema.omit({ _id: true, task: true }).extend({ task: taskSchema.shape.task.omit({ createdAt: true, createdBy: true }) }))
     .output(z.boolean())
     .errors({
       NOT_FOUND: {
