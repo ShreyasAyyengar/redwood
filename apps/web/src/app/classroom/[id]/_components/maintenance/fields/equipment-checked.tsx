@@ -4,6 +4,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@redwood/shad-ui/
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { CircleQuestionMark } from "lucide-react";
 import { useEffect, useState } from "react";
+import { urgencyStyle } from "../../../../../../util/style-util";
 import { type FormValues, useFieldContext } from "../maintenance-form";
 
 export default function EquipmentCheckedField({ existingValue }: { existingValue?: boolean }) {
@@ -19,7 +20,10 @@ export default function EquipmentCheckedField({ existingValue }: { existingValue
     <Field data-invalid={isInvalid}>
       <div className="flex items-center space-x-3">
         <div className="flex items-center gap-1">
-          <FieldLabel htmlFor={field.name} className={cn("rounded-lg px-2 text-lg transition-all duration-150", value && "bg-emerald-800")}>
+          <FieldLabel
+            htmlFor={field.name}
+            className={cn("rounded-lg bg-zinc-800 px-2 text-lg transition-all duration-150", value && urgencyStyle("green"))}
+          >
             Equipment Checked / QC'd
           </FieldLabel>
           <HoverCard openDelay={500} closeDelay={50}>
@@ -59,7 +63,7 @@ export default function EquipmentCheckedField({ existingValue }: { existingValue
           </HoverCard>
         </div>
         <Checkbox
-          className={cn("h-5 w-5", value && "text-emerald-500")}
+          className="h-5 w-5"
           checked={value}
           disabled={!!existingValue}
           onCheckedChange={(checked) => setValue(checked.valueOf() as boolean)}
