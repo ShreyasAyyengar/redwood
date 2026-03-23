@@ -5,6 +5,7 @@ import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { AlertCircle, AlertTriangle, BookAlert, Plus, TriangleAlert } from "lucide-react";
 import type { z } from "zod";
+import { daysAgo as daysAgoUtil } from "../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../util/style-util";
 
 export default function ActiveIssues({
@@ -63,6 +64,19 @@ export default function ActiveIssues({
         {openIssues && openIssues.length > 0 ? (
           <ScrollArea className="mt-5 h-full min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
             {openIssues?.map((issue) => {
+              const daysAgo = daysAgoUtil(new Date(issue.issue.issueDate));
+              const daysAgoStr = daysAgo === 0 ? "today" : daysAgo === 1 ? "yesterday" : `${daysAgo} days ago`;
+
+              return (
+                <Card key={issue._id} className="my-1 border-zinc-800 bg-zinc-900/50 p-4 transition-colors hover:border-zinc-700">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5">
+                      {issue.issue.urgent ? (
+                        <AlertTriangle className="size-5 text-red-400" />
+                      ) : (
+                        <AlertCircle className="size-5 text-amber-400" />
+                      )}
+                    </div>
 
                     <div className="min-w-0 flex-1">
                       {/*<div className="mb-2 flex flex-col items-start justify-between gap-2 lg:flex-row">*/}
@@ -82,15 +96,16 @@ export default function ActiveIssues({
                         </div>
                       </div>
 
-                    <div className="flex items-center gap-1 text-xs text-zinc-500">
-                      <span>Reported 5 days ago</span>
-                      <span className="text-zinc-700">•</span>
-                      <span>by {issue.issue.reportedBy.split("@")[0]}</span>
+                      <div className="flex items-center gap-1 text-xs text-zinc-500">
+                        <span>Reported {daysAgoStr}</span>
+                        <span className="text-zinc-700">•</span>
+                        <span>by {issue.issue.reportedBy.split("@")[0]}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </ScrollArea>
         ) : (
           <div className="flex flex-1 items-center justify-center font-semibold text-3xl text-zinc-300">
