@@ -77,7 +77,7 @@ export default function Page() {
             <Availability room={room} />
           </div>
           <div className="h-[45dvh]">
-            <ActiveIssues issues={issues} />
+            <ActiveIssues issues={issues} roomId={roomId} />
           </div>
           <div className="h-[45dvh]">
             <OpenTasks tasks={tasks} roomId={roomId} />
@@ -114,7 +114,7 @@ export default function Page() {
           <MaintenanceHistory history={maintenanceHistory} room={room} />
         </div>
         <div className="mt-10 flex h-[45dvh] gap-10">
-          <ActiveIssues issues={issues} />
+          <ActiveIssues issues={issues} roomId={roomId} />
           <OpenTasks tasks={tasks} roomId={roomId} />
         </div>
       </div>

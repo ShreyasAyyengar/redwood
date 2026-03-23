@@ -1,4 +1,4 @@
-import type { issueSchema } from "@redwood/contracts";
+import type { classroomSchema, issueSchema } from "@redwood/contracts";
 import { Badge } from "@redwood/shad-ui/components/badge";
 import { Card } from "@redwood/shad-ui/components/card";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
@@ -7,7 +7,13 @@ import { AlertCircle, AlertTriangle, BookAlert, Plus, TriangleAlert } from "luci
 import type { z } from "zod";
 import { urgencyStyle } from "../../../../util/style-util";
 
-export default function ActiveIssues({ issues }: { issues?: z.infer<typeof issueSchema>[] }) {
+export default function ActiveIssues({
+  issues,
+  roomId,
+}: {
+  issues?: z.infer<typeof issueSchema>[];
+  roomId: z.infer<typeof classroomSchema>["_id"];
+}) {
   const openIssues = issues?.filter((issue) => !issue.resolution);
 
   return (
