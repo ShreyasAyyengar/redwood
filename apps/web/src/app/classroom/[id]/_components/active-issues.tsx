@@ -7,6 +7,7 @@ import { AlertCircle, AlertTriangle, BookAlert, Plus, TriangleAlert } from "luci
 import type { z } from "zod";
 import { daysAgo as daysAgoUtil } from "../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../util/style-util";
+import { NewIssueDialog } from "./new-issue-dialog";
 
 export default function ActiveIssues({
   issues,
@@ -55,10 +56,12 @@ export default function ActiveIssues({
             </button>
           </div>
 
-          <div className="flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg transition-all duration-150 hover:bg-neutral-400 active:scale-95 active:transform">
-            <Plus className="mr-2 h-5 w-5" />
-            New Issue
-          </div>
+          <NewIssueDialog roomId={roomId}>
+            <div className="flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg transition-all duration-150 hover:bg-neutral-400 active:scale-95 active:transform">
+              <Plus className="mr-2 h-5 w-5" />
+              New Issue
+            </div>
+          </NewIssueDialog>
         </div>
 
         {openIssues && openIssues.length > 0 ? (
