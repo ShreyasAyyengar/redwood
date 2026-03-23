@@ -16,6 +16,22 @@ export const fileUploadSchema = z.object({
 // anyone can edit the issue, and can edit the resolution if it exists
 // show: created by, resolved by, last edited byi
 
+export const uploadPhotoInput = z.object({
+  id: z.uuidv7(),
+  file: z.file("Invalid file."),
+});
+
+// Valid MIME types for uploaded files: JPEG, PNG, WebP, GIF, AVIF, TIFF and SVG
+export const VALID_PHOTO_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/avif",
+  "image/tiff",
+  "image/svg+xml",
+] as const;
+
 export const issueSchema = z.object({
   _id: z.uuidv7(),
   classroomId: z.uuidv7(),
