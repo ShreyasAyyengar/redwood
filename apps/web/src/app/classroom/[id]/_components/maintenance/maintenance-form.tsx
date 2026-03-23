@@ -5,10 +5,9 @@ import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { Separator } from "@redwood/shad-ui/components/separator";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../../lib/orpc-web-client";
-import { useFetchedRoomsStore } from "../../../../_components/room-store";
 import DateField from "./fields/date-field";
 import DTENField from "./fields/dten-field";
 import EquipmentCheckedField from "./fields/equipment-checked";
@@ -33,14 +32,21 @@ export const { useAppForm } = createFormHook({
 export default function MaintenanceForm({
   roomId,
   maintenanceEntry,
+  onSuccess,
 }: {
   roomId: z.infer<typeof classroomSchema>["_id"];
   maintenanceEntry?: z.infer<typeof maintenanceEntrySchema>;
+  onSuccess?: () => void;
 }) {
-  const { updateRoom } = useFetchedRoomsStore();
+  const queryClient = useQueryClient();
   const createMaintenanceLog = useMutation(
     webClientORPC.maintenance.addMaintenanceEntry.mutationOptions({
-      onSuccess: (data) => updateRoom(roomId),
+      onSuccess: async (data) => {
+        await queryClient.invalidateQueries({
+          queryKey: webClientORPC.maintenance.getHistory.queryOptions({ input: { classroomId: roomId } }).queryKey,
+        });
+        onSuccess?.();
+      },
     })
   );
 
