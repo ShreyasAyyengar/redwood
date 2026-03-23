@@ -84,7 +84,7 @@ export default function RoomCard({ room }: { room: z.infer<typeof classroomSchem
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: no keys on mobile view
     <div
-      className="mb-5 flex flex-col rounded-lg bg-zinc-950 p-3 shadow-xl/50 ring-1 ring-black/5"
+      className="mb-5 flex flex-col rounded-lg bg-neutral-900 p-3 shadow-xl/50 ring-1 ring-black/5"
       onClick={() => router.push(`/classroom/${room._id}`)}
     >
       <div className="flex flex-col items-start gap-5">

@@ -50,7 +50,7 @@ export function RoomTable<TData, TValue>({ data, columns }: { data: TData[]; col
   const rows = table.getRowModel();
 
   return (
-    <ScrollArea className="flex h-full w-fit items-center justify-center rounded-lg bg-background-100 p-5 shadow-xl/50 ring-1 ring-black/5">
+    <ScrollArea className="flex h-full w-fit items-center justify-center rounded-lg bg-neutral-900 p-5 shadow-xl/50 ring-1 ring-black/5">
       <Table className="border-separate border-spacing-0">
         <TableHeader className="sticky top-0 z-1 border">
           {table.getHeaderGroups().map((headerGroup) => (
