@@ -12,3 +12,5 @@ export function urgencyStyle(style: "red" | "orange" | "green" | "purple"): stri
       return "";
   }
 }
+
+// TODO add `border` class?

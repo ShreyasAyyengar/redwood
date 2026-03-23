@@ -4,7 +4,7 @@ import type { Row } from "@tanstack/react-table";
 import type { z } from "zod";
 
 export default function OpenTasksCell({ row }: { row: Row<z.infer<typeof classroomSchema>> }) {
-  const openTasksCount = row.original.openTasksCount;
+  const openTasksCount = row.original.openTasksCount; // TODO find a way to make this 'open tasks'
 
   return (
     <div
