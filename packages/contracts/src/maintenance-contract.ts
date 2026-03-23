@@ -65,6 +65,10 @@ export const issueSchema = z.object({
   files: z.array(z.uuid()).optional(), // UUIDs of uploaded files to R2
 });
 
+export const issueFormSchema = issueSchema
+  .omit({ _id: true, classroomId: true, resolution: true, edited: true, adminNotes: true, files: true, issue: true })
+  .extend({ issue: issueSchema.shape.issue.omit({ reportedBy: true }) });
+
 export const taskSchema = z.object({
   _id: z.uuidv7(),
   classroomId: z.uuidv7(),
