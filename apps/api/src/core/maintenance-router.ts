@@ -73,4 +73,26 @@ export const maintenanceRouter = {
       throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
     }
   }),
+
+  addIssue: protectedProcedure.maintenance.addIssue.handler(async ({ input, errors, context }) => {
+    const classroom = await ClassroomService.findById(input.classroomId);
+    if (!classroom) throw errors.NOT_FOUND({ data: { message: `Classroom with id ${input.classroomId} not found` } });
+
+    const newIssue = {
+      ...input,
+      _id: uuidv7(),
+      adminNotes: [],
+      issue: {
+        ...input.issue,
+        reportedBy: context.user.email,
+      },
+    };
+
+    try {
+      await IssueService.insertOne(newIssue);
+      return true;
+    } catch (e) {
+      throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
+    }
+  }),
 };

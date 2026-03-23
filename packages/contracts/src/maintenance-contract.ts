@@ -182,7 +182,7 @@ export const maintenanceContract = {
     .route({
       method: "POST",
     })
-    .input(issueSchema.pick({ classroomId: true, issue: true }))
+    .input(issueFormSchema.extend({ classroomId: issueSchema.shape.classroomId }))
     .output(z.boolean())
     .errors({
       NOT_FOUND: {
@@ -286,6 +286,11 @@ export const maintenanceContract = {
     .output(z.boolean())
     .errors({
       NOT_FOUND: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+      UNPROCESSABLE_CONTENT: {
         data: z.object({
           message: z.string(),
         }),
