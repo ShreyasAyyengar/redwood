@@ -21,9 +21,9 @@ export default function MaintenanceHistory({
         <div>Maintenance History</div>
       </div>
 
-      <ScrollArea className="mt-3 h-full min-h-0 flex-1">
+      <ScrollArea className="mt-3 h-full min-h-0 flex-1 rounded-2xl bg-zinc-950/50 p-3">
         <TooltipProvider skipDelayDuration={0}>
-          <div className="space-y-2">
+          <div className="mt-1 space-y-2">
             {history?.map((entry) => {
               const date = new Date(entry.date);
               const monthName = monthNames[date.getMonth()];

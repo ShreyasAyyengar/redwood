@@ -76,15 +76,14 @@ export default function OpenTasks({ tasks, roomId }: { tasks?: z.infer<typeof ta
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <div className="mb-2 flex flex-col items-start justify-between gap-2 lg:flex-row">
+                      <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
                         <p className="flex-1 font-normal text-sm text-zinc-200">{task.task.description}</p>
                         <div className="flex shrink-0 gap-1.5">
                           {task.task.urgent && (
-                            <Badge variant="outline" className="border-red-500/30 bg-red-500/20 text-red-400">
+                            <Badge variant="outline" className={urgencyStyle("red")}>
                               Urgent
                             </Badge>
                           )}
-                          {/* TODO use this box for overdue tasks */}
                           {isOverdue && (
                             <Badge variant="outline" className={urgencyStyle("orange")}>
                               Overdue

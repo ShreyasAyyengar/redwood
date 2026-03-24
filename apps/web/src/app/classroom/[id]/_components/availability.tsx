@@ -10,7 +10,7 @@ import { convertMinutesToReadable } from "../../../../util/date-time-utils";
 
 const SHORT_BREAK_MINUTES = 15;
 
-// TODO red
+// TODO redo
 export default function Availability({ room }: { room: z.infer<typeof classroomSchema> }) {
   // get short break preference from local storage
   const storedOmitShortBreaks = localStorage.getItem("omittingShortBreaks");
@@ -77,7 +77,6 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
     return "future";
   };
 
-  // TODO add scroll indicator for availability
   // TODO add scroll indicator for availability
   return (
     <div className="flex h-full flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/80 sm:text-2xl">
@@ -269,7 +268,7 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
         <TabsList
           className={cn(
             // Mobile/tablet: tabs on top, horizontal scroll if needed
-            "w-full flex-row items-stretch gap-1 overflow-x-auto rounded-xl border bg-zinc-950/40 p-2",
+            "mx-auto ml-5 w-full flex-row items-stretch gap-1 overflow-x-auto rounded-xl border bg-zinc-950/40 p-2",
             // Desktop (xl+): tabs on the left, full height
             "xl:h-full xl:w-40 xl:flex-col xl:overflow-visible"
           )}
