@@ -64,25 +64,36 @@ export default function MaintenanceForm({
     },
   });
 
+  const microphoneSection =
+    !maintenanceEntry || maintenanceEntry.microphone ? (
+      <>
+        <Separator className="bg-indigo-500" />
+        <form.AppField name="microphone">{(field) => <field.MicrophoneField existingValues={maintenanceEntry?.microphone} />}</form.AppField>
+      </>
+    ) : null;
+
+  const dtenSection =
+    !maintenanceEntry || maintenanceEntry.dten ? (
+      <>
+        <Separator className="bg-indigo-500" />
+        <form.AppField name="dten">{(field) => <field.DTENField existingValue={maintenanceEntry?.dten} />}</form.AppField>
+      </>
+    ) : null;
+
   return (
     <>
       <ScrollArea className="max-h-[calc(100dvh-300px)] rounded-2xl bg-background/40 p-3">
-        {" "}
         <div className="my-2 flex flex-col gap-5 px-1">
           {/* Date */}
           <form.AppField name="date">{(field) => <field.DateField existingDate={maintenanceEntry?.date} />}</form.AppField>
-          <Separator className="bg-indigo-500" />
-
           {/* Microphone */}
-          <form.AppField name="microphone">{(field) => <field.MicrophoneField existingValues={maintenanceEntry?.microphone} />}</form.AppField>
 
-          <Separator className="bg-indigo-500" />
+          {microphoneSection}
 
           {/* DTEN */}
-          <form.AppField name="dten">{(field) => <field.DTENField existingValue={maintenanceEntry?.dten} />}</form.AppField>
+          {dtenSection}
 
           <Separator className="bg-indigo-500" />
-
           {/* General Maintenance */}
           <div className="flex flex-col items-start">
             <h2 className="mb-3 font-semibold text-lg">General Maintenance</h2>
@@ -99,22 +110,24 @@ export default function MaintenanceForm({
       </ScrollArea>
       <DialogFooter className="my-3">
         <DialogClose asChild>
-          <Button variant="outline">Cancel</Button>
+          <Button variant="outline">{maintenanceEntry ? "Close" : "Cancel"}</Button>
         </DialogClose>
-        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-          {([canSubmit, isSubmitting]) => (
-            <Button
-              className={cn(
-                `${canSubmit ? "bg-foreground hover:cursor-pointer hover:bg-foreground/50" : "cursor-not-allowed hover:bg-accent"}`,
-                `${isSubmitting ? "cursor-wait" : "cursor-default"}`
-              )}
-              onClick={form.handleSubmit}
-              disabled={!canSubmit || isSubmitting}
-            >
-              {isSubmitting ? "Logging..." : "Log Maintenance"}
-            </Button>
-          )}
-        </form.Subscribe>
+        {!maintenanceEntry && (
+          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+            {([canSubmit, isSubmitting]) => (
+              <Button
+                className={cn(
+                  `${canSubmit ? "bg-foreground hover:cursor-pointer hover:bg-foreground/50" : "cursor-not-allowed hover:bg-accent"}`,
+                  `${isSubmitting ? "cursor-wait" : "cursor-default"}`
+                )}
+                onClick={form.handleSubmit}
+                disabled={!canSubmit || isSubmitting}
+              >
+                {isSubmitting ? "Logging..." : "Log Maintenance"}
+              </Button>
+            )}
+          </form.Subscribe>
+        )}
       </DialogFooter>
     </>
   );

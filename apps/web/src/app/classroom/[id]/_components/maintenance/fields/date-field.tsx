@@ -2,6 +2,7 @@ import { Button } from "@redwood/shad-ui/components/button";
 import { Calendar } from "@redwood/shad-ui/components/calendar";
 import { Field, FieldError, FieldLabel } from "@redwood/shad-ui/components/field";
 import { Popover, PopoverContent, PopoverTrigger } from "@redwood/shad-ui/components/popover";
+import { cn } from "@redwood/shad-ui/lib/utils";
 import { CalendarDays, ChevronDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { type FormValues, useFieldContext } from "../maintenance-form";
@@ -17,7 +18,7 @@ export default function DateField({ existingDate }: { existingDate?: Date }) {
 
   return (
     <Field data-invalid={isInvalid}>
-      <div className="flex flex-col space-y-1">
+      <div className={cn("flex justify-between", existingDate && "cursor-not-allowed")}>
         <FieldLabel htmlFor={field.name} className="font-semibold text-lg">
           Date of Maintenance:
         </FieldLabel>
