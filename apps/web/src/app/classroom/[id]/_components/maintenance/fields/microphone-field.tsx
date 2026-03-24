@@ -22,11 +22,11 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
   type TransmitterStripe = z.infer<typeof transmitterStripeSchema>;
   type AldBatteriesCharged = z.infer<typeof aldBatteriesChargedSchema>;
 
-  const [equipped, setEquipped] = useState<boolean>(false);
-  const [batteryStripe, setBatteryStripe] = useState<BatteryStripe>("");
-  const [chargerStripe, setChargerStripe] = useState<ChargerStripe>("");
-  const [transmitterStripe, setTransmitterStripe] = useState<TransmitterStripe>("");
-  const [aldBatteriesCharged, setAldBatteriesCharged] = useState<AldBatteriesCharged>("");
+  const [equipped, setEquipped] = useState<boolean>(!!existingValues);
+  const [batteryStripe, setBatteryStripe] = useState<BatteryStripe>(existingValues?.batteryStripe ?? "");
+  const [chargerStripe, setChargerStripe] = useState<ChargerStripe>(existingValues?.chargerStripe ?? "");
+  const [transmitterStripe, setTransmitterStripe] = useState<TransmitterStripe>(existingValues?.transmitterStripe ?? "");
+  const [aldBatteriesCharged, setAldBatteriesCharged] = useState<AldBatteriesCharged>(existingValues?.aldBatteriesCharged ?? "");
 
   useEffect(() => {
     if (!equipped) field.handleChange(undefined);
@@ -45,6 +45,7 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
             className="data-[state=checked]:bg-zinc-400"
             checked={equipped}
             onCheckedChange={(checked) => setEquipped(checked.valueOf() as boolean)}
+            disabled={!!existingValues}
           />
           {isInvalid && <span className="text-red-500">Invalid</span>}
         </div>
@@ -59,7 +60,11 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
                   <div className="flex w-full items-center justify-between gap-2">
                     <span>Battery: </span>
 
-                    <Select value={batteryStripe} onValueChange={(value) => setBatteryStripe(value as BatteryStripe)}>
+                    <Select
+                      value={batteryStripe}
+                      onValueChange={(value) => setBatteryStripe(value as BatteryStripe)}
+                      disabled={!!existingValues}
+                    >
                       <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
                         <SelectValue placeholder="Status" />
                       </SelectTrigger>
@@ -77,7 +82,11 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
                   <div className="flex w-full items-center justify-between gap-2">
                     <span>Charger: </span>
 
-                    <Select value={chargerStripe} onValueChange={(value) => setChargerStripe(value as ChargerStripe)}>
+                    <Select
+                      value={chargerStripe}
+                      onValueChange={(value) => setChargerStripe(value as ChargerStripe)}
+                      disabled={!!existingValues}
+                    >
                       <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
                         <SelectValue placeholder="Status" />
                       </SelectTrigger>
@@ -95,7 +104,11 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
                   <div className="flex w-full items-center justify-between gap-2">
                     <span>Transmitter: </span>
 
-                    <Select value={transmitterStripe} onValueChange={(value) => setTransmitterStripe(value as TransmitterStripe)}>
+                    <Select
+                      value={transmitterStripe}
+                      onValueChange={(value) => setTransmitterStripe(value as TransmitterStripe)}
+                      disabled={!!existingValues}
+                    >
                       <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
                         <SelectValue placeholder="Status" />
                       </SelectTrigger>
@@ -115,7 +128,11 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
               <div className="flex w-full items-center justify-between gap-2">
                 <span>ALD Batteries Charged: </span>
 
-                <Select value={aldBatteriesCharged} onValueChange={(value) => setAldBatteriesCharged(value)}>
+                <Select
+                  value={aldBatteriesCharged}
+                  onValueChange={(value) => setAldBatteriesCharged(value as AldBatteriesCharged)}
+                  disabled={!!existingValues}
+                >
                   <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
