@@ -71,42 +71,47 @@ export default function ActiveIssues({
               const daysAgoStr = daysAgo === 0 ? "today" : daysAgo === 1 ? "yesterday" : `${daysAgo} days ago`;
 
               return (
-                <Card key={issue._id} className="my-1 border-zinc-800 bg-zinc-900/50 p-4 transition-colors hover:border-zinc-700">
-                  <div className="flex items-start gap-3">
-                    <div className="mt-0.5">
-                      {issue.issue.urgent ? (
-                        <AlertTriangle className="size-5 text-red-400" />
-                      ) : (
-                        <AlertCircle className="size-5 text-amber-400" />
-                      )}
-                    </div>
+                <NewIssueDialog key={issue._id} roomId={roomId} existingIssue={issue}>
+                  <Card
+                    key={issue._id}
+                    className="my-1 border-zinc-800 bg-zinc-900/50 p-4 transition-all duration-100 hover:border-zinc-700 active:scale-95"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="mt-0.5">
+                        {issue.issue.urgent ? (
+                          <AlertTriangle className="size-5 text-red-400" />
+                        ) : (
+                          <AlertCircle className="size-5 text-amber-400" />
+                        )}
+                      </div>
 
-                    <div className="min-w-0 flex-1">
-                      {/*<div className="mb-2 flex flex-col items-start justify-between gap-2 lg:flex-row">*/}
-                      <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
-                        <p className="flex-1 font-normal text-sm text-zinc-200">{issue.issue.description}</p>
-                        <div className="flex shrink-0 gap-1.5">
-                          {issue.issue.urgent && (
-                            <Badge variant="outline" className={urgencyStyle("red")}>
-                              Urgent
-                            </Badge>
-                          )}
-                          {issue.issue.supervisorNeeded && (
-                            <Badge variant="outline" className="border-purple-500/30 bg-purple-500/20 text-purple-400 hover:bg-purple-500/30">
-                              Supervisor Needed
-                            </Badge>
-                          )}
+                      <div className="min-w-0 flex-1">
+                        {/*<div className="mb-2 flex flex-col items-start justify-between gap-2 lg:flex-row">*/}
+                        <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
+                          <p className="flex-1 font-normal text-sm text-zinc-200">{issue.issue.description}</p>
+                          <div className="flex shrink-0 gap-1.5">
+                            {issue.issue.urgent && (
+                              <Badge variant="outline" className={urgencyStyle("red")}>
+                                Urgent
+                              </Badge>
+                            )}
+                            {issue.issue.supervisorNeeded && (
+                              <Badge variant="outline" className="border-purple-500/30 bg-purple-500/20 text-purple-400 hover:bg-purple-500/30">
+                                Supervisor Needed
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 text-xs text-zinc-500">
+                          <span>Reported {daysAgoStr}</span>
+                          <span className="text-zinc-700">•</span>
+                          <span>by {issue.issue.reportedBy.split("@")[0]}</span>
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-1 text-xs text-zinc-500">
-                        <span>Reported {daysAgoStr}</span>
-                        <span className="text-zinc-700">•</span>
-                        <span>by {issue.issue.reportedBy.split("@")[0]}</span>
-                      </div>
                     </div>
-                  </div>
-                </Card>
+                  </Card>
+                </NewIssueDialog>
               );
             })}
           </ScrollArea>

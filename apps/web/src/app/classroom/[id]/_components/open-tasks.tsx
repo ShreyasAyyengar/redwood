@@ -65,7 +65,10 @@ export default function OpenTasks({ tasks, roomId }: { tasks?: z.infer<typeof ta
               const daysAgoStr = daysAgo === 0 ? "today" : daysAgo === 1 ? "yesterday" : `${daysAgo} days ago`; // TODO apply this in more places?
 
               return (
-                <Card key={task._id} className="my-1 border-zinc-800 bg-zinc-900/50 p-4 transition-colors hover:border-zinc-700">
+                <Card
+                  key={task._id}
+                  className="my-1 border-zinc-800 bg-zinc-900/50 p-4 transition-all duration-100 hover:border-zinc-700 active:scale-95"
+                >
                   <div className="flex items-start gap-3">
                     <div className="mt-0.5">
                       {task.task.urgent ? (

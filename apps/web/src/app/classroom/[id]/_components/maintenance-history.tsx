@@ -5,7 +5,7 @@ import { cn } from "@redwood/shad-ui/lib/utils";
 import { CalendarDays, ClipboardClock, UserCog } from "lucide-react";
 import type { z } from "zod";
 import { monthNames, nth } from "../../../../util/date-time-utils";
-import NewMaintenanceDialog from "./new-maintenance-dialog";
+import MaintenanceDialog from "./maintenance-dialog";
 
 export default function MaintenanceHistory({
   history,
@@ -34,7 +34,7 @@ export default function MaintenanceHistory({
               return (
                 <Tooltip key={entry._id} delayDuration={500}>
                   <TooltipTrigger asChild>
-                    <NewMaintenanceDialog roomId={room._id} maintenanceEntry={entry}>
+                    <MaintenanceDialog roomId={room._id} maintenanceEntry={entry}>
                       <div
                         key={entry._id}
                         className={cn(
@@ -61,7 +61,7 @@ export default function MaintenanceHistory({
                           <span className="text-neutral-500">completed maintenance</span>
                         </div>
                       </div>
-                    </NewMaintenanceDialog>
+                    </MaintenanceDialog>
                   </TooltipTrigger>
                   <TooltipContent className="font-bold">View Maintenance Log</TooltipContent>
                 </Tooltip>

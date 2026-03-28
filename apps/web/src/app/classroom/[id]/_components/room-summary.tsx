@@ -4,7 +4,7 @@ import { Bug, Building2, Info, SquareCheckBig, Wrench } from "lucide-react";
 import type { z } from "zod";
 import { monthNames, nth } from "../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../util/style-util";
-import NewMaintenanceDialog from "./new-maintenance-dialog";
+import MaintenanceDialog from "./maintenance-dialog";
 
 export default function RoomSummary({
   room,
@@ -102,12 +102,12 @@ export default function RoomSummary({
       </div>
 
       <div className="flex justify-start lg:justify-center">
-        <NewMaintenanceDialog roomId={room._id}>
+        <MaintenanceDialog roomId={room._id}>
           <div className="mt-5 flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg transition-all duration-150 hover:bg-neutral-400 active:scale-95 active:transform">
             <Wrench className="mr-2 h-5 w-5" />
             Perform Maintenance
           </div>
-        </NewMaintenanceDialog>
+        </MaintenanceDialog>
       </div>
 
       {/* TODO: open dialog */}
