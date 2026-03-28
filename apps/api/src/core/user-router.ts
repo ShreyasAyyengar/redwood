@@ -52,4 +52,10 @@ export const userRouter = {
     await config.save();
     return true;
   }),
+
+  getUsers: adminProcedure.users.getUsers.handler(async ({ errors }) => {
+    const config = await ConfigService.findOne();
+    if (!config) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Configuration not found." } });
+    return config.users;
+  }),
 };
