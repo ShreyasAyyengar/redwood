@@ -2,7 +2,7 @@ import type { classroomSchema } from "@redwood/contracts";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@redwood/shad-ui/components/dialog";
 import { useState } from "react";
 import type { z } from "zod";
-import { NewTaskForm } from "./new-task-form";
+import { TaskForm } from "./task-form";
 
 export function NewTaskDialog({ roomId, children }: { roomId: z.infer<typeof classroomSchema>["_id"]; children?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
@@ -16,7 +16,7 @@ export function NewTaskDialog({ roomId, children }: { roomId: z.infer<typeof cla
             Create New Task:
           </DialogTitle>
         </DialogHeader>
-        <NewTaskForm roomId={roomId} onSuccess={() => setOpen(false)} />
+        <TaskForm roomId={roomId} onSuccess={() => setOpen(false)} />
       </DialogContent>
     </Dialog>
   );

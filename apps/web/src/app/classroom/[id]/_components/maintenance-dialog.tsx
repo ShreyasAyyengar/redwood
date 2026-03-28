@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { z } from "zod";
 import MaintenanceForm from "./maintenance/maintenance-form";
 
-export default function NewMaintenanceDialog({
+export default function MaintenanceDialog({
   children,
   roomId,
   maintenanceEntry,

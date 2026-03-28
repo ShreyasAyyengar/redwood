@@ -34,14 +34,14 @@ export default function Page() {
   );
 
   const { data: issues } = useQuery(
-    webClientORPC.maintenance.getIssues.queryOptions({
+    webClientORPC.issues.getIssues.queryOptions({
       input: { classroomId: roomId },
       enabled: !!room,
     })
   );
 
   const { data: tasks } = useQuery(
-    webClientORPC.maintenance.getTasks.queryOptions({
+    webClientORPC.tasks.getTasks.queryOptions({
       input: { classroomId: roomId },
       enabled: !!room,
     })

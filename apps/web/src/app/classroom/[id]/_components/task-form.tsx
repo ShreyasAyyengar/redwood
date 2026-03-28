@@ -25,14 +25,14 @@ export const { useAppForm } = createFormHook({
   formComponents: {},
 });
 
-export function NewTaskForm({ roomId, onSuccess }: { roomId: z.infer<typeof classroomSchema>["_id"]; onSuccess?: () => void }) {
+export function TaskForm({ roomId, onSuccess }: { roomId: z.infer<typeof classroomSchema>["_id"]; onSuccess?: () => void }) {
   const queryClient = useQueryClient();
 
   const createTask = useMutation(
-    webClientORPC.maintenance.addTask.mutationOptions({
+    webClientORPC.tasks.addTask.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries({
-          queryKey: webClientORPC.maintenance.getTasks.queryOptions({ input: { classroomId: roomId } }).queryKey,
+          queryKey: webClientORPC.tasks.getTasks.queryOptions({ input: { classroomId: roomId } }).queryKey,
         });
         onSuccess?.();
       },
@@ -79,6 +79,8 @@ export function NewTaskForm({ roomId, onSuccess }: { roomId: z.infer<typeof clas
               </form.AppField>
             </div>
           </div>
+
+
         </div>
       </ScrollArea>
       <DialogFooter className="my-3">

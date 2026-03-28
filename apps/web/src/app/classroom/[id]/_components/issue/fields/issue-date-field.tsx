@@ -4,17 +4,15 @@ import { Field, FieldError, FieldLabel } from "@redwood/shad-ui/components/field
 import { Popover, PopoverContent, PopoverTrigger } from "@redwood/shad-ui/components/popover";
 import { CalendarDays, ChevronDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useFieldContext } from "../../new-issue-form";
+import { useFieldContext } from "../../issue-form";
 
-export default function IssueDateField() {
+export default function IssueDateField({ existingDate }: { existingDate?: Date }) {
   const field = useFieldContext<Date>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-  const [date, setDate] = useState<Date | undefined>(field.state.value ?? new Date());
+  const [date, setDate] = useState<Date | undefined>(existingDate ?? field.state.value ?? new Date());
 
   useEffect(() => {
-    if (date) {
-      field.handleChange(date);
-    }
+    if (date) field.handleChange(date);
   }, [date]);
 
   return (
