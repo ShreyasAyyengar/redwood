@@ -45,7 +45,7 @@ export function IssueForm({
   existingIssue?: z.infer<typeof issueSchema>;
 }) {
   const queryClient = useQueryClient();
-  const [reportedBy, setReportedBy] = useState<string>(existingIssue?.issue.reportedBy ?? "");
+  const [reportedBy, setReportedBy] = useState<string | undefined>(existingIssue?.issue.reportedBy ?? undefined);
 
   const createIssue = useMutation(
     webClientORPC.issues.createIssue.mutationOptions({
@@ -70,6 +70,17 @@ export function IssueForm({
   );
 
   const form = useAppForm({
+    defaultValues: {
+      _id: existingIssue?._id,
+      issue: {
+        issueDate: existingIssue?.issue.issueDate ?? new Date(),
+        description: existingIssue?.issue.description ?? "",
+        urgent: existingIssue?.issue.urgent ?? false,
+        supervisorNeeded: existingIssue?.issue.supervisorNeeded ?? false,
+        cruzfixId: existingIssue?.issue.cruzfixId ?? undefined,
+        sodId: existingIssue?.issue.sodId ?? undefined,
+      },
+    } as FormValues | EditFormValues,
     validators: {
       onChange: existingIssue ? updateIssueRequestSchema : issueFormSchema,
     },
@@ -79,7 +90,12 @@ export function IssueForm({
         const editValue = value as EditFormValues;
         await editIssue.mutateAsync({
           ...existingIssue,
-          issue: { ...existingIssue.issue, ...editValue.issue, reportedBy },
+          ...editValue,
+          issue: {
+            ...existingIssue.issue, // re-spread existing issue after defining opening block {}
+            ...editValue.issue, // re-spread editValue.issue after defining opening block {}
+            reportedBy: reportedBy ?? undefined, // add reportedBy property with fallback value
+          },
         });
       } else {
         const createValue = value as FormValues;
@@ -134,23 +150,32 @@ export function IssueForm({
         </div>
       </ScrollArea>
       <DialogFooter className="my-3">
-        <DialogClose asChild>
-          <Button variant="outline">Cancel</Button>
-        </DialogClose>
-        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-          {([canSubmit, isSubmitting]) => (
-            <Button
-              className={cn(
-                `${!existingIssue && canSubmit ? "bg-foreground hover:cursor-pointer hover:bg-foreground/50" : "cursor-not-allowed hover:bg-accent"}`,
-                `${isSubmitting ? "cursor-wait" : "cursor-default"}`
+        <div className="flex w-full justify-between">
+          {/** biome-ignore lint/style/noNonNullAssertion: <explanation> */}
+          <DeleteIssueDialog roomId={roomId} existingIssue={existingIssue!}>
+            <Button className="bg-destructive hover:bg-destructive/50">Delete</Button>
+          </DeleteIssueDialog>
+
+          <div className="flex justify-end gap-2">
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+              {([canSubmit, isSubmitting]) => (
+                <Button
+                  className={cn(
+                    `${canSubmit ? "bg-foreground hover:cursor-pointer hover:bg-foreground/50" : "cursor-not-allowed hover:bg-accent"}`,
+                    `${isSubmitting ? "cursor-wait" : "cursor-default"}`
+                  )}
+                  onClick={form.handleSubmit}
+                  disabled={!canSubmit || isSubmitting}
+                >
+                  {isSubmitting ? (existingIssue ? "Updating..." : "Creating...") : existingIssue ? "Update Issue" : "Create Issue"}
+                </Button>
               )}
-              onClick={form.handleSubmit}
-              disabled={(!existingIssue && !canSubmit) || isSubmitting}
-            >
-              {isSubmitting ? (existingIssue ? "Updating..." : "Creating...") : existingIssue ? "Update Issue" : "Create Issue"}
-            </Button>
-          )}
-        </form.Subscribe>
+            </form.Subscribe>
+          </div>
+        </div>
       </DialogFooter>
     </>
   );
