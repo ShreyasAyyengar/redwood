@@ -7,10 +7,10 @@ import { cn } from "@redwood/shad-ui/lib/utils";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { z } from "zod";
-import { webClientORPC } from "../../../../lib/orpc-web-client";
-import DescriptionField from "./task/fields/description-field";
-import TaskDateField from "./task/fields/task-date-field";
-import UrgentField from "./task/fields/urgent-field";
+import { webClientORPC } from "../../../../../lib/orpc-web-client";
+import DescriptionField from "./fields/description-field";
+import TaskDateField from "./fields/task-date-field";
+import UrgentField from "./fields/urgent-field";
 
 export type FormValues = z.input<typeof taskFormSchema>;
 export const { fieldContext, formContext, useFieldContext } = createFormHookContexts();
@@ -79,8 +79,6 @@ export function TaskForm({ roomId, onSuccess }: { roomId: z.infer<typeof classro
               </form.AppField>
             </div>
           </div>
-
-
         </div>
       </ScrollArea>
       <DialogFooter className="my-3">

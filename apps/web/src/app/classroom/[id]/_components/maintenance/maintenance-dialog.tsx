@@ -2,7 +2,7 @@ import type { classroomSchema, maintenanceEntrySchema } from "@redwood/contracts
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@redwood/shad-ui/components/dialog";
 import { useState } from "react";
 import type { z } from "zod";
-import MaintenanceForm from "./maintenance/maintenance-form";
+import MaintenanceForm from "./maintenance-form";
 
 export default function MaintenanceDialog({
   children,

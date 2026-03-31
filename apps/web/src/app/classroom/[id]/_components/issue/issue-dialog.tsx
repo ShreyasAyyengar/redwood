@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { z } from "zod";
 import { IssueForm } from "./issue-form";
 
-export function NewIssueDialog({
+export function IssueDialog({
   roomId,
   existingIssue,
   children,

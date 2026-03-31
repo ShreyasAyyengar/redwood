@@ -4,7 +4,7 @@ import { Field, FieldError, FieldLabel } from "@redwood/shad-ui/components/field
 import { Popover, PopoverContent, PopoverTrigger } from "@redwood/shad-ui/components/popover";
 import { CalendarDays, ChevronDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useFieldContext } from "../../task-form";
+import { useFieldContext } from "../task-form";
 
 export default function TaskDateField({
   label,

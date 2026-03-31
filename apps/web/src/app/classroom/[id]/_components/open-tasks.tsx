@@ -7,7 +7,7 @@ import { AlertCircle, AlertTriangle, BookAlert, CircleAlert, Plus } from "lucide
 import type { z } from "zod";
 import { daysAgo as daysAgoUtil } from "../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../util/style-util";
-import { NewTaskDialog } from "./new-task-dialog";
+import { TaskDialog } from "./task/task-dialog";
 
 export default function OpenTasks({ tasks, roomId }: { tasks?: z.infer<typeof taskSchema>[]; roomId: z.infer<typeof classroomSchema>["_id"] }) {
   const now = Date.now();
@@ -49,12 +49,12 @@ export default function OpenTasks({ tasks, roomId }: { tasks?: z.infer<typeof ta
               {/* TODO open dialog */}
             </button>
           </div>
-          <NewTaskDialog roomId={roomId}>
+          <TaskDialog roomId={roomId}>
             <div className="flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg transition-all duration-150 hover:bg-neutral-400 active:scale-95 active:transform">
               <Plus className="mr-2 h-5 w-5" />
               New Task
             </div>
-          </NewTaskDialog>
+          </TaskDialog>
         </div>
 
         {openTasks && openTasks.length > 0 ? (

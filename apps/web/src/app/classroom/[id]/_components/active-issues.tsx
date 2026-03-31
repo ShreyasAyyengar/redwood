@@ -7,7 +7,7 @@ import { AlertCircle, AlertTriangle, BookAlert, Plus, TriangleAlert } from "luci
 import type { z } from "zod";
 import { daysAgo as daysAgoUtil } from "../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../util/style-util";
-import { NewIssueDialog } from "./new-issue-dialog";
+import { IssueDialog } from "./issue/issue-dialog";
 
 export default function ActiveIssues({
   issues,
@@ -56,12 +56,12 @@ export default function ActiveIssues({
             </button>
           </div>
 
-          <NewIssueDialog roomId={roomId}>
+          <IssueDialog roomId={roomId}>
             <div className="flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg transition-all duration-150 hover:bg-neutral-400 active:scale-95 active:transform">
               <Plus className="mr-2 h-5 w-5" />
               New Issue
             </div>
-          </NewIssueDialog>
+          </IssueDialog>
         </div>
 
         {openIssues && openIssues.length > 0 ? (
@@ -71,7 +71,7 @@ export default function ActiveIssues({
               const daysAgoStr = daysAgo === 0 ? "today" : daysAgo === 1 ? "yesterday" : `${daysAgo} days ago`;
 
               return (
-                <NewIssueDialog key={issue._id} roomId={roomId} existingIssue={issue}>
+                <IssueDialog key={issue._id} roomId={roomId} existingIssue={issue}>
                   <Card
                     key={issue._id}
                     className="my-1 border-zinc-800 bg-zinc-900/50 p-4 transition-all duration-100 hover:border-zinc-700 active:scale-95"
@@ -111,7 +111,7 @@ export default function ActiveIssues({
                       </div>
                     </div>
                   </Card>
-                </NewIssueDialog>
+                </IssueDialog>
               );
             })}
           </ScrollArea>

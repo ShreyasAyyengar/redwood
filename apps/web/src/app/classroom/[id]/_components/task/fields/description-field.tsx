@@ -1,6 +1,6 @@
 import { Field, FieldError, FieldLabel } from "@redwood/shad-ui/components/field";
 import { Textarea } from "@redwood/shad-ui/components/textarea";
-import { type FormValues, useFieldContext } from "../../task-form";
+import { type FormValues, useFieldContext } from "../task-form";
 
 export default function DescriptionField({ existingValue }: { existingValue?: string }) {
   const field = useFieldContext<FormValues["task"]["description"]>();

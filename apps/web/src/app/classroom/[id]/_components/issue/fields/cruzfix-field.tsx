@@ -1,7 +1,7 @@
 import { Checkbox } from "@redwood/shad-ui/components/checkbox";
 import { Input } from "@redwood/shad-ui/components/input";
 import { useEffect, useState } from "react";
-import { type FormValues, useFieldContext } from "../../issue-form";
+import { type FormValues, useFieldContext } from "../issue-form";
 
 export default function CruzfixField({ existingValue }: { existingValue?: string }) {
   const field = useFieldContext<FormValues["issue"]["cruzfixId"]>();

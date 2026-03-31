@@ -4,7 +4,7 @@ import { Bug, Building2, Info, SquareCheckBig, Wrench } from "lucide-react";
 import type { z } from "zod";
 import { monthNames, nth } from "../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../util/style-util";
-import MaintenanceDialog from "./maintenance-dialog";
+import MaintenanceDialog from "./maintenance/maintenance-dialog";
 
 export default function RoomSummary({
   room,

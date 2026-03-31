@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { z } from "zod";
 import { TaskForm } from "./task-form";
 
-export function NewTaskDialog({ roomId, children }: { roomId: z.infer<typeof classroomSchema>["_id"]; children?: React.ReactNode }) {
+export function TaskDialog({ roomId, children }: { roomId: z.infer<typeof classroomSchema>["_id"]; children?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
 
   return (

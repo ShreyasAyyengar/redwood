@@ -5,7 +5,7 @@ import { cn } from "@redwood/shad-ui/lib/utils";
 import { CalendarDays, ClipboardClock, UserCog } from "lucide-react";
 import type { z } from "zod";
 import { monthNames, nth } from "../../../../util/date-time-utils";
-import MaintenanceDialog from "./maintenance-dialog";
+import MaintenanceDialog from "./maintenance/maintenance-dialog";
 
 export default function MaintenanceHistory({
   history,
