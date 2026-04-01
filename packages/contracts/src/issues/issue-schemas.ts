@@ -56,8 +56,8 @@ export const issueSchema = z.object({
   _id: z.uuidv7(),
   classroomId: z.uuidv7(),
 
-  createdBy: z.email(),
-  createdAt: z.coerce.date(),
+  createdBy: z.email(), // non-editable
+  createdAt: z.coerce.date(), // non-editable
 
   issue: issueDetailsSchema,
   edited: issueEditSchema.optional(),
