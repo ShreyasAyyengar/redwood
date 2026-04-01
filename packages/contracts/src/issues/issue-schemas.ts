@@ -10,7 +10,7 @@ export const fileUploadSchema = z.object({
 
 // TODO if issue has no resolution, cannot edit resolution in payload, must resolve first
 // anyone can edit the issue, and can edit the resolution if it exists
-// show: created by, resolved by, last edited byi
+// show: created by, resolved by, last edited by
 
 export const uploadPhotoInput = z.object({
   id: z.uuidv7(),
@@ -30,59 +30,57 @@ export const VALID_PHOTO_MIME_TYPES = [
 
 export const commonAdminNotesSchema = z.enum(["Escalated to MSE"]);
 
+const issueDetailsSchema = z.object({
+  reportedBy: z.email("Issue reportedBy must be provided."),
+  reportedAt: z.coerce.date("Issue reportedAt must be provided"),
+  description: z.string("Issue description must be provided").min(1, "Issue description must be provided"),
+  sodId: z.string().optional(),
+  cruzfixId: z.string().optional(),
+  urgent: z.boolean(),
+  supervisorNeeded: z.boolean(),
+});
+
+const issueEditSchema = z.object({
+  editedBy: z.email("Issue edited.editedBy must be provided"),
+  editDate: z.coerce.date("Issue edited.editDate must be provided"),
+});
+
+const issueResolutionSchema = z.object({
+  resolvedBy: z.email("Issue resolution.resolvedBy must be provided"),
+  resolvedAt: z.coerce.date("Issue resolution.resolvedAt must be provided"),
+  comment: z.string("Issue resolution.comment must be provided"),
+});
+
 // DB Schema - The complete object as stored in the database
 export const issueSchema = z.object({
   _id: z.uuidv7(),
   classroomId: z.uuidv7(),
-  issue: z.object({
-    reportedBy: z.email(),
-    description: z.string().min(1),
-    sodId: z.string().optional(),
-    cruzfixId: z.string().optional(),
-    urgent: z.boolean(),
-    supervisorNeeded: z.boolean(),
-    issueDate: z.coerce.date(),
-  }),
-  edited: z
-    .object({
-      editedBy: z.email(),
-      editDate: z.coerce.date(),
-    })
-    .optional(),
-  resolution: z
-    .object({
-      resolvedBy: z.email().optional(),
-      comment: z.string().optional(),
-      resolutionDate: z.coerce.date().optional(),
-    })
-    .optional(),
+
+  createdBy: z.email(),
+  createdAt: z.coerce.date(),
+
+  issue: issueDetailsSchema,
+  edited: issueEditSchema.optional(),
+  resolution: issueResolutionSchema.optional(),
+
   adminNotes: z.array(z.union([commonAdminNotesSchema, z.string()])),
   files: z.array(z.uuid()).optional(),
 });
 
-// Form Schema - What the user fills out in the form
-export const issueFormSchema = z.object({
-  issue: z.object({
-    description: z.string().min(1, "Issue description is required."),
-    urgent: z.boolean(),
-    supervisorNeeded: z.boolean(),
-    issueDate: z.coerce.date(),
-    cruzfixId: z.string().optional(),
-    sodId: z.string().optional(),
-  }),
-});
+export const uiIssueFormSchema = z.object({
+  description: z.string().min(1, "Description is required"),
+  urgent: z.boolean().default(false),
+  supervisorNeeded: z.boolean().default(false),
+  cruzfixId: z.string().optional(),
+  sodId: z.string().optional(),
 
-// Create Request Schema - HTTP request body when creating a new issue
-export const createIssueRequestSchema = issueFormSchema.extend({
-  classroomId: z.uuidv7(),
-});
-
-// Update Request Schema - HTTP request body when updating an issue
-export const updateIssueRequestSchema = z.object({
-  _id: z.uuidv7(),
-  issue: issueSchema.shape.issue.partial(),
-  // Allow partial updates to issue fields
-  adminNotes: z.array(z.union([commonAdminNotesSchema, z.string()])).optional(),
-  resolution: issueSchema.shape.resolution.optional(),
-  files: z.array(z.uuid()).optional(),
+  // edit-specific fields
+  reportedBy: z.email().optional(),
+  reportedAt: z.coerce.date().optional(),
+  resolution: z
+    .object({
+      comment: z.string().min(1, "Issue resolution.comment must be provided"),
+    })
+    .optional(),
+  adminNotes: z.array(z.string()).optional(),
 });
