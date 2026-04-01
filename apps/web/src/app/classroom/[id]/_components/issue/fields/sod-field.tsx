@@ -17,7 +17,7 @@ export default function SodIDField({ existingValue }: { existingValue?: string }
   return (
     <div className="flex items-center gap-2">
       <Checkbox
-        className="h-5 w-5"
+        className="h-5 w-5 border border-neutral-400"
         checked={checked}
         onCheckedChange={(checked) => {
           setChecked(checked.valueOf() as boolean);

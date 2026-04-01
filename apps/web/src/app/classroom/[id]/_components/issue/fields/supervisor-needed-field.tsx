@@ -17,7 +17,11 @@ export default function SupervisorNeededField({ existingValue }: { existingValue
   return (
     <Field data-invalid={isInvalid}>
       <div className="flex items-center space-x-3">
-        <Checkbox className="h-5 w-5" checked={value} onCheckedChange={(checked) => setValue(checked.valueOf() as boolean)} />
+        <Checkbox
+          className="h-5 w-5 border border-neutral-400"
+          checked={value}
+          onCheckedChange={(checked) => setValue(checked.valueOf() as boolean)}
+        />
         <FieldLabel
           htmlFor={field.name}
           className={cn("rounded-lg bg-zinc-800 px-2 text-lg transition-all duration-150", value && urgencyStyle("purple"))}

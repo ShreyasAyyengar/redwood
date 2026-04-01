@@ -132,7 +132,7 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
                             }
                           }}
                         >
-                          <Checkbox id="terms-checkbox" name="terms-checkbox" checked={omitShortBreaks} />
+                          <Checkbox id="terms-checkbox" name="terms-checkbox" checked={omitShortBreaks} className="border border-neutral-400" />
                           <span
                             className={cn(
                               "font-normal text-sm text-zinc-400 transition-all duration-150",
@@ -318,6 +318,7 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
                           <Checkbox
                             id="terms-checkbox"
                             name="terms-checkbox"
+                            className="border border-neutral-400"
                             checked={omitShortBreaks}
                             onCheckedChange={(checked) => {
                               setOmitShortBreaks(!!checked);
