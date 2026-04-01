@@ -3,7 +3,7 @@ import { Textarea } from "@redwood/shad-ui/components/textarea";
 import { type FormValues, useFieldContext } from "../task-form";
 
 export default function DescriptionField({ existingValue }: { existingValue?: string }) {
-  const field = useFieldContext<FormValues["task"]["description"]>();
+  const field = useFieldContext<FormValues["description"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 
   return (
