@@ -68,8 +68,8 @@ export function TaskForm({
     defaultValues: {
       description: existingTask?.task.description ?? "",
       urgent: existingTask?.task.urgent ?? false,
-      visibleAt: existingTask?.task.visibleAt ? new Date(existingTask.task.visibleAt) : undefined,
-      completeBy: existingTask?.task.completeBy ? new Date(existingTask.task.completeBy) : undefined,
+      visibleAt: existingTask?.task.visibleAt ? existingTask.task.visibleAt : undefined,
+      completeBy: existingTask?.task.completeBy ? existingTask.task.completeBy : undefined,
       completion: existingTask?.completion ? { comment: existingTask.completion.comment } : undefined,
       createdBy: existingTask?.createdBy,
     } as FormValues,
