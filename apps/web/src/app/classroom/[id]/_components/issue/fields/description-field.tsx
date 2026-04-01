@@ -1,16 +1,10 @@
 import { Field, FieldError, FieldLabel } from "@redwood/shad-ui/components/field";
 import { Textarea } from "@redwood/shad-ui/components/textarea";
-import { useEffect, useState } from "react";
 import { type FormValues, useFieldContext } from "../issue-form";
 
 export default function DescriptionField({ existingValue }: { existingValue?: string }) {
   const field = useFieldContext<FormValues["description"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-  const [localValue, setLocalValue] = useState(existingValue ?? field.state.value);
-
-  useEffect(() => {
-    if (existingValue) field.handleChange(localValue); // force set field state if existingValue is provided
-  }, []);
 
   return (
     <Field data-invalid={isInvalid}>
@@ -22,11 +16,8 @@ export default function DescriptionField({ existingValue }: { existingValue?: st
           <Textarea
             className="border border-white/30 bg-zinc-950/30 p-3 text-lg"
             placeholder="Issue description..."
-            value={localValue}
-            onChange={(e) => {
-              setLocalValue(e.target.value);
-              field.handleChange(e.target.value);
-            }}
+            value={field.state.value}
+            onChange={(e) => field.handleChange(e.target.value)}
             onFocus={(e) => e.target.setSelectionRange(-1, -1)}
           />
         </div>
