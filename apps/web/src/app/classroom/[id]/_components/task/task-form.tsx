@@ -128,7 +128,7 @@ export function TaskForm({
                 {(field) => (
                   <field.TaskDateField
                     label="Visible At"
-                    name="task.visibleAt"
+                    name="visibleAt"
                     existingDate={existingTask?.task.visibleAt ? new Date(existingTask.task.visibleAt) : undefined}
                   />
                 )}
@@ -139,7 +139,7 @@ export function TaskForm({
                 {(field) => (
                   <field.TaskDateField
                     label="Complete By"
-                    name="task.completeBy"
+                    name="completeBy"
                     existingDate={existingTask?.task.completeBy ? new Date(existingTask.task.completeBy) : undefined}
                   />
                 )}
