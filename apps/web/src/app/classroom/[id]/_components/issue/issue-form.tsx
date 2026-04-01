@@ -77,9 +77,6 @@ export function IssueForm({
       supervisorNeeded: existingIssue?.issue.supervisorNeeded ?? false,
       cruzfixId: existingIssue?.issue.cruzfixId ?? undefined,
       sodId: existingIssue?.issue.sodId ?? undefined,
-
-      // EditFormValues
-      // reportedAt: existingIssue?.issue.reportedAt ?? new Date(),
     } as FormValues,
     validators: {
       onChange: uiIssueFormSchema,

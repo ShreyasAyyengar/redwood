@@ -102,7 +102,7 @@ export function TaskForm({
                   {(field) => <field.CreatedByFieldSelector existingValue={existingTask?.task.createdBy} />}
                 </form.AppField>
               ) : (
-                <p>Report New Issue</p>
+                <p>Create New Task</p>
               )}
             </DialogTitle>
           </DialogHeader>
