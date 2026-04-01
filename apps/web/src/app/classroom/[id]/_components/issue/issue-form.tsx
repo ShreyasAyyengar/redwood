@@ -6,6 +6,7 @@ import { Separator } from "@redwood/shad-ui/components/separator";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Trash2 } from "lucide-react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../../lib/orpc-web-client";
 import CruzfixField from "./fields/cruzfix-field";
@@ -163,7 +164,10 @@ export function IssueForm({
         <div className="flex w-full justify-between gap-2">
           {existingIssue && (
             <DeleteIssueDialog roomId={roomId} existingIssue={existingIssue}>
-              <Button className="bg-destructive hover:bg-destructive/50">Delete</Button>
+              <Button variant="ghost" className="bg-red-500/10 text-red-500 hover:bg-red-600/10 hover:text-red-600">
+                <Trash2 className="h-4 w-4" />
+                Delete Issue
+              </Button>
             </DeleteIssueDialog>
           )}
 

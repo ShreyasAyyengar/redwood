@@ -3,6 +3,7 @@ import { Button } from "@redwood/shad-ui/components/button";
 import { Dialog, DialogContent, DialogFooter, DialogTitle, DialogTrigger } from "@redwood/shad-ui/components/dialog";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../../lib/orpc-web-client";
@@ -44,11 +45,14 @@ export function DeleteIssueDialog({
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>
+
           <Button
-            variant="destructive"
-            className={cn("text-black", `${deleting ? "cursor-wait" : "cursor-default"}`)}
+            variant="ghost"
+            className={cn("bg-red-500/10 text-red-500 hover:bg-red-600/10 hover:text-red-600", `${deleting ? "cursor-wait" : "cursor-default"}`)}
             onClick={() => deleteIssueMutation.mutateAsync({ issueId: existingIssue._id })}
           >
+            <Trash2 className="h-4 w-4" />
+
             {deleting ? "Deleting..." : "Delete Issue"}
           </Button>
         </DialogFooter>
