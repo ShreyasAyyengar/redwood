@@ -1,13 +1,15 @@
-import type { basicUserSchema } from "@redwood/contracts";
-import { DialogTitle } from "@redwood/shad-ui/components/dialog";
+import type { basicUserSchema, issueSchema } from "@redwood/contracts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@redwood/shad-ui/components/select";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import type { z } from "zod";
 import { authClientWeb } from "../../../../../../lib/auth-client-web";
 import { webClientORPC } from "../../../../../../lib/orpc-web-client";
+import { type FormValues, useFieldContext } from "../issue-form";
 
-export default function IssueHeader({ existingValue, onChange }: { existingValue?: string; onChange: (value: string | undefined) => void }) {
+export default function ReportedByFieldSelector({ existingValue }: { existingValue?: z.infer<typeof issueSchema>["issue"]["reportedBy"] }) {
+  const field = useFieldContext<FormValues["sodId"]>();
+
   const { data: session } = authClientWeb.useSession();
   const isAdmin = session?.user.role === "admin";
   const [selectedUser, setSelectedUser] = useState<string | undefined>(existingValue);
@@ -19,23 +21,15 @@ export default function IssueHeader({ existingValue, onChange }: { existingValue
     })
   );
 
-  if (!existingValue) {
-    return (
-      <DialogTitle className="mx-auto rounded-md bg-zinc-950/30 px-10 py-3 text-center text-2xl ring-1 ring-white/15">
-        Report New Issue
-      </DialogTitle>
-    );
-  }
-
   return (
-    <DialogTitle className="mx-auto rounded-md bg-zinc-950/30 px-10 py-3 text-center text-2xl ring-1 ring-white/15">
+    <>
       {isAdmin ? (
         <div className="flex items-center justify-center">
           <Select
             value={selectedUser}
             onValueChange={(value) => {
               setSelectedUser(value);
-              onChange(value);
+              field.handleChange(value);
             }}
           >
             <SelectTrigger
@@ -57,6 +51,6 @@ export default function IssueHeader({ existingValue, onChange }: { existingValue
       ) : (
         `${selectedUser?.split("@")[0]}'s Issue Report`
       )}
-    </DialogTitle>
+    </>
   );
 }
