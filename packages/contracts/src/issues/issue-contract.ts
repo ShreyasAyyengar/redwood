@@ -1,14 +1,14 @@
 import { oc } from "@orpc/contract";
 import z from "zod";
 import { classroomSchema } from "../rooms/classroom-contract";
-import { createIssueRequestSchema, issueSchema, updateIssueRequestSchema } from "./issue-schemas";
+import { issueSchema, uiIssueFormSchema } from "./issue-schemas";
 
 export const issueContract = {
   createIssue: oc
     .route({
       method: "POST",
     })
-    .input(createIssueRequestSchema)
+    .input(uiIssueFormSchema.extend({ classroomId: z.uuidv7() }))
     .output(z.boolean())
     .errors({
       NOT_FOUND: {
@@ -46,9 +46,14 @@ export const issueContract = {
     .route({
       method: "PUT",
     })
-    .input(updateIssueRequestSchema)
+    .input(uiIssueFormSchema.extend({ _id: z.uuidv7() }))
     .output(z.boolean())
     .errors({
+      FORBIDDEN: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
       NOT_FOUND: {
         data: z.object({
           message: z.string(),
