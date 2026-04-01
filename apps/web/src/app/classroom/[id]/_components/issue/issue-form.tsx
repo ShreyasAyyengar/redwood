@@ -82,19 +82,14 @@ export function IssueForm({
       // reportedAt: existingIssue?.issue.reportedAt ?? new Date(),
     } as FormValues,
     validators: {
-      onChange: ({ formApi }) => {
-        const errors = formApi.parseValuesWithSchema(uiIssueFormSchema);
-        console.log(JSON.stringify(errors, null, 2));
-        return errors;
-      },
+      onChange: uiIssueFormSchema,
     },
 
     onSubmit: async ({ value }: { value: FormValues }) => {
       if (existingIssue) {
-        const editValue = value as FormValues;
         await editIssue.mutateAsync({
-          ...existingIssue,
-          ...editValue,
+          ...value,
+          _id: existingIssue._id,
         });
       } else {
         const createValue = value as FormValues;
