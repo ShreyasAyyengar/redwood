@@ -1,36 +1,37 @@
-import { type classroomSchema, issueFormSchema, type issueSchema, updateIssueRequestSchema } from "@redwood/contracts";
+import { type classroomSchema, type issueSchema, uiIssueFormSchema } from "@redwood/contracts";
 import { Button } from "@redwood/shad-ui/components/button";
-import { DialogClose, DialogFooter, DialogHeader } from "@redwood/shad-ui/components/dialog";
+import { DialogClose, DialogFooter, DialogHeader, DialogTitle } from "@redwood/shad-ui/components/dialog";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { Separator } from "@redwood/shad-ui/components/separator";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../../lib/orpc-web-client";
 import CruzfixField from "./fields/cruzfix-field";
 import DescriptionField from "./fields/description-field";
 import IssueDateField from "./fields/issue-date-field";
-import IssueHeader from "./fields/issue-header";
+import ReportedByFieldSelector from "./fields/reported-by-field-selector";
+import ResolutionField from "./fields/resolution-field";
 import SodIDField from "./fields/sod-field";
 import SupervisorNeededField from "./fields/supervisor-needed-field";
 import UrgentField from "./fields/urgent-field";
 import { DeleteIssueDialog } from "./issue-delete-dialog";
 
-export type FormValues = z.input<typeof issueFormSchema>;
-export type EditFormValues = z.input<typeof updateIssueRequestSchema>;
+export type FormValues = z.input<typeof uiIssueFormSchema>;
 export const { fieldContext, formContext, useFieldContext } = createFormHookContexts();
 export const { useAppForm } = createFormHook({
   fieldContext,
   formContext,
   fieldComponents: {
-    IssueDateField,
     DescriptionField,
     UrgentField,
     SupervisorNeededField,
     CruzfixField,
     SodIDField,
+    ReportedByFieldSelector,
+    IssueDateField,
+    ResolutionField,
   },
   formComponents: {},
 });
@@ -45,7 +46,6 @@ export function IssueForm({
   existingIssue?: z.infer<typeof issueSchema>;
 }) {
   const queryClient = useQueryClient();
-  const [reportedBy, setReportedBy] = useState<string | undefined>(existingIssue?.issue.reportedBy ?? undefined);
 
   const createIssue = useMutation(
     webClientORPC.issues.createIssue.mutationOptions({
@@ -71,36 +71,34 @@ export function IssueForm({
 
   const form = useAppForm({
     defaultValues: {
-      _id: existingIssue?._id,
-      issue: {
-        issueDate: existingIssue?.issue.issueDate ?? new Date(),
-        description: existingIssue?.issue.description ?? "",
-        urgent: existingIssue?.issue.urgent ?? false,
-        supervisorNeeded: existingIssue?.issue.supervisorNeeded ?? false,
-        cruzfixId: existingIssue?.issue.cruzfixId ?? undefined,
-        sodId: existingIssue?.issue.sodId ?? undefined,
-      },
-    } as FormValues | EditFormValues,
+      description: existingIssue?.issue.description ?? "",
+      urgent: existingIssue?.issue.urgent ?? false,
+      supervisorNeeded: existingIssue?.issue.supervisorNeeded ?? false,
+      cruzfixId: existingIssue?.issue.cruzfixId ?? undefined,
+      sodId: existingIssue?.issue.sodId ?? undefined,
+
+      // EditFormValues
+      // reportedAt: existingIssue?.issue.reportedAt ?? new Date(),
+    } as FormValues,
     validators: {
-      onChange: existingIssue ? updateIssueRequestSchema : issueFormSchema,
+      onChange: ({ formApi }) => {
+        const errors = formApi.parseValuesWithSchema(uiIssueFormSchema);
+        console.log(JSON.stringify(errors, null, 2));
+        return errors;
+      },
     },
 
-    onSubmit: async ({ value }: { value: FormValues | EditFormValues }) => {
+    onSubmit: async ({ value }: { value: FormValues }) => {
       if (existingIssue) {
-        const editValue = value as EditFormValues;
+        const editValue = value as FormValues;
         await editIssue.mutateAsync({
           ...existingIssue,
           ...editValue,
-          issue: {
-            ...existingIssue.issue, // re-spread existing issue after defining opening block {}
-            ...editValue.issue, // re-spread editValue.issue after defining opening block {}
-            reportedBy: reportedBy ?? undefined, // add reportedBy property with fallback value
-          },
         });
       } else {
         const createValue = value as FormValues;
         await createIssue.mutateAsync({
-          issue: { ...createValue.issue },
+          ...createValue,
           classroomId: roomId,
         });
       }
@@ -110,7 +108,21 @@ export function IssueForm({
   return (
     <>
       <DialogHeader>
-        <IssueHeader existingValue={existingIssue?.issue.reportedBy} onChange={(value) => setReportedBy(value ?? "")} />
+        <DialogTitle className="mx-auto rounded-md bg-zinc-950/30 px-10 py-3 text-center text-2xl ring-1 ring-white/15">
+          {existingIssue ? (
+            <>
+              <form.AppField name="reportedBy">
+                {(field) => <field.ReportedByFieldSelector existingValue={existingIssue.issue.reportedBy} />}
+              </form.AppField>
+
+              <form.AppField name="reportedAt">
+                {(field) => <field.IssueDateField existingDate={existingIssue?.issue.reportedAt} />}
+              </form.AppField>
+            </>
+          ) : (
+            <p>Report New Issue</p>
+          )}
+        </DialogTitle>
       </DialogHeader>
 
       <ScrollArea className="max-h-[calc(100dvh-300px)] rounded-2xl bg-background/40 p-3">
@@ -118,7 +130,7 @@ export function IssueForm({
           <Separator className="bg-red-500" />
 
           {/* Description */}
-          <form.AppField name="issue.description">
+          <form.AppField name="description">
             {(field) => <field.DescriptionField existingValue={existingIssue?.issue.description} />}
           </form.AppField>
 
@@ -127,36 +139,35 @@ export function IssueForm({
           {/* Urgent/Supervisor + SOD/Cruzfix */}
           <div className="flex flex-wrap justify-between gap-5">
             <div className="flex flex-col space-y-4">
-              <form.AppField name="issue.urgent">{(field) => <field.UrgentField existingValue={existingIssue?.issue.urgent} />}</form.AppField>
-              <form.AppField name="issue.supervisorNeeded">
+              <form.AppField name="urgent">{(field) => <field.UrgentField existingValue={existingIssue?.issue.urgent} />}</form.AppField>
+              <form.AppField name="supervisorNeeded">
                 {(field) => <field.SupervisorNeededField existingValue={existingIssue?.issue.supervisorNeeded} />}
               </form.AppField>
             </div>
 
             <div className="flex flex-col space-y-4">
-              <form.AppField name="issue.cruzfixId">
-                {(field) => <field.CruzfixField existingValue={existingIssue?.issue.cruzfixId} />}
-              </form.AppField>
-              <form.AppField name="issue.sodId">{(field) => <field.SodIDField existingValue={existingIssue?.issue.sodId} />}</form.AppField>
+              <form.AppField name="cruzfixId">{(field) => <field.CruzfixField existingValue={existingIssue?.issue.cruzfixId} />}</form.AppField>
+              <form.AppField name="sodId">{(field) => <field.SodIDField existingValue={existingIssue?.issue.sodId} />}</form.AppField>
             </div>
           </div>
 
           <Separator className="bg-red-500" />
-
-          {/* Issue Date */}
-          <form.AppField name="issue.issueDate">
-            {(field) => <field.IssueDateField existingDate={existingIssue?.issue.issueDate} />}
-          </form.AppField>
+          {existingIssue && (
+            <form.AppField name="resolution">
+              {(field) => <field.ResolutionField existingValue={existingIssue?.resolution?.comment} />}
+            </form.AppField>
+          )}
         </div>
       </ScrollArea>
       <DialogFooter className="my-3">
-        <div className="flex w-full justify-between">
-          {/** biome-ignore lint/style/noNonNullAssertion: <explanation> */}
-          <DeleteIssueDialog roomId={roomId} existingIssue={existingIssue!}>
-            <Button className="bg-destructive hover:bg-destructive/50">Delete</Button>
-          </DeleteIssueDialog>
+        <div className="flex w-full justify-between gap-2">
+          {existingIssue && (
+            <DeleteIssueDialog roomId={roomId} existingIssue={existingIssue}>
+              <Button className="bg-destructive hover:bg-destructive/50">Delete</Button>
+            </DeleteIssueDialog>
+          )}
 
-          <div className="flex justify-end gap-2">
+          <div className="flex w-full justify-end gap-2">
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
