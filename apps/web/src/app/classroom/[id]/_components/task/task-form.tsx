@@ -18,9 +18,11 @@ export const { useAppForm } = createFormHook({
   fieldContext,
   formContext,
   fieldComponents: {
+    CreatedByFieldSelector,
     TaskDateField,
     DescriptionField,
     UrgentField,
+    CompletionField,
   },
   formComponents: {},
 });
