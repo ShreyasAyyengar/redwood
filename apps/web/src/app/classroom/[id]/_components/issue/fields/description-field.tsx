@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { type FormValues, useFieldContext } from "../issue-form";
 
 export default function DescriptionField({ existingValue }: { existingValue?: string }) {
-  const field = useFieldContext<FormValues["issue"]["description"]>();
+  const field = useFieldContext<FormValues["description"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
   const [localValue, setLocalValue] = useState(existingValue ?? field.state.value);
 

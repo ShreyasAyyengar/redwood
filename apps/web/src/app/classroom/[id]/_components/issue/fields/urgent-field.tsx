@@ -6,7 +6,7 @@ import { urgencyStyle } from "../../../../../../util/style-util";
 import { type FormValues, useFieldContext } from "../issue-form";
 
 export default function UrgentField({ existingValue }: { existingValue?: boolean }) {
-  const field = useFieldContext<FormValues["issue"]["urgent"]>();
+  const field = useFieldContext<FormValues["urgent"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
   const [value, setValue] = useState<boolean>(existingValue ?? field.state.value ?? false);
 
