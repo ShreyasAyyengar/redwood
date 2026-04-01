@@ -65,44 +65,46 @@ export default function OpenTasks({ tasks, roomId }: { tasks?: z.infer<typeof ta
               const daysAgoStr = daysAgo === 0 ? "today" : daysAgo === 1 ? "yesterday" : `${daysAgo} days ago`; // TODO apply this in more places?
 
               return (
-                <Card
-                  key={task._id}
-                  className="my-1 border-zinc-800 bg-zinc-900/50 p-4 transition-all duration-100 hover:border-zinc-700 active:scale-95"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="mt-0.5">
-                      {task.task.urgent ? (
-                        <AlertTriangle className="size-5 text-red-400" />
-                      ) : (
-                        <AlertCircle className={cn("size-5", isOverdue ? "text-amber-400" : "text-zinc-400")} />
-                      )}
-                    </div>
+                <TaskDialog key={task._id} roomId={roomId} existingTask={task}>
+                  <Card
+                    key={task._id}
+                    className="my-1 border-zinc-800 bg-zinc-900/50 p-4 transition-all duration-100 hover:border-zinc-700 active:scale-95"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="mt-0.5">
+                        {task.task.urgent ? (
+                          <AlertTriangle className="size-5 text-red-400" />
+                        ) : (
+                          <AlertCircle className={cn("size-5", isOverdue ? "text-amber-400" : "text-zinc-400")} />
+                        )}
+                      </div>
 
-                    <div className="min-w-0 flex-1">
-                      <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
-                        <p className="flex-1 font-normal text-sm text-zinc-200">{task.task.description}</p>
-                        <div className="flex shrink-0 gap-1.5">
-                          {task.task.urgent && (
-                            <Badge variant="outline" className={urgencyStyle("red")}>
-                              Urgent
-                            </Badge>
-                          )}
-                          {isOverdue && (
-                            <Badge variant="outline" className={urgencyStyle("orange")}>
-                              Overdue
-                            </Badge>
-                          )}
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
+                          <p className="flex-1 font-normal text-sm text-zinc-200">{task.task.description}</p>
+                          <div className="flex shrink-0 gap-1.5">
+                            {task.task.urgent && (
+                              <Badge variant="outline" className={urgencyStyle("red")}>
+                                Urgent
+                              </Badge>
+                            )}
+                            {isOverdue && (
+                              <Badge variant="outline" className={urgencyStyle("orange")}>
+                                Overdue
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 text-xs text-zinc-500">
+                          <span>Created {daysAgoStr}</span>
+                          <span className="text-zinc-700">•</span>
+                          <span>by {task.task.createdBy.split("@")[0]}</span>
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-1 text-xs text-zinc-500">
-                        <span>Created {daysAgoStr}</span>
-                        <span className="text-zinc-700">•</span>
-                        <span>by {task.task.createdBy.split("@")[0]}</span>
-                      </div>
                     </div>
-                  </div>
-                </Card>
+                  </Card>
+                </TaskDialog>
               );
             })}
           </ScrollArea>
