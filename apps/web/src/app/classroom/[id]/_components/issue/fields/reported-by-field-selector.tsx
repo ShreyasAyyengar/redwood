@@ -8,7 +8,7 @@ import { webClientORPC } from "../../../../../../lib/orpc-web-client";
 import { type FormValues, useFieldContext } from "../issue-form";
 
 export default function ReportedByFieldSelector({ existingValue }: { existingValue?: z.infer<typeof issueSchema>["issue"]["reportedBy"] }) {
-  const field = useFieldContext<FormValues["sodId"]>();
+  const field = useFieldContext<FormValues["reportedBy"]>();
 
   const { data: session } = authClientWeb.useSession();
   const isAdmin = session?.user.role === "admin";
