@@ -67,7 +67,7 @@ export default function ActiveIssues({
         {openIssues && openIssues.length > 0 ? (
           <ScrollArea className="mt-5 h-full min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
             {openIssues?.map((issue) => {
-              const daysAgo = daysAgoUtil(new Date(issue.issue.issueDate));
+              const daysAgo = daysAgoUtil(new Date(issue.issue.reportedAt));
               const daysAgoStr = daysAgo === 0 ? "today" : daysAgo === 1 ? "yesterday" : `${daysAgo} days ago`;
 
               return (
