@@ -1,13 +1,13 @@
 import { oc } from "@orpc/contract";
 import z from "zod";
-import { createTaskRequestSchema, taskSchema } from "./task-schemas";
+import { taskSchema, uiTaskFormSchema } from "./task-schemas";
 
 export const taskContract = {
   addTask: oc
     .route({
       method: "POST",
     })
-    .input(createTaskRequestSchema)
+    .input(uiTaskFormSchema.extend({ classroomId: z.uuidv7() }))
     .output(z.boolean())
     .errors({
       NOT_FOUND: {
@@ -50,7 +50,7 @@ export const taskContract = {
     .route({
       method: "PUT",
     })
-    .input(taskSchema.omit({ _id: true }))
+    .input(uiTaskFormSchema.extend({ _id: z.uuidv7() }))
     .output(z.boolean())
     .errors({
       NOT_FOUND: {
