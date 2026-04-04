@@ -7,6 +7,7 @@
 - Database and Cloudflare R2 setup for production
 - Add PPDO (building numbers) to each classroom
 - improve this document
+- replace all lucide icons h-x w-x with size-x
 
 ## 🚀 Tech Stack
 
