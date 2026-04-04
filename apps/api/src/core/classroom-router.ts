@@ -110,6 +110,4 @@ export const classroomRouter = {
       throw INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
     }
   }),
-
-  // addMockData: adminProcedure.classrooms.addMockData.handler(async ({ errors: { INTERNAL_SERVER_ERROR } }) => {}),
 };
