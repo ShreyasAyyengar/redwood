@@ -20,11 +20,10 @@ export default function IssueHistoryDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="h-full max-h-[calc(100dvh-300px)] bg-zinc-800 p-3">
-        <DialogTitle className="font-semibold text-xl">Issue History: {room.displayName}</DialogTitle>
-
+      <DialogContent className="bg-zinc-800 p-3">
+        <DialogTitle className="text-center font-semibold text-xl">Issue History: {room.displayName}</DialogTitle>
         {issues && issues.length > 0 && (
-          <ScrollArea className="h-full min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-900 p-3">
+          <ScrollArea className="max-h-[50vh] rounded-2xl bg-zinc-900 p-3">
             {issues?.map((issue) => (
               <IssueDialog key={issue._id} roomId={room._id} existingIssue={issue}>
                 <IssueCard issue={issue} />
