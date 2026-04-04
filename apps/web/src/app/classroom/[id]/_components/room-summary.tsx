@@ -108,14 +108,12 @@ export default function RoomSummary({
 
       <div className="flex justify-start lg:justify-center">
         <MaintenanceDialog roomId={room._id}>
-          <div className="mt-5 flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg transition-all duration-150 hover:bg-neutral-400 active:scale-95 active:transform">
+          <div className="mt-3 flex w-fit items-center rounded-md bg-neutral-300 px-2 py-0.5 text-center font-semibold text-base text-black transition-all duration-150 hover:bg-neutral-400 active:scale-95 active:transform">
             <Wrench className="mr-2 h-5 w-5" />
             Perform Maintenance
           </div>
         </MaintenanceDialog>
       </div>
-
-      {/* TODO: open dialog */}
     </div>
   );
 }
