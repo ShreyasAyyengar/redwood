@@ -1,8 +1,9 @@
 import type { classroomSchema } from "@redwood/contracts";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { Bug, Building2, Info, SquareCheckBig, Wrench } from "lucide-react";
+import { useEffect } from "react";
 import type { z } from "zod";
-import { monthNames, nth } from "../../../../util/date-time-utils";
+import { daysAgo, monthNames, nth } from "../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../util/style-util";
 import MaintenanceDialog from "./maintenance/maintenance-dialog";
 
@@ -23,8 +24,12 @@ export default function RoomSummary({
     const day = date.getDate();
     const dayEnding = nth(day);
     lastServiced = `${monthName} ${day}${dayEnding}`;
-    lastServicedDaysAgo = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+    lastServicedDaysAgo = daysAgo(date);
   }
+
+  useEffect(() => {
+    console.log(lastServiced, lastServicedDaysAgo);
+  }, []);
 
   const roomStateBadge = (
     <div
@@ -65,7 +70,7 @@ export default function RoomSummary({
           <div className="flex items-center font-normal text-sm text-white/80">
             <div className="flex gap-1">
               {lastServiced &&
-                `${lastServiced} ${lastServicedDaysAgo && `• ${lastServicedDaysAgo} day${lastServicedDaysAgo === 1 ? "" : "s"} ago`}`}
+                `${lastServiced} ${lastServicedDaysAgo !== undefined && `• ${lastServicedDaysAgo} day${lastServicedDaysAgo === 1 ? "" : "s"} ago`}`}
               {!lastServiced && "No Record Yet"}
               {lastServiced && <div className="flex items-center text-sm">• {room.lastMaintenance?.by.split("@")[0]}</div>}
             </div>
