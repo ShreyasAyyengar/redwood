@@ -179,7 +179,7 @@ export function IssueForm({
                   onClick={form.handleSubmit}
                   disabled={!canSubmit || isSubmitting}
                 >
-                  {isSubmitting ? (existingIssue ? "Updating..." : "Creating...") : existingIssue ? "Update Issue" : "Create Issue"}
+                  {isSubmitting ? (existingIssue ? "Saving..." : "Creating...") : existingIssue ? "Save Changes" : "Create Issue"}
                 </Button>
               )}
             </form.Subscribe>

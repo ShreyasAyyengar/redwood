@@ -10,9 +10,9 @@ import { urgencyStyle } from "../../../../../util/style-util";
 
 export const IssueCard = forwardRef<HTMLDivElement, { issue: z.infer<typeof issueSchema> } & React.HTMLAttributes<HTMLDivElement>>(
   ({ issue, ...props }, ref) => {
-    const daysAgo = daysAgoUtil(new Date(issue.issue.reportedAt));
-    const editDaysAgo = issue.edited && daysAgoUtil(new Date(issue.edited.editDate));
-    const resolutionDaysAgo = issue.resolution && daysAgoUtil(new Date(issue.resolution.resolvedAt));
+    const daysAgo = daysAgoUtil(issue.issue.reportedAt);
+    const editDaysAgo = issue.edited && daysAgoUtil(issue.edited.editDate);
+    const resolutionDaysAgo = issue.resolution && daysAgoUtil(issue.resolution.resolvedAt);
 
     return (
       <Card
