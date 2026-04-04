@@ -80,7 +80,7 @@ export default function RoomSummary({
 
       <div className="mt-2 flex items-center gap-2">
         <Info className="h-5 w-5" />
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col">
           <div className="flex font-bold text-neutral-400 text-sm">Classroom Status</div>
           <div className="flex font-normal text-sm text-white/80">{roomStateBadge}</div>
         </div>
