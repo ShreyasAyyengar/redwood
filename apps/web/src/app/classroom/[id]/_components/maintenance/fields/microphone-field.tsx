@@ -16,21 +16,27 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
   const chargerStripeSchema = maintenanceFormSchema.shape.microphone.unwrap().shape.chargerStripe;
   const transmitterStripeSchema = maintenanceFormSchema.shape.microphone.unwrap().shape.transmitterStripe;
   const aldBatteriesChargedSchema = maintenanceFormSchema.shape.microphone.unwrap().shape.aldBatteriesCharged;
+  const windscreenSecureSchema = maintenanceFormSchema.shape.microphone.unwrap().shape.windscreenSecure;
+  const clipInstalledSchema = maintenanceFormSchema.shape.microphone.unwrap().shape.clipInstalled;
 
   type BatteryStripe = z.infer<typeof batteryStripeSchema>;
   type ChargerStripe = z.infer<typeof chargerStripeSchema>;
   type TransmitterStripe = z.infer<typeof transmitterStripeSchema>;
   type AldBatteriesCharged = z.infer<typeof aldBatteriesChargedSchema>;
+  type WindscreenSecure = z.infer<typeof windscreenSecureSchema>;
+  type ClipInstalled = z.infer<typeof clipInstalledSchema>;
 
   const [equipped, setEquipped] = useState<boolean>(!!existingValues);
   const [batteryStripe, setBatteryStripe] = useState<BatteryStripe>(existingValues?.batteryStripe ?? "");
   const [chargerStripe, setChargerStripe] = useState<ChargerStripe>(existingValues?.chargerStripe ?? "");
   const [transmitterStripe, setTransmitterStripe] = useState<TransmitterStripe>(existingValues?.transmitterStripe ?? "");
   const [aldBatteriesCharged, setAldBatteriesCharged] = useState<AldBatteriesCharged>(existingValues?.aldBatteriesCharged ?? "");
+  const [windscreenSecure, setWindscreenSecure] = useState<WindscreenSecure>(existingValues?.windscreenSecure ?? "");
+  const [clipInstalled, setClipInstalled] = useState<ClipInstalled>(existingValues?.clipInstalled ?? "");
 
   useEffect(() => {
     if (!equipped) field.handleChange(undefined);
-    else field.handleChange({ batteryStripe, chargerStripe, transmitterStripe, aldBatteriesCharged });
+    else field.handleChange({ batteryStripe, chargerStripe, transmitterStripe, aldBatteriesCharged, windscreenSecure, clipInstalled });
   }, [equipped, batteryStripe, chargerStripe, transmitterStripe, aldBatteriesCharged]);
 
   return (
@@ -56,7 +62,7 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
               <Separator className="ml-3 h-35! w-0.5! bg-zinc-500" orientation="vertical" />
               <div className="mr-3 w-full">
                 <span>Painted Green Stripe Visible:</span>
-                <div className="mt-1 ml-4 flex flex-col items-start space-y-1">
+                <div className="mt-1 ml-4 flex flex-col items-start">
                   <div className="flex w-full items-center justify-between gap-2">
                     <span>Battery: </span>
 
@@ -78,7 +84,7 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
                     </Select>
                   </div>
                 </div>
-                <div className="mt-1 ml-4 flex flex-col items-start space-y-1">
+                <div className="mt-1 ml-4 flex flex-col items-start">
                   <div className="flex w-full items-center justify-between gap-2">
                     <span>Charger: </span>
 
@@ -100,7 +106,7 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
                     </Select>
                   </div>
                 </div>
-                <div className="mt-1 ml-4 flex flex-col items-start space-y-1">
+                <div className="mt-1 ml-4 flex flex-col items-start">
                   <div className="flex w-full items-center justify-between gap-2">
                     <span>Transmitter: </span>
 
@@ -124,7 +130,8 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
                 </div>
               </div>
             </div>
-            <div className="mt-5 mr-3 flex space-y-1">
+
+            <div className="mt-5 mr-3 flex">
               <div className="flex w-full items-center justify-between gap-2">
                 <span>ALD Batteries Charged: </span>
 
@@ -138,6 +145,48 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
                   </SelectTrigger>
                   <SelectContent>
                     {Object.values(aldBatteriesChargedSchema.enum).map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {status}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="mt-5 mr-3 flex">
+              <div className="flex w-full items-center justify-between gap-2">
+                <span>Windscreen Secure: </span>
+
+                <Select
+                  value={windscreenSecure}
+                  onValueChange={(value) => setWindscreenSecure(value as WindscreenSecure)}
+                  disabled={!!existingValues}
+                >
+                  <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(windscreenSecureSchema.enum).map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {status}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="mt-5 mr-3 flex">
+              <div className="flex w-full items-center justify-between gap-2">
+                <span>Microphone Clip Installed: </span>
+
+                <Select value={clipInstalled} onValueChange={(value) => setClipInstalled(value as ClipInstalled)} disabled={!!existingValues}>
+                  <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(clipInstalledSchema.enum).map((status) => (
                       <SelectItem key={status} value={status}>
                         {status}
                       </SelectItem>

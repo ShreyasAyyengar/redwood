@@ -14,6 +14,8 @@ export const maintenanceEntrySchema = z.object({
         ["Yes", "Battery replaced", "Found dead, now re-charging", "No, task created for completion", "No, issue preventing completion"],
         "Invalid status"
       ),
+      windscreenSecure: z.enum(["Yes", "Re-applied", "No, task created for completion", "No, issue preventing completion"], "Invalid status"),
+      clipInstalled: z.enum(["Yes", "Re-applied", "No, task created for completion", "No, issue preventing completion"], "Invalid status"),
     })
     .optional(),
   dten: z
@@ -27,7 +29,7 @@ export const maintenanceEntrySchema = z.object({
     .optional(),
 
   surfacesWiped: z.boolean(),
-  equipmentChecked: z.boolean(), // TODO maybe expand this into fields for each piece of equipment
+  equipmentChecked: z.boolean(),
 });
 
 export const maintenanceFormSchema = maintenanceEntrySchema.omit({ _id: true, completedBy: true, classroomId: true });
