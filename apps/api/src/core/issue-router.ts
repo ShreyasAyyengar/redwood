@@ -56,6 +56,10 @@ export const issueRouter = {
     if (!issue) throw errors.NOT_FOUND({ data: { message: `Issue with id ${input._id} not found` } });
     const isAdmin = context.user.role === "admin";
 
+    console.log("INPUT RESOLUTION — START");
+    console.log(input.resolution);
+    console.log("INPUT RESOLUTION — END");
+
     const updatedIssue: z.infer<typeof issueSchema> = {
       ...issue,
       issue: {
@@ -70,15 +74,25 @@ export const issueRouter = {
         reportedBy: isAdmin ? (input.reportedBy ?? issue.issue.reportedBy) : issue.issue.reportedBy,
         reportedAt: isAdmin ? (input.reportedAt ?? issue.issue.reportedAt) : issue.issue.reportedAt,
       },
-      // if input.resolution is provided, update resolution
-      ...(input.resolution && { resolution: { resolvedBy: context.user.email, resolvedAt: new Date(), comment: input.resolution.comment } }),
+      edited: {
+        editedBy: context.user.email,
+        editDate: new Date(),
+      },
+      // if input.resolution is provided, update resolution, else make it undefined
+      ...(input.resolution
+        ? { resolution: { resolvedBy: context.user.email, resolvedAt: new Date(), comment: input.resolution.comment } }
+        : { resolution: undefined }),
     };
+
+    console.log("UPDATED ISSUE — START");
+    console.log(updatedIssue);
+    console.log("UPDATED ISSUE — END");
 
     const isValid = issueSchema.safeParse(updatedIssue);
     if (!isValid.success) throw errors.INTERNAL_SERVER_ERROR({ data: { message: isValid.error.message } });
 
     try {
-      await IssueService.findByIdAndUpdate(input._id, updatedIssue);
+      await IssueService.replaceOne({ _id: input._id }, updatedIssue);
 
       // biome-ignore lint/complexity/noVoid: fire-and-forget
       void recomputeRoomStatus(updatedIssue.classroomId);
