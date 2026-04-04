@@ -15,9 +15,9 @@ export const taskEditSchema = z.object({
 });
 
 export const taskCompletionSchema = z.object({
-  completedBy: z.email().optional(),
+  completedBy: z.email(),
   comment: z.string().optional(),
-  completionDate: z.coerce.date().optional(),
+  completedAt: z.coerce.date(),
 });
 
 export const taskSchema = z.object({
