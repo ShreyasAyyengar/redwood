@@ -1,12 +1,12 @@
 # Redwood Classroom Maintenance Management
 
-### Before Deployment
+### TODO
+- see relative time vs absolute time formatting options.
 - Optimise Google OAuth configuration for production
-- Database migrations for production
+- Database migrations for production + adding existing Redwood data to MongoDB
 - Database and Cloudflare R2 setup for production
-- Add PPDO numbers to each classroom
-
-A comprehensive, high-performance fullstack monorepo template powered by **Bun**, **Turborepo**, and **oRPC**. This project provides a unified architecture for building Web, Desktop (Electron), and Mobile (Expo) applications with a shared backend and type-safe contracts.
+- Add PPDO (building numbers) to each classroom
+- improve this document
 
 ## 🚀 Tech Stack
 
