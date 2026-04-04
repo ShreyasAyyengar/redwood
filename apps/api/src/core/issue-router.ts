@@ -56,10 +56,6 @@ export const issueRouter = {
     if (!issue) throw errors.NOT_FOUND({ data: { message: `Issue with id ${input._id} not found` } });
     const isAdmin = context.user.role === "admin";
 
-    console.log("INPUT RESOLUTION — START");
-    console.log(input.resolution);
-    console.log("INPUT RESOLUTION — END");
-
     const updatedIssue: z.infer<typeof issueSchema> = {
       ...issue,
       issue: {
@@ -83,10 +79,6 @@ export const issueRouter = {
         ? { resolution: { resolvedBy: context.user.email, resolvedAt: new Date(), comment: input.resolution.comment } }
         : { resolution: undefined }),
     };
-
-    console.log("UPDATED ISSUE — START");
-    console.log(updatedIssue);
-    console.log("UPDATED ISSUE — END");
 
     const isValid = issueSchema.safeParse(updatedIssue);
     if (!isValid.success) throw errors.INTERNAL_SERVER_ERROR({ data: { message: isValid.error.message } });
