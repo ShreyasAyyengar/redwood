@@ -1,7 +1,8 @@
 import type { issueSchema } from "@redwood/contracts";
 import { Badge } from "@redwood/shad-ui/components/badge";
 import { Card } from "@redwood/shad-ui/components/card";
-import { AlertCircle, AlertTriangle, Check, Flag, UserPen } from "lucide-react";
+import { cn } from "@redwood/shad-ui/lib/utils";
+import { AlertTriangle, Check, Flag, UserPen } from "lucide-react";
 import { forwardRef } from "react";
 import type { z } from "zod";
 import { daysAgo as daysAgoUtil } from "../../../../../util/date-time-utils";
@@ -22,7 +23,7 @@ export const IssueCard = forwardRef<HTMLDivElement, { issue: z.infer<typeof issu
       >
         <div className="flex items-start gap-3">
           <div className="mt-0.5">
-            {issue.issue.urgent ? <AlertTriangle className="size-5 text-red-400" /> : <AlertCircle className="size-5 text-amber-400" />}
+            <AlertTriangle className={cn("size-5", issue.issue.urgent ? "text-red-400" : "text-amber-400")} />
           </div>
 
           <div className="min-w-0 flex-1">

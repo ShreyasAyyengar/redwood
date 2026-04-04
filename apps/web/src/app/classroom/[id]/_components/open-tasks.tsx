@@ -3,7 +3,7 @@ import { Badge } from "@redwood/shad-ui/components/badge";
 import { Card } from "@redwood/shad-ui/components/card";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { cn } from "@redwood/shad-ui/lib/utils";
-import { AlertCircle, AlertTriangle, BookAlert, CircleAlert, Plus } from "lucide-react";
+import { BookAlert, ClipboardList, Plus } from "lucide-react";
 import type { z } from "zod";
 import { daysAgo as daysAgoUtil } from "../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../util/style-util";
@@ -24,7 +24,7 @@ export default function OpenTasks({ tasks, roomId }: { tasks?: z.infer<typeof ta
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <CircleAlert className="h-6 w-6 text-blue-500" />
+              <ClipboardList className="h-6 w-6 text-blue-500" />
               <div>Open Tasks</div>
               {openTasks && (
                 <span
@@ -72,11 +72,7 @@ export default function OpenTasks({ tasks, roomId }: { tasks?: z.infer<typeof ta
                   >
                     <div className="flex items-start gap-3">
                       <div className="mt-0.5">
-                        {task.task.urgent ? (
-                          <AlertTriangle className="size-5 text-red-400" />
-                        ) : (
-                          <AlertCircle className={cn("size-5", isOverdue ? "text-amber-400" : "text-zinc-400")} />
-                        )}
+                        <ClipboardList className={cn("size-5", task.task.urgent ? "text-red-400" : "text-amber-400")} />
                       </div>
 
                       <div className="min-w-0 flex-1">
