@@ -8,7 +8,7 @@ import { protectedProcedure } from "../libs/orpc-procedures";
 export const issueRouter = {
   getIssues: protectedProcedure.issues.getIssues.handler(async ({ input, errors }) => {
     const { classroomId } = input;
-    const issues: z.infer<typeof issueSchema>[] = await IssueService.find({ classroomId }).lean().sort({ issueDate: -1 });
+    const issues: z.infer<typeof issueSchema>[] = await IssueService.find({ classroomId }).lean().sort({ "issue.reportedAt": -1 });
 
     return issues;
   }),
