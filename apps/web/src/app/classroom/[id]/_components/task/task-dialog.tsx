@@ -8,12 +8,19 @@ export function TaskDialog({
   roomId,
   existingTask,
   children,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
 }: {
   roomId: z.infer<typeof classroomSchema>["_id"];
   existingTask?: z.infer<typeof taskSchema>;
   children?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+
+  const open = controlledOpen ?? uncontrolledOpen;
+  const setOpen = controlledOnOpenChange ?? setUncontrolledOpen;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

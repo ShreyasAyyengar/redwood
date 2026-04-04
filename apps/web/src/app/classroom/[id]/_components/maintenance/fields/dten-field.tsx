@@ -7,7 +7,13 @@ import { useEffect, useState } from "react";
 import type { z } from "zod";
 import { type FormValues, useFieldContext } from "../maintenance-form";
 
-export default function DTENField({ existingValue }: { existingValue?: z.infer<typeof maintenanceFormSchema>["dten"] }) {
+export default function DTENField({
+  existingValue,
+  onTriggerAide,
+}: {
+  existingValue?: z.infer<typeof maintenanceFormSchema>["dten"];
+  onTriggerAide?: (type: "task" | "issue") => void;
+}) {
   const field = useFieldContext<FormValues["dten"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 
@@ -35,6 +41,18 @@ export default function DTENField({ existingValue }: { existingValue?: z.infer<t
     else field.handleChange({ licenced, signPresent, microphoneWorking, speakerWorking, screenWiped });
   }, [equipped, licenced, signPresent, microphoneWorking, speakerWorking, screenWiped]);
 
+  const handleValueChange = (
+    value: LicencedSchema | SignPresentSchema | MicrophoneWorkingSchema | SpeakerWorkingSchema | ScreenWipedSchema,
+    setter: (val: LicencedSchema | SignPresentSchema | MicrophoneWorkingSchema | SpeakerWorkingSchema | ScreenWipedSchema) => void
+  ) => {
+    setter(value);
+    if (value === "No, task created for completion") {
+      onTriggerAide?.("task");
+    } else if (value === "No, issue preventing completion") {
+      onTriggerAide?.("issue");
+    }
+  };
+
   return (
     <Field data-invalid={isInvalid}>
       <div className="flex flex-col">
@@ -58,7 +76,11 @@ export default function DTENField({ existingValue }: { existingValue?: z.infer<t
               <div className="flex w-full items-center justify-between gap-2">
                 <span>Licensed: </span>
 
-                <Select value={licenced} onValueChange={(value) => setLicenced(value as LicencedSchema)} disabled={!!existingValue}>
+                <Select
+                  value={licenced}
+                  onValueChange={(value) => handleValueChange(value as LicencedSchema, (val) => setLicenced(val as LicencedSchema))}
+                  disabled={!!existingValue}
+                >
                   <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
@@ -76,7 +98,11 @@ export default function DTENField({ existingValue }: { existingValue?: z.infer<t
               <div className="flex w-full items-center justify-between gap-2">
                 <span>Sign Present: </span>
 
-                <Select value={signPresent} onValueChange={(value) => setSignPresent(value as SignPresentSchema)} disabled={!!existingValue}>
+                <Select
+                  value={signPresent}
+                  onValueChange={(value) => handleValueChange(value as SignPresentSchema, (val) => setSignPresent(val as SignPresentSchema))}
+                  disabled={!!existingValue}
+                >
                   <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
@@ -96,7 +122,9 @@ export default function DTENField({ existingValue }: { existingValue?: z.infer<t
 
                 <Select
                   value={microphoneWorking}
-                  onValueChange={(value) => setMicrophoneWorking(value as MicrophoneWorkingSchema)}
+                  onValueChange={(value) =>
+                    handleValueChange(value as MicrophoneWorkingSchema, (val) => setMicrophoneWorking(val as MicrophoneWorkingSchema))
+                  }
                   disabled={!!existingValue}
                 >
                   <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
@@ -118,7 +146,9 @@ export default function DTENField({ existingValue }: { existingValue?: z.infer<t
 
                 <Select
                   value={speakerWorking}
-                  onValueChange={(value) => setSpeakerWorking(value as SpeakerWorkingSchema)}
+                  onValueChange={(value) =>
+                    handleValueChange(value as SpeakerWorkingSchema, (val) => setSpeakerWorking(val as SpeakerWorkingSchema))
+                  }
                   disabled={!!existingValue}
                 >
                   <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
@@ -138,7 +168,11 @@ export default function DTENField({ existingValue }: { existingValue?: z.infer<t
               <div className="flex w-full items-center justify-between gap-2">
                 <span>Screen Wiped: </span>
 
-                <Select value={screenWiped} onValueChange={(value) => setScreenWiped(value as ScreenWipedSchema)} disabled={!!existingValue}>
+                <Select
+                  value={screenWiped}
+                  onValueChange={(value) => handleValueChange(value as ScreenWipedSchema, (val) => setScreenWiped(val as ScreenWipedSchema))}
+                  disabled={!!existingValue}
+                >
                   <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>

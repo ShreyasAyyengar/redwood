@@ -8,12 +8,19 @@ export function IssueDialog({
   roomId,
   existingIssue,
   children,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
 }: {
   roomId: z.infer<typeof classroomSchema>["_id"];
   existingIssue?: z.infer<typeof issueSchema>;
   children?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+
+  const open = controlledOpen ?? uncontrolledOpen;
+  const setOpen = controlledOnOpenChange ?? setUncontrolledOpen;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

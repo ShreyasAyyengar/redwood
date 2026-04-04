@@ -6,13 +6,17 @@ import { Separator } from "@redwood/shad-ui/components/separator";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../../lib/orpc-web-client";
+import { IssueDialog } from "../issue/issue-dialog";
+import { TaskDialog } from "../task/task-dialog";
 import DateField from "./fields/date-field";
 import DTENField from "./fields/dten-field";
 import EquipmentCheckedField from "./fields/equipment-checked";
 import MicrophoneField from "./fields/microphone-field";
 import SurfacesWipedField from "./fields/surfaces-wiped";
+import { MaintenanceAideDialog } from "./maintenance-aide-dialog";
 
 export type FormValues = z.input<typeof maintenanceFormSchema>;
 export const { fieldContext, formContext, useFieldContext } = createFormHookContexts();
@@ -38,6 +42,17 @@ export default function MaintenanceForm({
   maintenanceEntry?: z.infer<typeof maintenanceEntrySchema>;
   onSuccess?: () => void;
 }) {
+  const [aideOpen, setAideOpen] = useState(false);
+  const [aideType, setAideType] = useState<"task" | "issue" | null>(null);
+
+  const [createTaskOpen, setCreateTaskOpen] = useState(false);
+  const [createIssueOpen, setCreateIssueOpen] = useState(false);
+
+  const handleTriggerAide = (type: "task" | "issue") => {
+    setAideType(type);
+    setAideOpen(true);
+  };
+
   const queryClient = useQueryClient();
   const createMaintenanceLog = useMutation(
     webClientORPC.maintenance.addMaintenanceEntry.mutationOptions({
@@ -68,7 +83,9 @@ export default function MaintenanceForm({
     !maintenanceEntry || maintenanceEntry.microphone ? (
       <>
         <Separator className="bg-indigo-500" />
-        <form.AppField name="microphone">{(field) => <field.MicrophoneField existingValues={maintenanceEntry?.microphone} />}</form.AppField>
+        <form.AppField name="microphone">
+          {(field) => <field.MicrophoneField existingValues={maintenanceEntry?.microphone} onTriggerAide={handleTriggerAide} />}
+        </form.AppField>
       </>
     ) : null;
 
@@ -76,7 +93,9 @@ export default function MaintenanceForm({
     !maintenanceEntry || maintenanceEntry.dten ? (
       <>
         <Separator className="bg-indigo-500" />
-        <form.AppField name="dten">{(field) => <field.DTENField existingValue={maintenanceEntry?.dten} />}</form.AppField>
+        <form.AppField name="dten">
+          {(field) => <field.DTENField existingValue={maintenanceEntry?.dten} onTriggerAide={handleTriggerAide} />}
+        </form.AppField>
       </>
     ) : null;
 
@@ -129,6 +148,20 @@ export default function MaintenanceForm({
           </form.Subscribe>
         )}
       </DialogFooter>
+
+      <MaintenanceAideDialog
+        open={aideOpen}
+        onOpenChange={setAideOpen}
+        roomId={roomId}
+        type={aideType}
+        onCreateNew={() => {
+          if (aideType === "task") setCreateTaskOpen(true);
+          else if (aideType === "issue") setCreateIssueOpen(true);
+        }}
+      />
+
+      <TaskDialog roomId={roomId} open={createTaskOpen} onOpenChange={setCreateTaskOpen} />
+      <IssueDialog roomId={roomId} open={createIssueOpen} onOpenChange={setCreateIssueOpen} />
     </>
   );
 }

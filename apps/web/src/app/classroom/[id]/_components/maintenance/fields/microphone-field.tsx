@@ -8,7 +8,13 @@ import { useEffect, useState } from "react";
 import type { z } from "zod";
 import { type FormValues, useFieldContext } from "../maintenance-form";
 
-export default function MicrophoneField({ existingValues }: { existingValues?: z.infer<typeof maintenanceFormSchema>["microphone"] }) {
+export default function MicrophoneField({
+  existingValues,
+  onTriggerAide,
+}: {
+  existingValues?: z.infer<typeof maintenanceFormSchema>["microphone"];
+  onTriggerAide?: (type: "task" | "issue") => void;
+}) {
   const field = useFieldContext<FormValues["microphone"]>();
   const isInvalid = !field.state.meta.isValid && field.state.meta.isTouched;
 
@@ -39,6 +45,15 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
     else field.handleChange({ batteryStripe, chargerStripe, transmitterStripe, aldBatteriesCharged, windscreenSecure, clipInstalled });
   }, [equipped, batteryStripe, chargerStripe, transmitterStripe, aldBatteriesCharged]);
 
+  const handleValueChange = (
+    value: BatteryStripe | ChargerStripe | TransmitterStripe | AldBatteriesCharged | WindscreenSecure | ClipInstalled,
+    setter: (val: BatteryStripe | ChargerStripe | TransmitterStripe | AldBatteriesCharged | WindscreenSecure | ClipInstalled) => void
+  ) => {
+    setter(value);
+    if (value === "No, task created for completion") onTriggerAide?.("task");
+    else if (value === "No, issue preventing completion") onTriggerAide?.("issue");
+  };
+
   return (
     <Field data-invalid={isInvalid}>
       <div className="flex flex-col">
@@ -68,7 +83,7 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
 
                     <Select
                       value={batteryStripe}
-                      onValueChange={(value) => setBatteryStripe(value as BatteryStripe)}
+                      onValueChange={(value) => handleValueChange(value as BatteryStripe, (val) => setBatteryStripe(val as BatteryStripe))}
                       disabled={!!existingValues}
                     >
                       <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
@@ -90,7 +105,7 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
 
                     <Select
                       value={chargerStripe}
-                      onValueChange={(value) => setChargerStripe(value as ChargerStripe)}
+                      onValueChange={(value) => handleValueChange(value as ChargerStripe, (val) => setChargerStripe(val as ChargerStripe))}
                       disabled={!!existingValues}
                     >
                       <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
@@ -112,7 +127,9 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
 
                     <Select
                       value={transmitterStripe}
-                      onValueChange={(value) => setTransmitterStripe(value as TransmitterStripe)}
+                      onValueChange={(value) =>
+                        handleValueChange(value as TransmitterStripe, (val) => setTransmitterStripe(val as TransmitterStripe))
+                      }
                       disabled={!!existingValues}
                     >
                       <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
@@ -137,7 +154,9 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
 
                 <Select
                   value={aldBatteriesCharged}
-                  onValueChange={(value) => setAldBatteriesCharged(value as AldBatteriesCharged)}
+                  onValueChange={(value) =>
+                    handleValueChange(value as AldBatteriesCharged, (val) => setAldBatteriesCharged(val as AldBatteriesCharged))
+                  }
                   disabled={!!existingValues}
                 >
                   <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
@@ -160,7 +179,7 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
 
                 <Select
                   value={windscreenSecure}
-                  onValueChange={(value) => setWindscreenSecure(value as WindscreenSecure)}
+                  onValueChange={(value) => handleValueChange(value as WindscreenSecure, (val) => setWindscreenSecure(val as WindscreenSecure))}
                   disabled={!!existingValues}
                 >
                   <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
@@ -181,7 +200,11 @@ export default function MicrophoneField({ existingValues }: { existingValues?: z
               <div className="flex w-full items-center justify-between gap-2">
                 <span>Microphone Clip Installed: </span>
 
-                <Select value={clipInstalled} onValueChange={(value) => setClipInstalled(value as ClipInstalled)} disabled={!!existingValues}>
+                <Select
+                  value={clipInstalled}
+                  onValueChange={(value) => handleValueChange(value as ClipInstalled, (val) => setClipInstalled(val as ClipInstalled))}
+                  disabled={!!existingValues}
+                >
                   <SelectTrigger className="w-fit border border-white/30 bg-zinc-950/30">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
