@@ -65,20 +65,18 @@ export const taskRouter = {
         editedBy: context.user.email,
         editDate: new Date(),
       },
-      ...(input.completion && {
-        completion: {
-          completedBy: context.user.email,
-          comment: input.completion.comment,
-          completedAt: new Date(),
-        },
-      }),
+      ...(input.completion
+        ? { completion: { completedBy: context.user.email, comment: input.completion.comment, completedAt: new Date() } }
+        : undefined),
     };
+
+    if (updatedTask.completion) updatedTask.task.visibleAt = undefined;
 
     const isValid = taskSchema.safeParse(updatedTask);
     if (!isValid.success) throw errors.INTERNAL_SERVER_ERROR({ data: { message: isValid.error.message } });
 
     try {
-      await TaskService.findByIdAndUpdate(input._id, updatedTask);
+      await TaskService.replaceOne({ _id: input._id }, updatedTask);
       return true;
     } catch (e) {
       throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
