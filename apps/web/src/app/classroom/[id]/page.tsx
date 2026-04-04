@@ -80,7 +80,7 @@ export default function Page() {
             <ActiveIssues issues={issues} room={room} />
           </div>
           <div className="h-[45dvh]">
-            <OpenTasks tasks={tasks} roomId={roomId} />
+            <OpenTasks tasks={tasks} room={room} />
           </div>
           <div className="h-[40dvh]">
             <MaintenanceHistory history={maintenanceHistory} room={room} />
@@ -115,7 +115,7 @@ export default function Page() {
         </div>
         <div className="mt-10 flex h-[45dvh] gap-10">
           <ActiveIssues issues={issues} room={room} />
-          <OpenTasks tasks={tasks} roomId={roomId} />
+          <OpenTasks tasks={tasks} room={room} />
         </div>
       </div>
     </>
