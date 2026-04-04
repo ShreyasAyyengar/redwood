@@ -69,7 +69,7 @@ export const taskRouter = {
         completion: {
           completedBy: context.user.email,
           comment: input.completion.comment,
-          completionDate: new Date(),
+          completedAt: new Date(),
         },
       }),
     };
