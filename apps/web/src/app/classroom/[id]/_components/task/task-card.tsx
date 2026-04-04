@@ -2,7 +2,7 @@ import type { taskSchema } from "@redwood/contracts";
 import { Badge } from "@redwood/shad-ui/components/badge";
 import { Card } from "@redwood/shad-ui/components/card";
 import { cn } from "@redwood/shad-ui/lib/utils";
-import { Check, ClipboardList, Flag, UserPen } from "lucide-react";
+import { Check, ClipboardClock, ClipboardList, Flag, UserPen } from "lucide-react";
 import type React from "react";
 import { forwardRef } from "react";
 import type { z } from "zod";
@@ -16,6 +16,8 @@ export const TaskCard = forwardRef<HTMLDivElement, { task: z.infer<typeof taskSc
     const completionDaysAgo = task.completion && daysAgoUtil(task.completion.completedAt);
 
     const isOverdue = task.task.completeBy && Date.now() > new Date(task.task.completeBy).getTime();
+    const isVisible = !task.task.visibleAt || task.task.visibleAt.getTime() <= Date.now();
+    const visibleIn = task.task.visibleAt && daysAgoUtil(task.task.visibleAt).toLocaleString().replace("-", "");
 
     return (
       <Card
@@ -64,6 +66,13 @@ export const TaskCard = forwardRef<HTMLDivElement, { task: z.infer<typeof taskSc
                 <span className="text-zinc-700">•</span>
                 <span>by {task.task.createdBy.split("@")[0]}</span>
               </div>
+
+              {!isVisible && (
+                <div className="flex items-center gap-1 text-sm">
+                  <ClipboardClock className="h-5 w-5 text-neutral-400" />
+                  <span>Visible in {visibleIn} days</span>
+                </div>
+              )}
 
               {task.edited && (
                 <div className="flex items-center gap-1 text-sm">
