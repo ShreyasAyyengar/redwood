@@ -28,7 +28,7 @@ export const classroomRouter = {
       const touchedRoomNames = Object.keys(uploadedRooms);
 
       // Load ALL existing docs to know which ones to deactivate
-      const existingRoomDocuments = await ClassroomService.find({});
+      const existingRoomDocuments = await ClassroomService.find({}).lean();
       const existingByName = new Map(
         existingRoomDocuments.map((doc) => {
           const parsed = classroomSchema.parse(doc);
