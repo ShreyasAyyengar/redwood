@@ -51,9 +51,10 @@ export function IssueForm({
   const createIssue = useMutation(
     webClientORPC.issues.createIssue.mutationOptions({
       onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: webClientORPC.issues.getIssues.queryOptions({ input: { classroomId: roomId } }).queryKey,
-        });
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: webClientORPC.issues.getIssues.queryOptions({ input: { classroomId: roomId } }).queryKey }),
+          queryClient.invalidateQueries({ queryKey: webClientORPC.classrooms.getRooms.queryOptions({}).queryKey }),
+        ]);
         onSuccess?.();
       },
     })
@@ -62,9 +63,10 @@ export function IssueForm({
   const editIssue = useMutation(
     webClientORPC.issues.editIssue.mutationOptions({
       onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: webClientORPC.issues.getIssues.queryOptions({ input: { classroomId: roomId } }).queryKey,
-        });
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: webClientORPC.issues.getIssues.queryOptions({ input: { classroomId: roomId } }).queryKey }),
+          queryClient.invalidateQueries({ queryKey: webClientORPC.classrooms.getRooms.queryOptions({}).queryKey }),
+        ]);
         onSuccess?.();
       },
     })

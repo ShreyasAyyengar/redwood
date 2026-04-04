@@ -1,4 +1,4 @@
-import { issueSchema } from "@redwood/contracts";
+import { type classroomSchema, issueSchema } from "@redwood/contracts";
 import { v7 as uuidv7 } from "uuid";
 import type { z } from "zod";
 import { ClassroomService } from "../database/classroom-service";
@@ -35,13 +35,15 @@ export const issueRouter = {
       adminNotes: [],
     };
 
-    console.log(newIssue);
-
     const isValid = issueSchema.safeParse(newIssue);
     if (!isValid.success) throw errors.INTERNAL_SERVER_ERROR({ data: { message: isValid.error.message } });
 
     try {
       await IssueService.insertOne(newIssue);
+
+      // biome-ignore lint/complexity/noVoid: fire-and-forget
+      void recomputeRoomStatus(newIssue.classroomId);
+
       return true;
     } catch (e) {
       throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
@@ -52,10 +54,6 @@ export const issueRouter = {
     const issue = await IssueService.findById(input._id).lean();
     if (!issue) throw errors.NOT_FOUND({ data: { message: `Issue with id ${input._id} not found` } });
     const isAdmin = context.user.role === "admin";
-
-    console.log("<-- INPUT START -->");
-    console.log(JSON.stringify(input, null, 2));
-    console.log("<-- INPUT END -->");
 
     const updatedIssue: z.infer<typeof issueSchema> = {
       ...issue,
@@ -80,6 +78,10 @@ export const issueRouter = {
 
     try {
       await IssueService.findByIdAndUpdate(input._id, updatedIssue);
+
+      // biome-ignore lint/complexity/noVoid: fire-and-forget
+      void recomputeRoomStatus(updatedIssue.classroomId);
+
       return true;
     } catch (e) {
       throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
@@ -92,6 +94,10 @@ export const issueRouter = {
 
     try {
       await IssueService.findByIdAndDelete(input.issueId);
+
+      // biome-ignore lint/complexity/noVoid: fire-and-forget
+      void recomputeRoomStatus(issue.classroomId);
+
       return true;
     } catch (e) {
       throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
