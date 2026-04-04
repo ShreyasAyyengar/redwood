@@ -8,7 +8,8 @@ import { protectedProcedure } from "../libs/orpc-procedures";
 export const issueRouter = {
   getIssues: protectedProcedure.issues.getIssues.handler(async ({ input, errors }) => {
     const { classroomId } = input;
-    const issues = await IssueService.find({ classroomId }).lean().sort({ issueDate: -1 });
+    const issues: z.infer<typeof issueSchema>[] = await IssueService.find({ classroomId }).lean().sort({ issueDate: -1 });
+
     return issues;
   }),
 
@@ -104,3 +105,27 @@ export const issueRouter = {
     }
   }),
 };
+
+async function recomputeRoomStatus(classroomId: string) {
+  try {
+    const issues: z.infer<typeof issueSchema>[] = await IssueService.find({
+      classroomId,
+      resolution: { $exists: false },
+    }).lean();
+
+    let currentStatus: z.infer<typeof classroomSchema>["roomStatus"] = "GOOD";
+
+    for (const issue of issues) {
+      if (issue.issue.urgent) {
+        currentStatus = "NEEDS URGENT ATTENTION";
+        break;
+      }
+    }
+
+    if (currentStatus === "GOOD" && issues.length > 0) currentStatus = "NEEDS ATTENTION";
+
+    await ClassroomService.updateOne({ _id: classroomId }, { roomStatus: currentStatus });
+  } catch (e) {
+    console.error("Failed to recompute room status:", e);
+  }
+}
