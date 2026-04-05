@@ -39,5 +39,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-// TODO change favicon.ico to existing Redwood FileMaker icon
