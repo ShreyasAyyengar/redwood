@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "@redwood/shad-ui/globals.css";
+import { Suspense } from "react";
 import { env } from "../env";
 import { AuthLayer } from "./_components/auth-layer";
 import Providers from "./_components/providers";
@@ -29,7 +30,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <Providers>
-        <AuthLayer />
+        <Suspense fallback={null}>
+          <AuthLayer />
+        </Suspense>
         <head>{reactScanEnabled && <script crossOrigin="anonymous" src="//unpkg.com/react-scan/dist/auto.global.js" />}</head>
         <body className={`${geistSans.variable} ${geistMono.variable}`}>{children}</body>
       </Providers>
