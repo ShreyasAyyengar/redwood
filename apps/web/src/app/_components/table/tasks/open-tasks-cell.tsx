@@ -7,14 +7,7 @@ export default function OpenTasksCell({ row }: { row: Row<z.infer<typeof classro
   const openTasksCount = row.original.openTasksCount; // TODO find a way to make this 'open tasks'
 
   return (
-    <div
-      className={cn(
-        "flex items-center justify-center text-lg",
-        row.original.roomStatus === "NEEDS URGENT ATTENTION" && "text-red-500",
-        row.original.roomStatus === "NEEDS ATTENTION" && "text-yellow-500",
-        row.original.roomStatus === "GOOD" && "text-foreground"
-      )}
-    >
+    <div className={cn("flex items-center justify-center text-lg", row.original.roomStatus === "GOOD" && "text-foreground")}>
       {openTasksCount}
     </div>
   );
