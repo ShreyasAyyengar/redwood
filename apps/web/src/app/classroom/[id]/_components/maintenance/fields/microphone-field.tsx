@@ -33,12 +33,14 @@ export default function MicrophoneField({
   type ClipInstalled = z.infer<typeof clipInstalledSchema>;
 
   const [equipped, setEquipped] = useState<boolean>(!!existingValues);
-  const [batteryStripe, setBatteryStripe] = useState<BatteryStripe>(existingValues?.batteryStripe ?? "");
-  const [chargerStripe, setChargerStripe] = useState<ChargerStripe>(existingValues?.chargerStripe ?? "");
-  const [transmitterStripe, setTransmitterStripe] = useState<TransmitterStripe>(existingValues?.transmitterStripe ?? "");
-  const [aldBatteriesCharged, setAldBatteriesCharged] = useState<AldBatteriesCharged>(existingValues?.aldBatteriesCharged ?? "");
-  const [windscreenSecure, setWindscreenSecure] = useState<WindscreenSecure>(existingValues?.windscreenSecure ?? "");
-  const [clipInstalled, setClipInstalled] = useState<ClipInstalled>(existingValues?.clipInstalled ?? "");
+  const [batteryStripe, setBatteryStripe] = useState<BatteryStripe>(existingValues?.batteryStripe ?? ("" as BatteryStripe));
+  const [chargerStripe, setChargerStripe] = useState<ChargerStripe>(existingValues?.chargerStripe ?? ("" as ChargerStripe));
+  const [transmitterStripe, setTransmitterStripe] = useState<TransmitterStripe>(existingValues?.transmitterStripe ?? ("" as TransmitterStripe));
+  const [aldBatteriesCharged, setAldBatteriesCharged] = useState<AldBatteriesCharged>(
+    existingValues?.aldBatteriesCharged ?? ("" as AldBatteriesCharged)
+  );
+  const [windscreenSecure, setWindscreenSecure] = useState<WindscreenSecure>(existingValues?.windscreenSecure ?? ("" as WindscreenSecure));
+  const [clipInstalled, setClipInstalled] = useState<ClipInstalled>(existingValues?.clipInstalled ?? ("" as ClipInstalled));
 
   useEffect(() => {
     if (!equipped) field.handleChange(undefined);
