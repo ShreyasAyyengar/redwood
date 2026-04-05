@@ -32,9 +32,9 @@ export default function LastServicedHeader({ column }: { column: Column<z.infer<
         <p className="text-lg">Last Serviced</p>
         {column.getIsSorted() ? (
           column.getIsSorted() === "asc" ? (
-            <CalendarArrowDown className="ml-2 h-6 w-6 text-yellow-500" />
-          ) : (
             <CalendarArrowUp className="ml-2 h-6 w-6 text-green-500" />
+          ) : (
+            <CalendarArrowDown className="ml-2 h-6 w-6 text-yellow-500" />
           )
         ) : (
           <SlidersHorizontal className="ml-2 h-6 w-6 rotate-90" />
