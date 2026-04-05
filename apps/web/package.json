@@ -7,7 +7,7 @@
     "dev": "bun run next dev --port 3000",
     "build": "bun run next build",
     "start": "bun run next start",
-    "check-types": "bun run next typegen && bun run tsc --noEmit"
+    "check-types": "bun run next typegen && bun run tsgo --noEmit"
   },
   "dependencies": {
     "@better-auth/electron": "1.5.6",
