@@ -30,11 +30,13 @@ export default function DTENField({
   type ScreenWipedSchema = z.infer<typeof screenWipedSchema>;
 
   const [equipped, setEquipped] = useState<boolean>(!!existingValue);
-  const [licenced, setLicenced] = useState<LicencedSchema>(existingValue?.licenced ?? "");
-  const [signPresent, setSignPresent] = useState<SignPresentSchema>(existingValue?.signPresent ?? "");
-  const [microphoneWorking, setMicrophoneWorking] = useState<MicrophoneWorkingSchema>(existingValue?.microphoneWorking ?? "");
-  const [speakerWorking, setSpeakerWorking] = useState<SpeakerWorkingSchema>(existingValue?.speakerWorking ?? "");
-  const [screenWiped, setScreenWiped] = useState<ScreenWipedSchema>(existingValue?.screenWiped ?? "");
+  const [licenced, setLicenced] = useState<LicencedSchema>(existingValue?.licenced ?? ("" as LicencedSchema));
+  const [signPresent, setSignPresent] = useState<SignPresentSchema>(existingValue?.signPresent ?? ("" as SignPresentSchema));
+  const [microphoneWorking, setMicrophoneWorking] = useState<MicrophoneWorkingSchema>(
+    existingValue?.microphoneWorking ?? ("" as MicrophoneWorkingSchema)
+  );
+  const [speakerWorking, setSpeakerWorking] = useState<SpeakerWorkingSchema>(existingValue?.speakerWorking ?? ("" as SpeakerWorkingSchema));
+  const [screenWiped, setScreenWiped] = useState<ScreenWipedSchema>(existingValue?.screenWiped ?? ("" as ScreenWipedSchema));
 
   useEffect(() => {
     if (!equipped) field.handleChange(undefined);
