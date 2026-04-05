@@ -26,7 +26,6 @@
     "noPropertyAccessFromIndexSignature": false,
 
     "outDir": "dist",
-    "baseUrl": ".",
     "rootDir": "src",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   }

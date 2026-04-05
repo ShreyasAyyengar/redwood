@@ -1,7 +1,6 @@
 {
   "extends": "@redwood/typescript-config/react-library.json",
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "@redwood/shad-ui/*": ["./src/*"]
     }
