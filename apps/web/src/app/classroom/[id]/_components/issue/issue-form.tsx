@@ -150,9 +150,7 @@ export function IssueForm({
 
           <Separator className="bg-red-500" />
           {existingIssue && (
-            <form.AppField name="resolution">
-              {(field) => <field.ResolutionField existingValue={existingIssue?.resolution?.comment} />}
-            </form.AppField>
+            <form.AppField name="resolution">{(field) => <field.ResolutionField existingValue={existingIssue.resolution} />}</form.AppField>
           )}
         </div>
       </ScrollArea>
