@@ -19,8 +19,6 @@ import SupervisorNeededField from "./fields/supervisor-needed-field";
 import UrgentField from "./fields/urgent-field";
 import { DeleteIssueDialog } from "./issue-delete-dialog";
 
-import loadingFailed = module;
-
 export type FormValues = z.input<typeof uiIssueFormSchema>;
 export const { fieldContext, formContext, useFieldContext } = createFormHookContexts();
 export const { useAppForm } = createFormHook({
