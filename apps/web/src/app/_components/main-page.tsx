@@ -1,6 +1,7 @@
 import RoomList from "./list/room-list";
 import { useFetchedRoomsStore } from "./room-store";
 import { columns } from "./table/columns";
+import Filters from "./table/filters";
 import { RoomTable } from "./table/room-table";
 
 export default function MainPage() {
@@ -20,6 +21,7 @@ export default function MainPage() {
         <p className="mt-5 text-center font-bold text-3xl">Redwood — Classroom Maintenance</p>
 
         <div className="flex w-full flex-1 items-center justify-center overflow-hidden p-5">
+          <Filters />
           <RoomTable data={fetchedRooms} columns={columns} />
         </div>
       </div>
