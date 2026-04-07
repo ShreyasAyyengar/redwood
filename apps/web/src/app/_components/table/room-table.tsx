@@ -7,6 +7,7 @@ import {
   type ColumnDef,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getSortedRowModel,
   type Row,
   type SortingState,
@@ -14,20 +15,23 @@ import {
 } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import type { z } from "zod";
+import { useShallow } from "zustand/react/shallow";
+import { dayAvailability, getBlocksForToday, getCaliClock } from "../../../util/date-time-utils";
+import { useActiveFiltersStore } from "./active-filters";
 import { RoomRow } from "./room-row";
 
 const SORTING_STORAGE_KEY = "room-table-sorting";
 
-export function RoomTable<TData, TValue>({ data, columns }: { data: TData[]; columns: ColumnDef<TData, TValue>[] }) {
+export function RoomTable({
+  data,
+  columns,
+}: {
+  data: z.infer<typeof classroomSchema>[];
+  columns: ColumnDef<z.infer<typeof classroomSchema>>[];
+}) {
   const [sorting, setSorting] = useState<SortingState>(() => {
     const stored = localStorage.getItem(SORTING_STORAGE_KEY);
-    if (stored) {
-      try {
-        return JSON.parse(stored);
-      } catch {
-        return [];
-      }
-    }
+    if (stored) return JSON.parse(stored);
     return [];
   });
 
@@ -35,14 +39,64 @@ export function RoomTable<TData, TValue>({ data, columns }: { data: TData[]; col
     localStorage.setItem(SORTING_STORAGE_KEY, JSON.stringify(sorting));
   }, [sorting]);
 
+  const filterState = useActiveFiltersStore(
+    useShallow((s) => ({
+      exclusive: s.exclusive,
+      status: s.status,
+      hasIssues: s.hasIssues,
+      incompleteTasks: s.incompleteTasks,
+      overdueTasks: s.overdueTasks,
+      availableNow: s.availableNow,
+      group: s.group,
+    }))
+  );
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     enableFilters: true,
     state: {
       sorting,
+      globalFilter: filterState,
+    },
+    globalFilterFn: (row, columnId, filterValue) => {
+      const { exclusive, status, hasIssues, incompleteTasks, overdueTasks, availableNow, group } = filterState;
+
+      const room = row.original;
+
+      // hard constraint: if group is selected, room must be in that group
+      if (group && room.groupKey !== group) return false;
+
+      const checks: boolean[] = [];
+
+      if (status) checks.push(room.roomStatus === status);
+
+      if (hasIssues) checks.push(room.roomStatus !== "GOOD");
+
+      if (incompleteTasks) checks.push(room.openTasksCount > 0);
+
+      if (overdueTasks) checks.push(false); // replace with real logic
+
+      if (availableNow) {
+        if (!room.schedule) {
+          checks.push(false);
+        } else {
+          const { weekdayKey, nowMin } = getCaliClock();
+          const blocks = getBlocksForToday(room.schedule, weekdayKey);
+          const availability = dayAvailability(blocks, nowMin);
+          checks.push(availability.kind === "open");
+        }
+      }
+
+      // if no non-group filters are active, and group matched, allow it
+      if (checks.length === 0) return true;
+
+      return exclusive
+        ? checks.every(Boolean) // AND across remaining filters
+        : checks.some(Boolean); // OR across remaining filters
     },
     onSortingChange: setSorting,
   });
