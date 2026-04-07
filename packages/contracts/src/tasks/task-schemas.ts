@@ -41,6 +41,7 @@ export const uiTaskFormSchema = z.object({
   completion: z
     .object({
       comment: z.string().optional(),
+      completedBy: z.email(),
     })
     .optional(),
 });

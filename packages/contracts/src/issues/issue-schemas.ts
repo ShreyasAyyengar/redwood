@@ -77,9 +77,11 @@ export const uiIssueFormSchema = z.object({
   // edit-specific fields
   reportedBy: z.email().optional(),
   reportedAt: z.coerce.date().optional(),
+
   resolution: z
     .object({
       comment: z.string().min(1, "Issue resolution.comment must be provided"),
+      resolvedBy: z.email(),
     })
     .optional(),
   adminNotes: z.array(z.string()).optional(),
