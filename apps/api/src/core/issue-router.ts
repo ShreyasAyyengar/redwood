@@ -74,9 +74,16 @@ export const issueRouter = {
         editedBy: context.user.email,
         editDate: new Date(),
       },
+
       // if input.resolution is provided, update resolution, else make it undefined
       ...(input.resolution
-        ? { resolution: { resolvedBy: context.user.email, resolvedAt: new Date(), comment: input.resolution.comment } }
+        ? {
+            resolution: {
+              resolvedBy: input.resolution.resolvedBy,
+              resolvedAt: new Date(),
+              comment: input.resolution.comment,
+            },
+          }
         : { resolution: undefined }),
     };
 
