@@ -50,6 +50,7 @@ export const taskRouter = {
   editTask: protectedProcedure.tasks.editTask.handler(async ({ input, errors, context }) => {
     const task = await TaskService.findById(input._id).lean();
     if (!task) throw errors.NOT_FOUND({ data: { message: `Task with id ${input._id} not found` } });
+    const isAdmin = context.user.role === "admin";
 
     const updatedTask: z.infer<typeof taskSchema> = {
       ...task,
@@ -66,7 +67,14 @@ export const taskRouter = {
         editDate: new Date(),
       },
       ...(input.completion
-        ? { completion: { completedBy: context.user.email, comment: input.completion.comment, completedAt: new Date() } }
+        ? {
+            completion: {
+              // the completedBy can be different than the context, only if user is admin
+              completedBy: isAdmin ? input.completion.completedBy : context.user.email,
+              completedAt: isAdmin ? input.completion.completedAt : new Date(),
+              comment: input.completion.comment,
+            },
+          }
         : undefined),
     };
 
