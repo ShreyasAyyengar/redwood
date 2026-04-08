@@ -81,7 +81,7 @@ export const issueRouter = {
             resolution: {
               // the resolvedBy can be different than the context, only if user is admin
               resolvedBy: isAdmin ? input.resolution.resolvedBy : context.user.email,
-              resolvedAt: new Date(),
+              resolvedAt: isAdmin ? input.resolution.resolvedAt : new Date(),
               comment: input.resolution.comment,
             },
           }
