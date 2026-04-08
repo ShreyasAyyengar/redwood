@@ -93,35 +93,34 @@ export function TaskForm({
 
   return (
     <>
+      {/* HEADER OUTSIDE SCROLL */}
+      <DialogHeader>
+        <DialogTitle className="mx-auto rounded-md bg-zinc-950/30 px-10 py-3 text-center text-2xl ring-1 ring-white/15">
+          {existingTask ? (
+            <form.AppField name="createdBy">
+              {(field) => <field.CreatedByFieldSelector existingValue={existingTask?.task.createdBy} />}
+            </form.AppField>
+          ) : (
+            <p>Create New Task</p>
+          )}
+        </DialogTitle>
+      </DialogHeader>
+
+      {/* SCROLL ONLY WRAPS BODY */}
       <ScrollArea className="max-h-[calc(100dvh-300px)] rounded-2xl bg-background/40 p-3">
         <div className="my-2 flex flex-col gap-5 px-1">
-          <DialogHeader>
-            <DialogTitle className="mx-auto rounded-md bg-zinc-950/30 px-10 py-3 text-center text-2xl ring-1 ring-white/15">
-              {existingTask ? (
-                <form.AppField name="createdBy">
-                  {(field) => <field.CreatedByFieldSelector existingValue={existingTask?.task.createdBy} />}
-                </form.AppField>
-              ) : (
-                <p>Create New Task</p>
-              )}
-            </DialogTitle>
-          </DialogHeader>
-
           <Separator className="bg-indigo-500" />
 
-          {/* Description */}
           <form.AppField name="description">
             {(field) => <field.DescriptionField existingValue={existingTask?.task.description} />}
           </form.AppField>
 
           <Separator className="bg-indigo-500" />
 
-          {/* Urgent */}
           <form.AppField name="urgent">{(field) => <field.UrgentField existingValue={existingTask?.task.urgent} />}</form.AppField>
 
           <Separator className="bg-indigo-500" />
 
-          {/* Dates */}
           <div className="mx-auto flex w-full justify-between">
             <div>
               <form.AppField name="visibleAt">
@@ -134,6 +133,7 @@ export function TaskForm({
                 )}
               </form.AppField>
             </div>
+
             <div>
               <form.AppField name="completeBy">
                 {(field) => (
@@ -150,13 +150,12 @@ export function TaskForm({
           {existingTask && (
             <>
               <Separator className="bg-indigo-500" />
-              <form.AppField name="completion">
-                {(field) => <field.CompletionField existingValue={existingTask?.completion?.comment} />}
-              </form.AppField>
+              <form.AppField name="completion">{(field) => <field.CompletionField existingValue={existingTask?.completion} />}</form.AppField>
             </>
           )}
         </div>
       </ScrollArea>
+
       <DialogFooter className="my-3">
         <div className="flex w-full items-center justify-between">
           <div>
@@ -169,10 +168,12 @@ export function TaskForm({
               </DeleteTaskDialog>
             )}
           </div>
+
           <div className="flex gap-2">
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
+
             <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
               {([canSubmit, isSubmitting]) => (
                 <Button
