@@ -82,6 +82,7 @@ export const uiIssueFormSchema = z.object({
     .object({
       comment: z.string().min(1, "Issue resolution.comment must be provided"),
       resolvedBy: z.email(),
+      resolvedAt: z.coerce.date(),
     })
     .optional(),
   adminNotes: z.array(z.string()).optional(),
