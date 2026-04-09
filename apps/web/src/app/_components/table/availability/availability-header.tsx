@@ -3,7 +3,6 @@ import type { Column } from "@tanstack/react-table";
 import { CalendarClock, CircleX, ClockCheck, SlidersHorizontal } from "lucide-react";
 import type { z } from "zod";
 
-// TODO figure out what <any> can be replaced with
 export default function AvailabilityHeader({ column }: { column: Column<z.infer<typeof classroomSchema>> }) {
   return (
     <div>

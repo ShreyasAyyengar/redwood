@@ -23,7 +23,6 @@ const statusOrder: Record<string, number> = {
 
 const columnHelper = createColumnHelper<z.infer<typeof classroomSchema>>();
 
-// TODO find better type for `any`
 export const columns: ColumnDef<z.infer<typeof classroomSchema>>[] = [
   columnHelper.accessor("roomStatus", {
     header: ({ column }) => <StatusHeader column={column} />,

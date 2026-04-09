@@ -3,7 +3,6 @@ import type { Column } from "@tanstack/react-table";
 import { ArrowDown01, ArrowDown10, SlidersHorizontal, SquareCheckBig } from "lucide-react";
 import type { z } from "zod";
 
-// TODO figure out what <any> can be replaced with
 export default function OpenTasksHeader({ column }: { column: Column<z.infer<typeof classroomSchema>> }) {
   return (
     <div>
