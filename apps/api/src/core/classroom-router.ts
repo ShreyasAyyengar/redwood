@@ -47,7 +47,7 @@ export const classroomRouter = {
         const existingRoom = existingByName.get(roomName);
 
         // if existingRoom exists, spread and only change schedule
-        const roomData: z.infer<typeof classroomSchema> = existingRoom
+        const roomData: z.input<typeof classroomSchema> = existingRoom
           ? { ...existingRoom, schedule, isActive: true }
           : {
               _id: uuidv7(),
@@ -58,11 +58,6 @@ export const classroomRouter = {
               openTasksCount: 0,
               roomStatus: "GOOD" as const,
               isActive: true,
-              attributes: {
-                touchPanel: false,
-                permanentSeating: false,
-                lecturnFan: false,
-              },
             };
 
         // Validate against schema

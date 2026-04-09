@@ -39,5 +39,5 @@ export const classroomSchema = z.object({
       ip: z.string(),
     })
     .optional(),
-  attributes: z.array(z.string()),
+  attributes: z.array(z.string()).default([]),
 });
