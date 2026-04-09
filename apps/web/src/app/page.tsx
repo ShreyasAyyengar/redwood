@@ -1,8 +1,8 @@
 "use client";
 
 import { authClientWeb } from "../lib/auth-client-web";
+import HomePage from "./_components/home-page";
 import LoadingComponent from "./_components/loading";
-import MainPage from "./_components/main-page";
 import { useFetchedRoomsStore } from "./_components/room-store";
 
 export default function Home() {
@@ -11,5 +11,5 @@ export default function Home() {
 
   if (isPending || !data || fetchedRooms.length === 0) return <LoadingComponent />;
 
-  return <MainPage />;
+  return <HomePage />;
 }

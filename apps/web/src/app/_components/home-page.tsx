@@ -6,7 +6,7 @@ import { columns } from "./table/columns";
 import Filters from "./table/filters";
 import { RoomTable } from "./table/room-table";
 
-export default function MainPage() {
+export default function HomePage() {
   const { fetchedRooms } = useFetchedRoomsStore();
 
   const { data } = authClientWeb.useSession();
