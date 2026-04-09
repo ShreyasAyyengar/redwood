@@ -32,22 +32,12 @@ export const classroomSchema = z.object({
   roomStatus: z.enum(["GOOD", "NEEDS ATTENTION", "NEEDS URGENT ATTENTION"]).default("GOOD"),
   openTasksCount: z.number(), // denormalized -> derived by updates from writes // TODO not rlly accurate
   isActive: z.boolean().default(true),
-  attributes: z
+  captioning: z
     .object({
-      captioning: z
-        .object({
-          type: z.enum(["DTEN", "MAC"]),
-          name: z.string(),
-          ip: z.string(),
-        })
-        .optional(),
-      touchPanel: z.boolean(),
-      permanentSeating: z.boolean(),
-      lecturnFan: z.boolean(),
+      type: z.enum(["DTEN", "MAC"]),
+      name: z.string(),
+      ip: z.string(),
     })
-    .default({
-      touchPanel: false,
-      permanentSeating: false,
-      lecturnFan: false,
-    }),
+    .optional(),
+  attributes: z.array(z.string()),
 });
