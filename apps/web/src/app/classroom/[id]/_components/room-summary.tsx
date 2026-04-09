@@ -47,7 +47,7 @@ export default function RoomSummary({
   return (
     <div
       className={cn(
-        "flex flex-col rounded-2xl p-5 font-bold text-3xl text-zinc-300/80 shadow-xl/80",
+        "flex flex-col rounded-2xl p-5 pt-3 font-bold text-2xl text-zinc-300/80 shadow-xl/80",
         room.roomStatus === "GOOD" && "bg-green-500/10",
         room.roomStatus === "NEEDS ATTENTION" && "bg-yellow-500/10",
         room.roomStatus === "NEEDS URGENT ATTENTION" && "bg-red-500/10"
@@ -108,7 +108,7 @@ export default function RoomSummary({
 
       <div className="flex justify-start lg:justify-center">
         <MaintenanceDialog roomId={room._id}>
-          <div className="mt-3 flex w-fit items-center rounded-md bg-neutral-300 px-2 py-0.5 text-center font-semibold text-base text-black transition-all duration-150 hover:bg-neutral-400 active:scale-95 active:transform">
+          <div className="mt-4 flex w-fit items-center rounded-md bg-neutral-300 px-2 py-0.5 text-center font-semibold text-base text-black transition-all duration-150 hover:bg-neutral-400 active:scale-95 active:transform">
             <Wrench className="mr-2 h-5 w-5" />
             Perform Maintenance
           </div>

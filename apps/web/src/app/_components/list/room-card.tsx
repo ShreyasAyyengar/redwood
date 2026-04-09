@@ -35,12 +35,8 @@ export default function RoomCard({ room }: { room: z.infer<typeof classroomSchem
   };
 
   const roomStatus = () => {
-    if (room.roomStatus === "NEEDS URGENT ATTENTION") {
-      return <TriangleAlert className="flex h-4 w-4 text-red-500" />;
-    }
-    if (room.roomStatus === "NEEDS ATTENTION") {
-      return <CircleAlert className="flex h-4 w-4 text-yellow-500" />;
-    }
+    if (room.roomStatus === "NEEDS URGENT ATTENTION") return <TriangleAlert className="flex h-4 w-4 text-red-500" />;
+    if (room.roomStatus === "NEEDS ATTENTION") return <CircleAlert className="flex h-4 w-4 text-yellow-500" />;
     return <ThumbsUp className="flex h-4 w-4" />;
   };
 
