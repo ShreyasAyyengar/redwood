@@ -41,6 +41,30 @@ export default function HomePage() {
               <RoomTable data={fetchedRooms} columns={columns} />
             </div>
           </TabsContent>
+
+          <TabsContent value="issues" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
+            <div className="flex w-full flex-1 items-center justify-center overflow-hidden p-5">
+              <h1>Issues</h1>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="tasks" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
+            <div className="flex w-full flex-1 items-center justify-center overflow-hidden p-5">
+              <h1>Tasks</h1>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="builder" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
+            <div className="flex w-full flex-1 items-center justify-center overflow-hidden p-5">
+              <h1>Coming Soon to a Kerr Hall near you!</h1>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="admin" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
+            <div className="flex w-full flex-1 justify-center overflow-hidden p-5">
+              <h1>Admin Panel</h1>
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
     </>
