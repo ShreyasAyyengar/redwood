@@ -68,7 +68,7 @@ export const issueSchema = z.object({
 });
 
 export const uiIssueFormSchema = z.object({
-  description: z.string().min(1, "Description is required"),
+  description: z.string().min(1, "Issue description must be provided"),
   urgent: z.boolean().default(false),
   supervisorNeeded: z.boolean().default(false),
   cruzfixId: z.string().optional(),
