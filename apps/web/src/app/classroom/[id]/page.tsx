@@ -14,6 +14,7 @@ import MaintenanceHistory from "./_components/maintenance-history";
 import OpenTasks from "./_components/open-tasks";
 import RoomSummary from "./_components/room-summary";
 
+// TODO loading states for each component
 export default function Page() {
   const params = useParams();
   const roomId = params.id as string;
