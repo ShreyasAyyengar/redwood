@@ -1,3 +1,4 @@
+import { attributesContract } from "./attributes/attributes-contract";
 import { issueContract } from "./issues/issue-contract";
 import { maintenanceContract } from "./maintenance/maintenance-contract";
 import { classroomContract } from "./rooms/classroom-schemas";
@@ -10,4 +11,5 @@ export const httpContract = {
   issues: issueContract,
   tasks: taskContract,
   users: userContract,
+  attributes: attributesContract,
 };
