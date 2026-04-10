@@ -9,3 +9,5 @@ export * from "./tasks/task-contract";
 export * from "./tasks/task-schemas";
 export * from "./users/user-contract";
 export * from "./users/user-schemas";
+export * from "./routes/routes-schemas";
+export * from "./routes/routes-contract";
