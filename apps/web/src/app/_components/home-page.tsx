@@ -1,5 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@redwood/shad-ui/components/tabs";
 import { authClientWeb } from "../../lib/auth-client-web";
+import AdminPanel from "./admin/admin-panel";
 import RoomList from "./list/room-list";
 import { useFetchedRoomsStore } from "./room-store";
 import { columns } from "./table/columns";
@@ -60,10 +61,8 @@ export default function HomePage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="admin" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
-            <div className="flex w-full flex-1 justify-center overflow-hidden p-5">
-              <h1>Admin Panel</h1>
-            </div>
+          <TabsContent value="admin">
+            <AdminPanel />
           </TabsContent>
         </Tabs>
       </div>
