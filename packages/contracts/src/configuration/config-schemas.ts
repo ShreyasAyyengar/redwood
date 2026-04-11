@@ -13,7 +13,14 @@ export const csvRecordSchema = z.object({
 
 export const configurationSchema = z.object({
   users: z.array(redwoodUserSchema),
-  roomGroups: z.array(z.string()),
+  roomGroups: z
+    .array(
+      z.object({
+        startingWith: z.string(),
+        under: z.string(),
+      })
+    )
+    .default([]),
   attributes: z.array(attributeSchema),
   csvRecords: csvRecordSchema.optional(),
 });
