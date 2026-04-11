@@ -3,10 +3,12 @@ import { parse } from "csv-parse/sync";
 import { v7 as uuidv7 } from "uuid";
 import type { z } from "zod";
 import { ClassroomService } from "../database/classroom-service";
+import { ConfigService } from "../database/config-service";
 import { protectedProcedure, publicProcedure } from "../libs/orpc-procedures";
 import { emptySchedule, processTimeRanges, rowSchema } from "../util/csv-util";
 
 export const classroomRouter = {
+  loadClassrooms: publicProcedure.classrooms.loadClassrooms.handler(async ({ input, errors: { INTERNAL_SERVER_ERROR } }) => {
     try {
       const text = await input.csvFile.text();
       const parsedCSV = parse(text, {
@@ -90,12 +92,25 @@ export const classroomRouter = {
 
       if (ops.length > 0) await ClassroomService.bulkWrite(ops, { ordered: false });
 
+      await ConfigService.findOneAndUpdate(
+        {},
+        { $set: { "csvRecords.fileName": input.csvFile.name, "csvRecords.dateUploaded": new Date() } },
+        { new: true }
+      );
+
       return true;
     } catch (e) {
       console.error(e);
       throw INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
     }
   }),
+
+  getCSVRecord: protectedProcedure.classrooms.getCSVRecord.handler(async ({ errors: { NOT_FOUND } }) => {
+    const config = await ConfigService.findOne().lean();
+    if (!config) throw NOT_FOUND({ data: { message: "Configuration not found." } });
+    return config.csvRecords ?? null;
+  }),
+
   getRooms: protectedProcedure.classrooms.getRooms.handler(async ({ errors: { INTERNAL_SERVER_ERROR } }) => {
     try {
       return await ClassroomService.find({ isActive: true });
