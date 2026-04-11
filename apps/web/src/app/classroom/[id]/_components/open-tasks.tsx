@@ -38,7 +38,7 @@ export default function OpenTasks({ tasks, room }: { tasks?: z.infer<typeof task
               )}
             </div>
 
-            <TaskHistoryDialog room={room} tasks={tasks}>
+            <TaskHistoryDialog title={`Task History: ${room.displayName}`} tasks={tasks}>
               <button
                 type="button"
                 className="flex w-full cursor-pointer items-center gap-3 font-normal transition-colors hover:text-neutral-200 sm:text-lg"

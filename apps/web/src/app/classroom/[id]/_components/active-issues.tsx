@@ -38,7 +38,7 @@ export default function ActiveIssues({ issues, room }: { issues?: z.infer<typeof
               )}
             </div>
 
-            <IssueHistoryDialog room={room} issues={issues}>
+            <IssueHistoryDialog title={`Issue History: ${room.displayName}`} issues={issues}>
               <button
                 type="button"
                 className="flex w-full cursor-pointer items-center gap-3 font-normal transition-colors hover:text-neutral-200 sm:text-lg"
