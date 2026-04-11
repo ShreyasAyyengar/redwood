@@ -1,4 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@redwood/shad-ui/components/tabs";
+import CSVUpload from "./csv/csv-upload";
 import Overview from "./overview/overview";
 
 export default function AdminPanel() {
@@ -17,7 +18,9 @@ export default function AdminPanel() {
         <TabsContent value="overview">
           <Overview />
         </TabsContent>
-        <TabsContent value="csv">{/*<CSVUpload />*/}</TabsContent>
+        <TabsContent value="csv">
+          <CSVUpload />
+        </TabsContent>
         {/*<TabsContent value="attributes">*/}
         {/*  <RoomAttributes />*/}
         {/*</TabsContent>*/}
