@@ -1,3 +1,4 @@
+import { attributesRouter } from "../core/attributes-routers";
 import { classroomRouter } from "../core/classroom-router";
 import { issueRouter } from "../core/issue-router";
 import { maintenanceRouter } from "../core/maintenance-router";
@@ -10,4 +11,5 @@ export const httpRouter = {
   issues: issueRouter,
   tasks: taskRouter,
   users: userRouter,
+  attributes: attributesRouter,
 };
