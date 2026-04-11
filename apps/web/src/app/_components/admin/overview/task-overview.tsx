@@ -52,7 +52,7 @@ export default function TaskOverview() {
             <span className={cn("font-medium", openTasks.length > 0 ? "text-blue-100" : "text-emerald-100")}>Active Tasks</span>
             <span className="font-bold text-3xl">{isFetching ? "Loading..." : openTasks.length}</span>
             <span className={cn(openTasks.length > 0 ? "text-blue-100/70" : "text-emerald-100/70")}>
-              {openTasks.length > 0 ? "Currently open" : "All clear"}
+              {openTasks.length > 0 ? "Currently active" : "All clear"}
             </span>
           </div>,
           openTasks,

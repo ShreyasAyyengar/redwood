@@ -1,3 +1,4 @@
+import { ClassroomService } from "../database/classroom-service";
 import { ConfigService } from "../database/config-service";
 import { adminProcedure } from "../libs/orpc-procedures";
 
@@ -6,12 +7,14 @@ export const attributesRouter = {
     const config = await ConfigService.findOne();
     if (!config) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Configuration not found." } });
 
-    return config.attributes;
+    return config.attributes ?? [];
   }),
 
   addAttribute: adminProcedure.attributes.addAttribute.handler(async ({ input: { attribute }, errors }) => {
     const config = await ConfigService.findOne();
     if (!config) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Configuration not found." } });
+
+    if (!config.attributes) config.attributes = [];
 
     config.attributes.push(attribute);
     await config.save();
@@ -27,12 +30,14 @@ export const attributesRouter = {
     return true;
   }),
 
-  updateAttributes: adminProcedure.attributes.updateAttributes.handler(async ({ input: { attributes }, errors }) => {
-    const config = await ConfigService.findOne();
-    if (!config) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Configuration not found." } });
+  // updateAttributes: adminProcedure.attributes.updateAttributes.handler(async ({ input: { attributes }, errors }) => {
+  //   const config = await ConfigService.findOne();
+  //   if (!config) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Configuration not found." } });
+  //
+  //   config.attributes = attributes;
+  //   await config.save();
+  //   return true;
+  // }),
 
-    config.attributes = attributes;
-    await config.save();
-    return true;
   }),
 };
