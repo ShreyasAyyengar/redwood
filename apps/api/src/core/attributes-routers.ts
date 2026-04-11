@@ -39,5 +39,20 @@ export const attributesRouter = {
   //   return true;
   // }),
 
+  bulkUpdateClassrooms: adminProcedure.attributes.bulkUpdateClassrooms.handler(async ({ input: { updates }, errors }) => {
+    try {
+      const bulkOps = updates.map((update) => ({
+        updateOne: {
+          filter: { _id: update.classroomId },
+          update: { $set: { attributes: update.attributes } },
+        },
+      }));
+
+      await ClassroomService.bulkWrite(bulkOps);
+      return true;
+    } catch (e) {
+      console.error(e);
+      throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Failed to update classrooms." } });
+    }
   }),
 };

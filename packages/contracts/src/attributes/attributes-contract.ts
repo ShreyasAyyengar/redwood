@@ -55,4 +55,27 @@ export const attributesContract = {
         }),
       },
     }),
+
+  bulkUpdateClassrooms: oc
+    .route({
+      method: "POST",
+    })
+    .input(
+      z.object({
+        updates: z.array(
+          z.object({
+            classroomId: z.string().uuid(),
+            attributes: z.array(z.string()),
+          }),
+        ),
+      }),
+    )
+    .output(z.boolean())
+    .errors({
+      INTERNAL_SERVER_ERROR: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+    }),
 };
