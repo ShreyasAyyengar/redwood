@@ -1,4 +1,4 @@
-import type { basicUserSchema, taskSchema } from "@redwood/contracts";
+import type { redwoodUserSchema, taskSchema } from "@redwood/contracts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@redwood/shad-ui/components/select";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -39,7 +39,7 @@ export default function CreatedByFieldSelector({ existingValue }: { existingValu
               <SelectValue>{selectedUser?.split("@")[0]}</SelectValue>
             </SelectTrigger>
             <SelectContent>
-              {fetchedUsers.map((user: z.infer<typeof basicUserSchema>) => (
+              {fetchedUsers.map((user: z.infer<typeof redwoodUserSchema>) => (
                 <SelectItem key={user.email} value={user.email} className="border px-2 py-1 text-2xl" hasCheck={false}>
                   {user.email.split("@")[0]}
                 </SelectItem>

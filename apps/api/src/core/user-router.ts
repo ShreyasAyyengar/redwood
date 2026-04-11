@@ -1,4 +1,4 @@
-import type { basicUserSchema } from "@redwood/contracts";
+import type { redwoodUserSchema } from "@redwood/contracts";
 import type { z } from "zod";
 import { ConfigService } from "../database/config-service";
 import { adminProcedure } from "../libs/orpc-procedures";
@@ -10,7 +10,7 @@ export const userRouter = {
 
     if (exists) throw errors.UNPROCESSABLE_CONTENT({ data: { message: "Credentials already exist." } });
 
-    const basicNewUser: z.infer<typeof basicUserSchema> = {
+    const basicNewUser: z.infer<typeof redwoodUserSchema> = {
       email,
       role,
     };

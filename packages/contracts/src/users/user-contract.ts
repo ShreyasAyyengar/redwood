@@ -1,13 +1,13 @@
 import { oc } from "@orpc/contract";
 import { z } from "zod";
-import { basicUserSchema, userSchema } from "./user-schemas";
+import { redwoodUserSchema, userSchema } from "./user-schemas";
 
 export const userContract = {
   createCredentials: oc
     .route({
       method: "POST",
     })
-    .input(basicUserSchema)
+    .input(redwoodUserSchema)
     .output(z.boolean())
     .errors({
       INTERNAL_SERVER_ERROR: {
@@ -26,7 +26,7 @@ export const userContract = {
     .route({
       method: "DELETE",
     })
-    .input(z.object({ email: basicUserSchema.shape.email }))
+    .input(z.object({ email: redwoodUserSchema.shape.email }))
     .output(z.boolean())
     .errors({
       INTERNAL_SERVER_ERROR: {
@@ -45,7 +45,7 @@ export const userContract = {
     .route({
       method: "PATCH",
     })
-    .input(z.object({ email: basicUserSchema.shape.email, newRole: userSchema.shape.role }))
+    .input(z.object({ email: redwoodUserSchema.shape.email, newRole: userSchema.shape.role }))
     .output(z.boolean())
     .errors({
       INTERNAL_SERVER_ERROR: {
@@ -65,7 +65,7 @@ export const userContract = {
       method: "GET",
     })
     .input(z.object({}))
-    .output(z.array(basicUserSchema))
+    .output(z.array(redwoodUserSchema))
     .errors({
       INTERNAL_SERVER_ERROR: {
         data: z.object({

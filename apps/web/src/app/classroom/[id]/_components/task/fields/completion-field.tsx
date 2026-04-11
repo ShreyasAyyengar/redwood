@@ -1,4 +1,4 @@
-import type { basicUserSchema, taskSchema } from "@redwood/contracts";
+import type { redwoodUserSchema, taskSchema } from "@redwood/contracts";
 import { Button } from "@redwood/shad-ui/components/button";
 import { Calendar } from "@redwood/shad-ui/components/calendar";
 import { Checkbox } from "@redwood/shad-ui/components/checkbox";
@@ -112,7 +112,7 @@ export default function CompletionField({ existingValue }: { existingValue?: z.i
                       <SelectValue className="text-2xl">{selectedCompletedBy?.split("@")[0]}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                      {fetchedUsers.map((user: z.infer<typeof basicUserSchema>) => (
+                      {fetchedUsers.map((user: z.infer<typeof redwoodUserSchema>) => (
                         <SelectItem key={user.email} value={user.email} className="border px-2 py-1 text-sm" hasCheck={false}>
                           {user.email.split("@")[0]}
                         </SelectItem>

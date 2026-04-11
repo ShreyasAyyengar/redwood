@@ -10,7 +10,7 @@ export const userSchema = z.object({
   role: z.enum(["employee", "supervisor", "admin"]),
 });
 
-export const basicUserSchema = z.object({
+export const redwoodUserSchema = z.object({
   email: userSchema.shape.email,
   role: userSchema.shape.role,
 });
