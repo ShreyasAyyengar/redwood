@@ -6,8 +6,14 @@ export const attributeSchema = z.object({
   color: z.string(),
 });
 
+export const csvRecordSchema = z.object({
+  fileName: z.string(),
+  dateUploaded: z.coerce.date(),
+});
+
 export const configurationSchema = z.object({
   users: z.array(redwoodUserSchema),
   roomGroups: z.array(z.string()),
   attributes: z.array(attributeSchema),
+  csvRecords: csvRecordSchema.optional(),
 });

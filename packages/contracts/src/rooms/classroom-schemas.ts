@@ -1,5 +1,6 @@
 import { oc } from "@orpc/contract";
 import { z } from "zod";
+import { csvRecordSchema } from "../configuration/config-schemas";
 import { classroomSchema } from "./classroom-contract";
 
 export const classroomContract = {
@@ -11,6 +12,19 @@ export const classroomContract = {
     .output(z.boolean())
     .errors({
       INTERNAL_SERVER_ERROR: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+    }),
+
+  getCSVRecord: oc
+    .route({
+      method: "GET",
+    })
+    .output(csvRecordSchema.nullable())
+    .errors({
+      NOT_FOUND: {
         data: z.object({
           message: z.string(),
         }),
