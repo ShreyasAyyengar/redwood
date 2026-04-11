@@ -12,6 +12,11 @@ export const issueRouter = {
 
     return issues;
   }),
+  getAllIssues: protectedProcedure.issues.getAllIssues.handler(async ({ errors }) => {
+    const issues: z.infer<typeof issueSchema>[] = await IssueService.find().lean().sort({ "issue.reportedAt": -1 });
+
+    return issues;
+  }),
 
   createIssue: protectedProcedure.issues.createIssue.handler(async ({ input, errors, context }) => {
     const classroom = await ClassroomService.findById(input.classroomId).lean();

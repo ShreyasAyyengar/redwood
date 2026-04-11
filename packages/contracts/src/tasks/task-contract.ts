@@ -107,4 +107,22 @@ export const taskContract = {
         }),
       },
     }),
+
+  getAllTasks: oc
+    .route({
+      method: "GET",
+    })
+    .output(z.array(taskSchema))
+    .errors({
+      NOT_FOUND: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+      INTERNAL_SERVER_ERROR: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+    }),
 };

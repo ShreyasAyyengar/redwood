@@ -84,4 +84,17 @@ export const issueContract = {
         }),
       },
     }),
+
+  getAllIssues: oc
+    .route({
+      method: "GET",
+    })
+    .output(z.array(issueSchema))
+    .errors({
+      INTERNAL_SERVER_ERROR: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+    }),
 };

@@ -12,6 +12,11 @@ export const taskRouter = {
     return tasks;
   }),
 
+  getAllTasks: protectedProcedure.tasks.getAllTasks.handler(async ({ errors }) => {
+    const tasks = await TaskService.find().sort({ createdAt: -1 });
+    return tasks;
+  }),
+
   addTask: protectedProcedure.tasks.addTask.handler(async ({ input, errors, context }) => {
     const classroom = await ClassroomService.findById(input.classroomId);
     if (!classroom) throw errors.NOT_FOUND({ data: { message: `Classroom with id ${input.classroomId} not found` } });
