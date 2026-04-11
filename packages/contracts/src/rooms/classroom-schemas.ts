@@ -3,7 +3,7 @@ import { z } from "zod";
 import { classroomSchema } from "./classroom-contract";
 
 export const classroomContract = {
-  loadRooms: oc
+  loadClassrooms: oc
     .route({
       method: "POST",
     })

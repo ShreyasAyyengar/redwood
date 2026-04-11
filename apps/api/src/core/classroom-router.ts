@@ -7,7 +7,6 @@ import { protectedProcedure, publicProcedure } from "../libs/orpc-procedures";
 import { emptySchedule, processTimeRanges, rowSchema } from "../util/csv-util";
 
 export const classroomRouter = {
-  loadClassrooms: publicProcedure.classrooms.loadRooms.handler(async ({ input, errors: { INTERNAL_SERVER_ERROR } }) => {
     try {
       const text = await input.csvFile.text();
       const parsedCSV = parse(text, {

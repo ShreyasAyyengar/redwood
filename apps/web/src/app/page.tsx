@@ -7,9 +7,9 @@ import { useFetchedRoomsStore } from "./_components/room-store";
 
 export default function Home() {
   const { data, isPending } = authClientWeb.useSession();
-  const { fetchedRooms } = useFetchedRoomsStore();
+  const { isFetching } = useFetchedRoomsStore();
 
-  if (isPending || !data || fetchedRooms.length === 0) return <LoadingComponent />;
+  if (isPending || !data || isFetching) return <LoadingComponent />;
 
   return <HomePage />;
 }
