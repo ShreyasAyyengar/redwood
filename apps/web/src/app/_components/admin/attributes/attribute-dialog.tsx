@@ -58,9 +58,13 @@ export function AttributeForm({
   );
 
   const form = useAppForm({
-    defaultValues: existingAttribute ?? ({} as AttributeFormValues),
+    defaultValues: existingAttribute ?? {
+      label: "",
+      color: "#000000",
+    },
     validators: {
       onChange: attributeFormSchema,
+      onMount: attributeFormSchema,
     },
     onSubmit: async ({ value }) => {
       if (existingAttribute) await updateAttribute.mutateAsync({ _id: existingAttribute._id, label: value.label, color: value.color });
@@ -90,8 +94,7 @@ export function AttributeForm({
                     </Label>
                     <Input
                       id={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
+                      value={field.state.value ?? ""}
                       onChange={(e) => field.handleChange(e.target.value)}
                       placeholder="e.g. Has Swag"
                       className="border-zinc-700 bg-zinc-900/50"
@@ -111,8 +114,7 @@ export function AttributeForm({
                       <Input
                         type="color"
                         id={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
+                        value={field.state.value ?? ""}
                         onChange={(e) => field.handleChange(e.target.value)}
                         className="h-10 w-20 cursor-pointer border-zinc-700 bg-zinc-900/50 p-1"
                       />
