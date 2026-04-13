@@ -6,8 +6,8 @@ import { AlertCircle, Loader2, Minus, Plus } from "lucide-react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../lib/orpc-web-client";
 import { generateAttributeColors } from "../../../../util/style-util";
+import AttributeDialog from "./attribute-dialog";
 import { useAttributeStore } from "./attribute-store";
-import NewAttributeDialog from "./new-attribute-dialog";
 
 export function AttributeSelector({ availableAttributes }: { availableAttributes: z.infer<typeof attributeSchema>[] }) {
   const queryClient = useQueryClient();
@@ -50,26 +50,27 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
       <div className="mb-4 flex flex-col space-y-1">
         <div className="flex items-center gap-2">
           <h2 className="font-medium text-md text-zinc-100">Available Attributes</h2>
-          <NewAttributeDialog>
+          <AttributeDialog>
             <Button variant="outline" className="">
               <Plus className="h-4 w-4" />
             </Button>
-          </NewAttributeDialog>
+          </AttributeDialog>
         </div>
 
         <div className="flex flex-wrap gap-2">
           {availableAttributes.map((attribute) => (
-            <span
-              key={attribute.label}
-              className="rounded border px-2 py-0.5 font-medium text-xs transition-colors"
-              style={{
-                backgroundColor: `${attribute.color}15`,
-                color: attribute.color,
-                borderColor: `${attribute.color}40`,
-              }}
-            >
-              {attribute.label}
-            </span>
+            <AttributeDialog key={attribute._id} existingAttribute={attribute}>
+              <span
+                className="cursor-pointer rounded border px-2 py-0.5 font-medium text-xs transition-all hover:opacity-50"
+                style={{
+                  backgroundColor: `${attribute.color}15`,
+                  color: attribute.color,
+                  borderColor: `${attribute.color}40`,
+                }}
+              >
+                {attribute.label}
+              </span>
+            </AttributeDialog>
           ))}
         </div>
       </div>
@@ -93,7 +94,7 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
             <ScrollArea className="h-full rounded-lg bg-zinc-950/50">
               <div className="space-y-2 pr-3">
                 {availableAttributes.map((attribute) => {
-                  const stats = getAttributeStats(attribute.label);
+                  const stats = getAttributeStats(attribute._id);
                   const allHaveIt = stats.count === selectedClassrooms.length && stats.count > 0;
                   const someHaveIt = stats.count > 0 && stats.count < selectedClassrooms.length;
                   const noneHaveIt = stats.count === 0;
@@ -101,7 +102,7 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
 
                   return (
                     <div
-                      key={attribute.label}
+                      key={attribute._id}
                       className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-3 transition-colors hover:bg-zinc-800/50"
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -133,7 +134,7 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
                           {!allHaveIt && (
                             <button
                               type="button"
-                              onClick={() => applyAttribute(attribute.label)}
+                              onClick={() => applyAttribute(attribute._id)}
                               className="rounded border border-emerald-800 bg-emerald-950 p-1.5 text-emerald-100 transition-colors hover:bg-emerald-900"
                               title="Add attribute"
                             >
@@ -143,7 +144,7 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
                           {!noneHaveIt && (
                             <button
                               type="button"
-                              onClick={() => removeAttribute(attribute.label)}
+                              onClick={() => removeAttribute(attribute._id)}
                               className="rounded border border-red-800 bg-red-950 p-1.5 text-red-100 transition-colors hover:bg-red-900"
                               title="Remove attribute"
                             >
