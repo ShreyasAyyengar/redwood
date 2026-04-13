@@ -1,45 +1,46 @@
+import type { attributeSchema } from "@redwood/contracts";
+import { v7 as uuidv7 } from "uuid";
+import type { z } from "zod";
+import { AttributeService } from "../database/attribute-service";
 import { ClassroomService } from "../database/classroom-service";
-import { ConfigService } from "../database/config-service";
 import { adminProcedure } from "../libs/orpc-procedures";
 
 export const attributesRouter = {
   getAttributes: adminProcedure.attributes.getAttributes.handler(async ({ errors }) => {
-    const config = await ConfigService.findOne();
-    if (!config) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Configuration not found." } });
-
-    return config.attributes ?? [];
+    const attributes = await AttributeService.find();
+    if (!attributes) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Attributes not found." } });
+    return attributes;
   }),
 
-  addAttribute: adminProcedure.attributes.addAttribute.handler(async ({ input: { attribute }, errors }) => {
-    const config = await ConfigService.findOne();
-    if (!config) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Configuration not found." } });
+  addAttribute: adminProcedure.attributes.addAttribute.handler(async ({ input, errors }) => {
+    const existingAttribute = await AttributeService.findOne({ label: input.label });
+    if (existingAttribute) throw errors.UNPROCESSABLE_CONTENT({ data: { message: "Attribute with this label already exists." } });
 
-    if (!config.attributes) config.attributes = [];
+    const newAttribute: z.infer<typeof attributeSchema> = {
+      ...input,
+      _id: uuidv7(),
+    };
 
-    config.attributes.push(attribute);
-    await config.save();
-    return true;
+    const attribute = await AttributeService.create(newAttribute);
+    if (!attribute) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Failed to create attribute." } });
+    return { success: true };
   }),
 
-  deleteAttribute: adminProcedure.attributes.deleteAttribute.handler(async ({ input: { attribute }, errors }) => {
-    const config = await ConfigService.findOne();
-    if (!config) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Configuration not found." } });
-
-    config.attributes = config.attributes.filter((a) => a !== attribute);
-    await config.save();
-    return true;
+  deleteAttribute: adminProcedure.attributes.deleteAttribute.handler(async ({ input, errors }) => {
+    const res = await AttributeService.deleteOne({ _id: input.id });
+    if (!res.deletedCount) throw errors.NOT_FOUND({ data: { message: "Attribute not found." } });
+    return { success: true };
   }),
 
-  // updateAttributes: adminProcedure.attributes.updateAttributes.handler(async ({ input: { attributes }, errors }) => {
-  //   const config = await ConfigService.findOne();
-  //   if (!config) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Configuration not found." } });
-  //
-  //   config.attributes = attributes;
-  //   await config.save();
-  //   return true;
-  // }),
+  updateAttribute: adminProcedure.attributes.updateAttribute.handler(async ({ input, errors }) => {
+    const attribute = await AttributeService.findOneAndUpdate({ _id: input._id }, input);
+    if (!attribute) throw errors.NOT_FOUND({ data: { message: "Attribute not found." } });
+    return { success: true };
+  }),
 
   bulkUpdateClassrooms: adminProcedure.attributes.bulkUpdateClassrooms.handler(async ({ input: { updates }, errors }) => {
+    console.log(updates);
+
     try {
       const bulkOps = updates.map((update) => ({
         updateOne: {
@@ -49,7 +50,7 @@ export const attributesRouter = {
       }));
 
       await ClassroomService.bulkWrite(bulkOps);
-      return true;
+      return { success: true };
     } catch (e) {
       console.error(e);
       throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Failed to update classrooms." } });
