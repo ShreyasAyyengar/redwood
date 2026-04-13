@@ -13,7 +13,7 @@ export function ClassroomCard({
   const isSelected = useAttributeStore((state) => state.selectedClassroomIds.includes(classroom._id));
   const toggleSelectedClassroom = useAttributeStore((state) => state.toggleSelectedClassroom);
 
-  const attributeMap = new Map(availableAttributes.map((attr) => [attr.label, attr]));
+  const attributeMap = new Map(availableAttributes.map((attr) => [attr._id, attr]));
 
   const handleToggle = () => {
     toggleSelectedClassroom(classroom._id);
