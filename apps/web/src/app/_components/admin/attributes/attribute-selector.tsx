@@ -91,8 +91,8 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
           </div>
 
           <div className="min-h-0 flex-1">
-            <ScrollArea className="h-full rounded-lg bg-zinc-950/50">
-              <div className="space-y-2 pr-3">
+            <ScrollArea className="h-full rounded-lg bg-zinc-950/50 p-3">
+              <div className="space-y-2">
                 {availableAttributes.map((attribute) => {
                   const stats = getAttributeStats(attribute._id);
                   const allHaveIt = stats.count === selectedClassrooms.length && stats.count > 0;
