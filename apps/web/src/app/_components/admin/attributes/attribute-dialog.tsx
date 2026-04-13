@@ -49,6 +49,15 @@ export function AttributeForm({
     })
   );
 
+  const deleteAttribute = useMutation(
+    webClientORPC.attributes.deleteAttribute.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: webClientORPC.attributes.getAttributes.queryKey() });
+        onSuccess?.();
+      },
+    })
+  );
+
   const form = useAppForm({
     defaultValues: existingAttribute ?? ({} as AttributeFormValues),
     validators: {
@@ -141,26 +150,38 @@ export function AttributeForm({
       </ScrollArea>
 
       <DialogFooter>
-        <div className="flex w-full justify-end gap-2">
-          <DialogClose asChild>
-            <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
-              Cancel
+        <div className="flex w-full justify-between gap-2">
+          {existingAttribute && (
+            <Button
+              variant="default"
+              onClick={() => deleteAttribute.mutateAsync({ id: existingAttribute._id })}
+              disabled={deleteAttribute.isPending}
+              className="bg-red-900 text-zinc-300 hover:bg-red-900/50"
+            >
+              {deleteAttribute.isPending ? "Deleting..." : "Delete Attribute"}
             </Button>
-          </DialogClose>
-          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-            {([canSubmit, isSubmitting]) => (
-              <Button
-                className={cn(
-                  "px-8",
-                  canSubmit ? "bg-zinc-100 text-zinc-950 hover:bg-zinc-200" : "cursor-not-allowed bg-zinc-800 text-zinc-500"
-                )}
-                onClick={form.handleSubmit}
-                disabled={!canSubmit || isSubmitting}
-              >
-                {isSubmitting ? (existingAttribute ? "Saving..." : "Creating...") : existingAttribute ? "Save Changes" : "Create Attribute"}
+          )}
+          <div className="flex gap-2">
+            <DialogClose asChild>
+              <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                Cancel
               </Button>
-            )}
-          </form.Subscribe>
+            </DialogClose>
+            <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+              {([canSubmit, isSubmitting]) => (
+                <Button
+                  className={cn(
+                    "px-8",
+                    canSubmit ? "bg-zinc-100 text-zinc-950 hover:bg-zinc-200" : "cursor-not-allowed bg-zinc-800 text-zinc-500"
+                  )}
+                  onClick={form.handleSubmit}
+                  disabled={!canSubmit || isSubmitting}
+                >
+                  {isSubmitting ? (existingAttribute ? "Saving..." : "Creating...") : existingAttribute ? "Save Changes" : "Create Attribute"}
+                </Button>
+              )}
+            </form.Subscribe>
+          </div>
         </div>
       </DialogFooter>
     </div>
