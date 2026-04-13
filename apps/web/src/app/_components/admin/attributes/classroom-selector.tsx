@@ -59,7 +59,7 @@ export function ClassroomSelector({ availableAttributes }: { availableAttributes
       </div>
 
       {filteredClassrooms.length > 0 ? (
-        <div className="min-h-0 flex-1">
+        <div className="min-h-0 flex-1 rounded-lg bg-zinc-950/50 py-3">
           <ScrollArea className="h-full px-3">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {filteredClassrooms.map((classroom) => (
