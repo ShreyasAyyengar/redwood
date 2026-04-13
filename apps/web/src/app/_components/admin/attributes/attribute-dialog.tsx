@@ -1,4 +1,4 @@
-import { attributeSchema } from "@redwood/contracts";
+import { attributeFormSchema, type attributeSchema } from "@redwood/contracts";
 import { Button } from "@redwood/shad-ui/components/button";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@redwood/shad-ui/components/dialog";
 import { Input } from "@redwood/shad-ui/components/input";
@@ -13,7 +13,7 @@ import type { z } from "zod";
 import { webClientORPC } from "../../../../lib/orpc-web-client";
 import { generateAttributeColors } from "../../../../util/style-util";
 
-export type FormValues = z.infer<typeof attributeSchema>;
+export type AttributeFormValues = z.infer<typeof attributeFormSchema>;
 export const { fieldContext, formContext, useFieldContext } = createFormHookContexts();
 export const { useAppForm } = createFormHook({
   fieldContext,
@@ -22,7 +22,13 @@ export const { useAppForm } = createFormHook({
   formComponents: {},
 });
 
-export function NewAttributeForm({ onSuccess }: { onSuccess?: () => void }) {
+export function AttributeForm({
+  existingAttribute,
+  onSuccess,
+}: {
+  existingAttribute?: z.infer<typeof attributeSchema>;
+  onSuccess?: () => void;
+}) {
   const queryClient = useQueryClient();
 
   const addAttribute = useMutation(
@@ -34,16 +40,23 @@ export function NewAttributeForm({ onSuccess }: { onSuccess?: () => void }) {
     })
   );
 
+  const updateAttribute = useMutation(
+    webClientORPC.attributes.updateAttribute.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: webClientORPC.attributes.getAttributes.queryKey() });
+        onSuccess?.();
+      },
+    })
+  );
+
   const form = useAppForm({
-    defaultValues: {
-      label: "",
-      color: "#3b82f6", // Default blue
-    } as FormValues,
+    defaultValues: existingAttribute ?? ({} as AttributeFormValues),
     validators: {
-      onChange: attributeSchema,
+      onChange: attributeFormSchema,
     },
     onSubmit: async ({ value }) => {
-      await addAttribute.mutateAsync({ attribute: value });
+      if (existingAttribute) await updateAttribute.mutateAsync({ _id: existingAttribute._id, label: value.label, color: value.color });
+      else await addAttribute.mutateAsync({ label: value.label, color: value.color });
     },
   });
 
@@ -51,7 +64,7 @@ export function NewAttributeForm({ onSuccess }: { onSuccess?: () => void }) {
     <div className="flex flex-col gap-6">
       <DialogHeader>
         <DialogTitle className="mx-auto rounded-md bg-zinc-950/30 px-10 py-3 text-center text-2xl ring-1 ring-white/15">
-          Create New Attribute
+          {existingAttribute ? "Edit Attribute" : "Create New Attribute"}
         </DialogTitle>
       </DialogHeader>
 
@@ -144,7 +157,7 @@ export function NewAttributeForm({ onSuccess }: { onSuccess?: () => void }) {
                 onClick={form.handleSubmit}
                 disabled={!canSubmit || isSubmitting}
               >
-                {isSubmitting ? "Creating..." : "Create Attribute"}
+                {isSubmitting ? (existingAttribute ? "Saving..." : "Creating...") : existingAttribute ? "Save Changes" : "Create Attribute"}
               </Button>
             )}
           </form.Subscribe>
@@ -154,14 +167,20 @@ export function NewAttributeForm({ onSuccess }: { onSuccess?: () => void }) {
   );
 }
 
-export default function NewAttributeDialog({ children }: { children?: React.ReactNode }) {
+export default function AttributeDialog({
+  children,
+  existingAttribute,
+}: {
+  children?: React.ReactNode;
+  existingAttribute?: z.infer<typeof attributeSchema>;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="border-zinc-700 bg-zinc-800 p-6 sm:max-w-[600px]">
-        <NewAttributeForm onSuccess={() => setOpen(false)} />
+        <AttributeForm onSuccess={() => setOpen(false)} existingAttribute={existingAttribute} />
       </DialogContent>
     </Dialog>
   );
