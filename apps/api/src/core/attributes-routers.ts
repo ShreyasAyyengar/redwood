@@ -29,6 +29,9 @@ export const attributesRouter = {
   deleteAttribute: adminProcedure.attributes.deleteAttribute.handler(async ({ input, errors }) => {
     const res = await AttributeService.deleteOne({ _id: input.id });
     if (!res.deletedCount) throw errors.NOT_FOUND({ data: { message: "Attribute not found." } });
+
+    await ClassroomService.updateMany({ attributes: input.id }, { $pull: { attributes: input.id } });
+
     return { success: true };
   }),
 
