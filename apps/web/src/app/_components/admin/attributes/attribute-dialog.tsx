@@ -11,7 +11,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../lib/orpc-web-client";
-import { generateAttributeColors } from "../../../../util/style-util";
 
 export type AttributeFormValues = z.infer<typeof attributeFormSchema>;
 export const { fieldContext, formContext, useFieldContext } = createFormHookContexts();
@@ -127,14 +126,14 @@ export function AttributeForm({
               <span className="font-medium text-xs text-zinc-500 uppercase tracking-wider">Preview</span>
               <form.Subscribe selector={(state) => [state.values.label, state.values.color]}>
                 {([label, color]) => {
-                  const style = generateAttributeColors(color || "#000000");
+                  const colorHex = color || "#000000";
                   return (
                     <span
                       className="rounded border px-2 py-0.5 font-medium text-xs transition-colors"
                       style={{
-                        backgroundColor: style.bg,
-                        color: style.text,
-                        borderColor: style.border,
+                        backgroundColor: `${colorHex}15`,
+                        color: colorHex,
+                        borderColor: `${colorHex}40`,
                       }}
                     >
                       {label || "Preview Label"}

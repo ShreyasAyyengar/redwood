@@ -5,7 +5,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, Loader2, Minus, Plus } from "lucide-react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../lib/orpc-web-client";
-import { generateAttributeColors } from "../../../../util/style-util";
 import AttributeDialog from "./attribute-dialog";
 import { useAttributeStore } from "./attribute-store";
 
@@ -98,7 +97,6 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
                   const allHaveIt = stats.count === selectedClassrooms.length && stats.count > 0;
                   const someHaveIt = stats.count > 0 && stats.count < selectedClassrooms.length;
                   const noneHaveIt = stats.count === 0;
-                  const style = generateAttributeColors(attribute.color);
 
                   return (
                     <div
@@ -111,9 +109,9 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
                             <span
                               className="rounded border px-2 py-0.5 font-medium text-xs transition-colors"
                               style={{
-                                backgroundColor: style.bg,
-                                color: style.text,
-                                borderColor: style.border,
+                                backgroundColor: `${attribute.color}15`,
+                                color: attribute.color,
+                                borderColor: `${attribute.color}40`,
                               }}
                             >
                               {attribute.label}
