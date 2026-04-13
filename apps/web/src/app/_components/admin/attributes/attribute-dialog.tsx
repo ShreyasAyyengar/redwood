@@ -167,15 +167,13 @@ export function AttributeForm({
                 Cancel
               </Button>
             </DialogClose>
-            <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-              {([canSubmit, isSubmitting]) => (
+            <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting, state.isDirty]}>
+              {([canSubmit, isSubmitting, isDirty]) => (
                 <Button
-                  className={cn(
-                    "px-8",
-                    canSubmit ? "bg-zinc-100 text-zinc-950 hover:bg-zinc-200" : "cursor-not-allowed bg-zinc-800 text-zinc-500"
-                  )}
+                  variant="default"
+                  className={cn("bg-zinc-100 px-8 text-zinc-950 hover:bg-zinc-200", !canSubmit && "cursor-not-allowed")}
                   onClick={form.handleSubmit}
-                  disabled={!canSubmit || isSubmitting}
+                  disabled={!canSubmit || isSubmitting || (existingAttribute && !isDirty)}
                 >
                   {isSubmitting ? (existingAttribute ? "Saving..." : "Creating...") : existingAttribute ? "Save Changes" : "Create Attribute"}
                 </Button>
