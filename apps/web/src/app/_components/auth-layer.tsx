@@ -8,7 +8,7 @@ import { authClientWeb } from "../../lib/auth-client-web";
 import { webClientORPC } from "../../lib/orpc-web-client";
 import { useFetchedRoomsStore } from "./room-store";
 
-export const AuthLayer = () => {
+export default function AuthLayer() {
   const { data, isPending } = authClientWeb.useSession();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -40,4 +40,4 @@ export const AuthLayer = () => {
   }, [roomData, isFetched, setRoomsAndFetching]);
 
   return null;
-};
+}
