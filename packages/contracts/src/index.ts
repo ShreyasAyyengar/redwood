@@ -1,3 +1,5 @@
+export * from "./attributes/attributes-contract";
+export * from "./attributes/attributes-schemas";
 export * from "./configuration/config-schemas";
 export * from "./http-contract";
 export * from "./issues/issue-contract";

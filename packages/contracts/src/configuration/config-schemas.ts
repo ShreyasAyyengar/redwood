@@ -1,11 +1,6 @@
 import { z } from "zod";
 import { redwoodUserSchema } from "../users/user-schemas";
 
-export const attributeSchema = z.object({
-  label: z.string(),
-  color: z.string(),
-});
-
 export const csvRecordSchema = z.object({
   fileName: z.string(),
   dateUploaded: z.coerce.date(),
@@ -21,6 +16,5 @@ export const configurationSchema = z.object({
       })
     )
     .default([]),
-  attributes: z.array(attributeSchema),
   csvRecords: csvRecordSchema.optional(),
 });
