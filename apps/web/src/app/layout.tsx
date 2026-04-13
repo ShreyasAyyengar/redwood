@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import "@redwood/shad-ui/globals.css";
 import { Suspense } from "react";
 import { env } from "../env";
-import { AuthLayer } from "./_components/auth-layer";
+import AuthLayer from "./_components/auth-layer";
 import Providers from "./_components/providers";
 
 const geistSans = localFont({
