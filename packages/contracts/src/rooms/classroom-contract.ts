@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { attributeSchema } from "../attributes/attributes-schemas";
 
 const blockSchema = z
   .object({
@@ -39,5 +40,5 @@ export const classroomSchema = z.object({
       ip: z.string(),
     })
     .optional(),
-  attributes: z.array(z.string()).default([]),
+  attributes: z.array(attributeSchema.shape._id).default([]),
 });
