@@ -14,10 +14,10 @@ export default function TaskOverview() {
     })
   );
 
-  const openTasks = tasks.filter((task) => !task.completion);
+  const openTasks = tasks.filter((task) => !task.completion && (!task.task.visibleAt || task.task.visibleAt.getTime() <= Date.now()));
   const urgentTasks = openTasks.filter((task) => task.task.urgent);
-  const overdue = openTasks.filter((task) => task.task.completeBy && Date.now() > new Date(task.task.completeBy).getTime());
-  const scheduled = openTasks.filter((task) => task.task.visibleAt && task.task.visibleAt.getTime() > Date.now());
+  const overdue = tasks.filter((task) => task.task.completeBy && Date.now() > new Date(task.task.completeBy).getTime());
+  const scheduled = tasks.filter((task) => task.task.visibleAt && task.task.visibleAt.getTime() > Date.now());
 
   function maybeWrapWithDialog(children: React.ReactNode, filteredTasks: typeof tasks, title: string) {
     if (filteredTasks.length < 1) return children;
