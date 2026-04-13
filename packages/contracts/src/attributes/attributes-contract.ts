@@ -1,6 +1,7 @@
 import { oc } from "@orpc/contract";
 import { z } from "zod";
-import { attributeSchema } from "../configuration/config-schemas";
+import { classroomSchema } from "../rooms/classroom-contract";
+import { attributeSchema } from "./attributes-schemas";
 
 export const attributesContract = {
   getAttributes: oc
@@ -20,8 +21,12 @@ export const attributesContract = {
     .route({
       method: "POST",
     })
-    .input(z.object({ attribute: attributeSchema }))
-    .output(z.boolean())
+    .input(attributeSchema.pick({ label: true, color: true }))
+    .output(
+      z.object({
+        success: z.boolean(),
+      })
+    )
     .errors({
       UNPROCESSABLE_CONTENT: {
         data: z.object({
@@ -41,10 +46,49 @@ export const attributesContract = {
     .route({
       method: "DELETE",
     })
-    .input(z.object({ attribute: attributeSchema }))
-    .output(z.boolean())
+    .input(z.object({ id: attributeSchema.shape._id }))
+    .output(
+      z.object({
+        success: z.boolean(),
+      })
+    )
     .errors({
       NOT_FOUND: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+      INTERNAL_SERVER_ERROR: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+    }),
+
+  updateAttribute: oc
+    .route({
+      method: "PUT",
+    })
+    .input(
+      attributeSchema
+        .partial()
+        .required({ _id: true })
+        .refine((data) => data.color !== undefined || data.label !== undefined, {
+          message: "At least color or label must be provided to edit attribute.",
+        })
+    )
+    .output(
+      z.object({
+        success: z.boolean(),
+      })
+    )
+    .errors({
+      NOT_FOUND: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+      UNPROCESSABLE_CONTENT: {
         data: z.object({
           message: z.string(),
         }),
@@ -64,13 +108,17 @@ export const attributesContract = {
       z.object({
         updates: z.array(
           z.object({
-            classroomId: z.string().uuid(),
-            attributes: z.array(z.string()),
-          }),
+            classroomId: classroomSchema.shape._id,
+            attributes: z.array(attributeSchema.shape._id),
+          })
         ),
-      }),
+      })
     )
-    .output(z.boolean())
+    .output(
+      z.object({
+        success: z.boolean(),
+      })
+    )
     .errors({
       INTERNAL_SERVER_ERROR: {
         data: z.object({
