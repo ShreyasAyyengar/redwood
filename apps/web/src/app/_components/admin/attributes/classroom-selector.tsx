@@ -26,8 +26,8 @@ export function ClassroomSelector({ availableAttributes }: { availableAttributes
   };
 
   return (
-    <div className="rounded-lg border border-zinc-800 bg-neutral-900 p-5">
-      <div className="mb-4 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+    <div className="flex h-full flex-col rounded-lg border border-zinc-800 bg-neutral-900 p-5">
+      <div className="mb-4 flex shrink-0 flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h2 className="flex items-center gap-2 font-semibold text-lg text-zinc-100">
             Classrooms
@@ -59,15 +59,17 @@ export function ClassroomSelector({ availableAttributes }: { availableAttributes
       </div>
 
       {filteredClassrooms.length > 0 ? (
-        <ScrollArea className="px-3">
-          <div className="grid max-h-[calc(100vh-250px)] grid-cols-1 gap-3 sm:grid-cols-2">
-            {filteredClassrooms.map((classroom) => (
-              <ClassroomCard key={classroom._id} classroom={classroom} availableAttributes={availableAttributes} />
-            ))}
-          </div>
-        </ScrollArea>
+        <div className="min-h-0 flex-1">
+          <ScrollArea className="h-full px-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {filteredClassrooms.map((classroom) => (
+                <ClassroomCard key={classroom._id} classroom={classroom} availableAttributes={availableAttributes} />
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
       ) : (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-zinc-800 border-dashed bg-zinc-950/50 py-12 text-center">
+        <div className="flex flex-1 flex-col items-center justify-center rounded-xl border border-zinc-800 border-dashed bg-zinc-950/50 py-12 text-center">
           <div className="mb-3 rounded-full bg-zinc-800 p-3">
             <Search className="h-6 w-6 text-zinc-500" />
           </div>

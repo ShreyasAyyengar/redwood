@@ -23,15 +23,13 @@ export function AttributeEditor() {
   }, [attributes]);
 
   return (
-    <div className="mx-auto max-w-7xl text-zinc-100">
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Classrooms Section */}
-        <div className="lg:col-span-2">
+    <div className="mx-auto h-[calc(100vh-145px)] w-7xl text-zinc-100">
+      <div className="grid h-full grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="min-h-0 lg:col-span-2">
           <ClassroomSelector availableAttributes={availableAttributes} />
         </div>
 
-        {/* Attribute Editor Section */}
-        <div className="lg:col-span-1">
+        <div className="min-h-0 lg:col-span-1">
           <AttributeSelector availableAttributes={availableAttributes} />
         </div>
       </div>

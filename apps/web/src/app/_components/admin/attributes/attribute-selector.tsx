@@ -45,7 +45,7 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
   };
 
   return (
-    <div className="sticky top-6 rounded-lg border border-zinc-800 bg-neutral-900 p-5">
+    <div className="flex h-full flex-col rounded-lg border border-zinc-800 bg-neutral-900 p-5">
       <h2 className="mb-4 font-semibold text-lg text-zinc-100">Attribute Editor</h2>
       <div className="mb-4 flex flex-col space-y-1">
         <div className="flex items-center gap-2">
@@ -73,7 +73,6 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
           ))}
         </div>
       </div>
-
       {!hasSelection ? (
         <div className="flex items-start gap-3 rounded-lg border border-amber-800 bg-amber-950 p-4">
           <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
@@ -90,9 +89,9 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
             </p>
           </div>
 
-          <div className="space-y-2">
-            <ScrollArea className="rounded-lg bg-zinc-950/50 p-3">
-              <div className="max-h-[calc(100vh-450px)] space-y-2 pr-1">
+          <div className="min-h-0 flex-1">
+            <ScrollArea className="h-full rounded-lg bg-zinc-950/50">
+              <div className="space-y-2 pr-3">
                 {availableAttributes.map((attribute) => {
                   const stats = getAttributeStats(attribute.label);
                   const allHaveIt = stats.count === selectedClassrooms.length && stats.count > 0;
