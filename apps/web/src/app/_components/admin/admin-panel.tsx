@@ -1,6 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@redwood/shad-ui/components/tabs";
 import { AttributeEditor } from "./attributes/attribute-editor";
 import CSVUpload from "./csv/csv-upload";
+import { RoomGroupEditor } from "./groups/room-group-editor";
 import Overview from "./overview/overview";
 
 export default function AdminPanel() {
@@ -25,9 +26,9 @@ export default function AdminPanel() {
         <TabsContent value="attributes">
           <AttributeEditor />
         </TabsContent>
-        {/*<TabsContent value="groups">*/}
-        {/*  <RoomGroups />*/}
-        {/*</TabsContent>*/}
+        <TabsContent value="groups">
+          <RoomGroupEditor />
+        </TabsContent>
         {/*<TabsContent value="statistics">*/}
         {/*  <Statistics />*/}
         {/*</TabsContent>*/}
