@@ -90,77 +90,87 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
           </div>
 
           <div className="min-h-0 flex-1">
-            <ScrollArea className="h-full rounded-lg bg-zinc-950/50 p-3">
-              <div className="space-y-2">
-                {availableAttributes.map((attribute) => {
-                  const stats = getAttributeStats(attribute._id);
-                  const allHaveIt = stats.count === selectedClassrooms.length && stats.count > 0;
-                  const someHaveIt = stats.count > 0 && stats.count < selectedClassrooms.length;
-                  const noneHaveIt = stats.count === 0;
+            <ScrollArea className="h-full min-h-0 rounded-lg bg-zinc-950/50 p-3">
+              {availableAttributes.length === 0 && selectedCount > 0 ? (
+                <div className="flex items-start gap-3 rounded-lg border border-red-800 bg-red-950 p-4">
+                  <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-300" />
+                  <div>
+                    <p className="font-medium text-red-100 text-sm">No attributes created</p>
+                    <p className="mt-1 text-red-300 text-xs">Click the 'plus' button to create one.</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {availableAttributes.map((attribute) => {
+                    const stats = getAttributeStats(attribute._id);
+                    const allHaveIt = stats.count === selectedClassrooms.length && stats.count > 0;
+                    const someHaveIt = stats.count > 0 && stats.count < selectedClassrooms.length;
+                    const noneHaveIt = stats.count === 0;
 
-                  return (
-                    <div
-                      key={attribute._id}
-                      className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-3 transition-colors hover:bg-zinc-800/50"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span
-                              className="rounded border px-2 py-0.5 font-medium text-xs transition-colors"
-                              style={{
-                                backgroundColor: `${attribute.color}15`,
-                                color: attribute.color,
-                                borderColor: `${attribute.color}40`,
-                              }}
-                            >
-                              {attribute.label}
-                            </span>
-                          </div>
-
-                          <div className="mt-2 flex items-center gap-2">
-                            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
-                              <div className="h-full bg-blue-500 transition-all duration-300" style={{ width: `${stats.percentage}%` }} />
+                    return (
+                      <div
+                        key={attribute._id}
+                        className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-3 transition-colors hover:bg-zinc-800/50"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span
+                                className="rounded border px-2 py-0.5 font-medium text-xs transition-colors"
+                                style={{
+                                  backgroundColor: `${attribute.color}15`,
+                                  color: attribute.color,
+                                  borderColor: `${attribute.color}40`,
+                                }}
+                              >
+                                {attribute.label}
+                              </span>
                             </div>
-                            <span className="whitespace-nowrap text-[10px] text-zinc-400">
-                              {stats.count}/{selectedClassrooms.length}
-                            </span>
+
+                            <div className="mt-2 flex items-center gap-2">
+                              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
+                                <div className="h-full bg-blue-500 transition-all duration-300" style={{ width: `${stats.percentage}%` }} />
+                              </div>
+                              <span className="whitespace-nowrap text-[10px] text-zinc-400">
+                                {stats.count}/{selectedClassrooms.length}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-1">
+                            {!allHaveIt && (
+                              <button
+                                type="button"
+                                onClick={() => applyAttribute(attribute._id)}
+                                className="rounded border border-emerald-800 bg-emerald-950 p-1.5 text-emerald-100 transition-colors hover:bg-emerald-900"
+                                title="Add attribute"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </button>
+                            )}
+                            {!noneHaveIt && (
+                              <button
+                                type="button"
+                                onClick={() => removeAttribute(attribute._id)}
+                                className="rounded border border-red-800 bg-red-950 p-1.5 text-red-100 transition-colors hover:bg-red-900"
+                                title="Remove attribute"
+                              >
+                                <Minus className="h-4 w-4" />
+                              </button>
+                            )}
                           </div>
                         </div>
 
-                        <div className="flex gap-1">
-                          {!allHaveIt && (
-                            <button
-                              type="button"
-                              onClick={() => applyAttribute(attribute._id)}
-                              className="rounded border border-emerald-800 bg-emerald-950 p-1.5 text-emerald-100 transition-colors hover:bg-emerald-900"
-                              title="Add attribute"
-                            >
-                              <Plus className="h-4 w-4" />
-                            </button>
-                          )}
-                          {!noneHaveIt && (
-                            <button
-                              type="button"
-                              onClick={() => removeAttribute(attribute._id)}
-                              className="rounded border border-red-800 bg-red-950 p-1.5 text-red-100 transition-colors hover:bg-red-900"
-                              title="Remove attribute"
-                            >
-                              <Minus className="h-4 w-4" />
-                            </button>
-                          )}
-                        </div>
+                        <p className="mt-2 text-[10px] text-zinc-500 italic">
+                          {allHaveIt && "All selected rooms have this"}
+                          {someHaveIt && `${stats.count} of ${selectedClassrooms.length} selected`}
+                          {noneHaveIt && "None of the selected rooms have this"}
+                        </p>
                       </div>
-
-                      <p className="mt-2 text-[10px] text-zinc-500 italic">
-                        {allHaveIt && "All selected rooms have this"}
-                        {someHaveIt && `${stats.count} of ${selectedClassrooms.length} selected`}
-                        {noneHaveIt && "None of the selected rooms have this"}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </ScrollArea>
           </div>
 
