@@ -43,8 +43,6 @@ export const classroomRouter = {
       for (const [roomName, rows] of Object.entries(uploadedRooms)) {
         const schedule = processTimeRanges(rows);
 
-        const groupKey = roomName.split(/\s+/)[0] || "Ungrouped";
-
         const existingRoom = existingByName.get(roomName);
 
         // if existingRoom exists, spread and only change schedule
@@ -54,7 +52,6 @@ export const classroomRouter = {
               _id: uuidv7(),
               sourceRoomName: roomName,
               displayName: roomName,
-              groupKey,
               schedule,
               openTasksCount: 0,
               roomStatus: "GOOD" as const,

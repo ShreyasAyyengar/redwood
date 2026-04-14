@@ -63,8 +63,3 @@ export const classroomContract = {
       },
     }),
 };
-
-// mapping of raw names to groups, e.g "Cowell Com {num}" and "Cowell Clrm {num}" -> "Cowell"
-// mapping of raw names to classroom display names:
-// - "Cowell Clrm 131" -> "Cowell 131"
-// - "Cowell Com 134" -> "Cowell 134"
