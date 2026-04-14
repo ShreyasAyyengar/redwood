@@ -1,5 +1,6 @@
 import { attributesRouter } from "../core/attributes-routers";
 import { classroomRouter } from "../core/classroom-router";
+import { groupsRouter } from "../core/groups-router";
 import { issueRouter } from "../core/issue-router";
 import { maintenanceRouter } from "../core/maintenance-router";
 import { taskRouter } from "../core/task-router";
@@ -12,4 +13,5 @@ export const httpRouter = {
   tasks: taskRouter,
   users: userRouter,
   attributes: attributesRouter,
+  groups: groupsRouter,
 };

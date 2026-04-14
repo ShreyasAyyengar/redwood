@@ -8,10 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@redwood/shad-ui/components/separator";
 import { Switch } from "@redwood/shad-ui/components/switch";
 import { cn } from "@redwood/shad-ui/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { CalendarClock, Clock, Info, LayoutGrid, ListFilter, RotateCcw, SquareCheckBig, TriangleAlert } from "lucide-react";
 import type { z } from "zod";
-import { useFetchedRoomsStore } from "../room-store";
+import { webClientORPC } from "../../../lib/orpc-web-client";
 import { useActiveFiltersStore } from "./active-filters";
 
 export default function Filters() {
@@ -32,8 +33,7 @@ export default function Filters() {
     setGroup,
   } = useActiveFiltersStore();
 
-  const { fetchedRooms } = useFetchedRoomsStore();
-  const groups = Array.from(new Set(fetchedRooms.map((r) => r.groupKey).filter(Boolean) as string[])).sort();
+  const { data: groups } = useQuery(webClientORPC.groups.getGroups.queryOptions());
 
   const resetFilters = () => {
     setExclusive(false);
@@ -94,9 +94,9 @@ export default function Filters() {
                 </SelectTrigger>
                 <SelectContent className="border-white/10 bg-neutral-900 text-neutral-200">
                   <SelectItem value="ALL">All</SelectItem>
-                  {groups.map((g) => (
-                    <SelectItem key={g} value={g}>
-                      {g}
+                  {groups?.map((g) => (
+                    <SelectItem key={g._id} value={g._id}>
+                      {g.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
