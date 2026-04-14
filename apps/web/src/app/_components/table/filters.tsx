@@ -95,10 +95,11 @@ export default function Filters() {
                 <SelectContent className="border-white/10 bg-neutral-900 text-neutral-200">
                   <SelectItem value="ALL">All</SelectItem>
                   {groups?.map((g) => (
-                    <SelectItem key={g._id} value={g._id}>
+                    <SelectItem key={g._id} value={g.label}>
                       {g.label}
                     </SelectItem>
                   ))}
+                  <SelectItem value="Ungrouped">Ungrouped</SelectItem>
                 </SelectContent>
               </Select>
             </div>

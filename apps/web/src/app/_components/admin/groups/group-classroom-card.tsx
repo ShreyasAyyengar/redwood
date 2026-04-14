@@ -39,9 +39,9 @@ export function GroupClassroomCard({ classroom }: { classroom: z.infer<typeof cl
 
       <div className="pr-8">
         <h3 className="font-semibold text-zinc-100">{classroom.displayName}</h3>
-        <p className="mt-0.5 text-sm text-zinc-400">
-          Current Group:{" "}
-          <span className="rounded border border-zinc-700 bg-zinc-950/50 px-2 py-0.5 font-medium text-[10px] text-zinc-300 transition-colors">
+        <p className="mt-0.5 flex items-center gap-2 text-sm text-zinc-400">
+          Current Group:
+          <span className="rounded border border-zinc-700 bg-zinc-950/50 px-2 py-0.5 font-medium text-[14px] text-md text-zinc-300 transition-colors">
             {classroom.groupKey}
           </span>
         </p>

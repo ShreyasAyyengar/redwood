@@ -84,69 +84,79 @@ export function GroupSelector({ availableGroups }: { availableGroups: z.infer<ty
 
           <div className="min-h-0 flex-1">
             <ScrollArea className="h-full rounded-lg bg-zinc-950/50 p-3">
-              <div className="space-y-2">
-                {availableGroups.map((group) => {
-                  const stats = getGroupStats(group.label);
-                  const allHaveIt = stats.count === selectedClassrooms.length && stats.count > 0;
-                  const someHaveIt = stats.count > 0 && stats.count < selectedClassrooms.length;
-                  const noneHaveIt = stats.count === 0;
+              {availableGroups.length === 0 && selectedCount > 0 ? (
+                <div className="flex items-start gap-3 rounded-lg border border-red-800 bg-red-950 p-4">
+                  <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-300" />
+                  <div>
+                    <p className="font-medium text-red-100 text-sm">No groups created</p>
+                    <p className="mt-1 text-red-300 text-xs">Click the 'plus' button to create one.</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {availableGroups.map((group) => {
+                    const stats = getGroupStats(group.label);
+                    const allHaveIt = stats.count === selectedClassrooms.length && stats.count > 0;
+                    const someHaveIt = stats.count > 0 && stats.count < selectedClassrooms.length;
+                    const noneHaveIt = stats.count === 0;
 
-                  return (
-                    <div
-                      key={group._id}
-                      className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-3 transition-colors hover:bg-zinc-800/50"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="rounded border border-zinc-700 bg-zinc-900 px-2 py-0.5 font-medium text-xs text-zinc-100 transition-colors">
-                              {group.label}
-                            </span>
-                          </div>
-
-                          <div className="mt-2 flex items-center gap-2">
-                            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
-                              <div className="h-full bg-blue-500 transition-all duration-300" style={{ width: `${stats.percentage}%` }} />
+                    return (
+                      <div
+                        key={group._id}
+                        className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-3 transition-colors hover:bg-zinc-800/50"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="rounded border border-zinc-700 bg-zinc-900 px-2 py-0.5 font-medium text-xs text-zinc-100 transition-colors">
+                                {group.label}
+                              </span>
                             </div>
-                            <span className="whitespace-nowrap text-[10px] text-zinc-400">
-                              {stats.count}/{selectedClassrooms.length}
-                            </span>
+
+                            <div className="mt-2 flex items-center gap-2">
+                              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
+                                <div className="h-full bg-blue-500 transition-all duration-300" style={{ width: `${stats.percentage}%` }} />
+                              </div>
+                              <span className="whitespace-nowrap text-[10px] text-zinc-400">
+                                {stats.count}/{selectedClassrooms.length}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-1">
+                            {!allHaveIt && (
+                              <button
+                                type="button"
+                                onClick={() => applyGroup(group.label)}
+                                className="rounded border border-emerald-800 bg-emerald-950 p-1.5 text-emerald-100 transition-colors hover:bg-emerald-900"
+                                title="Assign to group"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </button>
+                            )}
+                            {!noneHaveIt && (
+                              <button
+                                type="button"
+                                onClick={() => removeGroup(group.label)}
+                                className="rounded border border-red-800 bg-red-950 p-1.5 text-red-100 transition-colors hover:bg-red-900"
+                                title="Remove from group"
+                              >
+                                <Minus className="h-4 w-4" />
+                              </button>
+                            )}
                           </div>
                         </div>
 
-                        <div className="flex gap-1">
-                          {!allHaveIt && (
-                            <button
-                              type="button"
-                              onClick={() => applyGroup(group.label)}
-                              className="rounded border border-emerald-800 bg-emerald-950 p-1.5 text-emerald-100 transition-colors hover:bg-emerald-900"
-                              title="Assign to group"
-                            >
-                              <Plus className="h-4 w-4" />
-                            </button>
-                          )}
-                          {!noneHaveIt && (
-                            <button
-                              type="button"
-                              onClick={() => removeGroup(group.label)}
-                              className="rounded border border-red-800 bg-red-950 p-1.5 text-red-100 transition-colors hover:bg-red-900"
-                              title="Remove from group"
-                            >
-                              <Minus className="h-4 w-4" />
-                            </button>
-                          )}
-                        </div>
+                        <p className="mt-2 text-[10px] text-zinc-500 italic">
+                          {allHaveIt && "All selected rooms are in this group"}
+                          {someHaveIt && `${stats.count} of ${selectedClassrooms.length} selected`}
+                          {noneHaveIt && "None of the selected rooms are in this group"}
+                        </p>
                       </div>
-
-                      <p className="mt-2 text-[10px] text-zinc-500 italic">
-                        {allHaveIt && "All selected rooms are in this group"}
-                        {someHaveIt && `${stats.count} of ${selectedClassrooms.length} selected`}
-                        {noneHaveIt && "None of the selected rooms are in this group"}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </ScrollArea>
           </div>
 
