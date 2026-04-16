@@ -8,10 +8,6 @@ export const fileUploadSchema = z.object({
   mimeType: z.enum(VALID_MIME_TYPES, "Invalid file type."),
 });
 
-// TODO if issue has no resolution, cannot edit resolution in payload, must resolve first
-// anyone can edit the issue, and can edit the resolution if it exists
-// show: created by, resolved by, last edited by
-
 export const uploadPhotoInput = z.object({
   id: z.uuidv7(),
   file: z.file("Invalid file."),

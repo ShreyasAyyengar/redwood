@@ -40,8 +40,6 @@ export const attributesContract = {
       },
     }),
 
-  // todo find a nice way to update an existing attr
-
   deleteAttribute: oc
     .route({
       method: "DELETE",
