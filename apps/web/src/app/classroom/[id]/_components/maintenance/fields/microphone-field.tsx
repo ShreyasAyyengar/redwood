@@ -45,7 +45,7 @@ export default function MicrophoneField({
   useEffect(() => {
     if (!equipped) field.handleChange(undefined);
     else field.handleChange({ batteryStripe, chargerStripe, transmitterStripe, aldBatteriesCharged, windscreenSecure, clipInstalled });
-  }, [equipped, batteryStripe, chargerStripe, transmitterStripe, aldBatteriesCharged]);
+  }, [equipped, batteryStripe, chargerStripe, transmitterStripe, aldBatteriesCharged, windscreenSecure, clipInstalled]);
 
   const handleValueChange = (
     value: BatteryStripe | ChargerStripe | TransmitterStripe | AldBatteriesCharged | WindscreenSecure | ClipInstalled,
