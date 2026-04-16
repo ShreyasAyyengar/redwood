@@ -47,7 +47,7 @@ export function MaintenanceAideDialog({
             Create a{type === "issue" && "n"} {type} to aid completing maintenance.
           </DialogTitle>
           <DialogDescription className="text-zinc-400">
-            Please check that the {type} does not already exist. If it does, select the 'Exists' button.
+            Please check that the {type} does not already exist. If it does, select the '{type === "task" ? "Task" : "Issue"} Exists' button.
           </DialogDescription>
         </DialogHeader>
 
@@ -69,7 +69,7 @@ export function MaintenanceAideDialog({
               onOpenChange(false);
               onCreateNew();
             }}
-            className={type === "task" ? "bg-blue-600 hover:bg-blue-700" : "bg-yellow-600 hover:bg-yellow-700"}
+            className={type === "task" ? "bg-blue-400 hover:bg-blue-500" : "bg-yellow-400 hover:bg-yellow-500"}
           >
             Create New {type === "task" ? "Task" : "Issue"}
           </Button>
