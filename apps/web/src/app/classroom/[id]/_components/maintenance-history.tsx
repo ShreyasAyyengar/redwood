@@ -31,34 +31,149 @@ export default function MaintenanceHistory({
               const dayEnding = nth(day);
               const who = entry.completedBy.split("@")[0];
 
+              const microphoneEntries = entry.microphone ? Object.entries(entry.microphone) : [];
+              const dtenEntries = entry.dten ? Object.entries(entry.dten) : [];
+              const allChecks = [...microphoneEntries, ...dtenEntries];
+
+              const issueChecks = allChecks.filter(([, value]) => value === "No, issue preventing completion");
+              const taskChecks = allChecks.filter(([, value]) => value === "No, task created for completion");
+              const fixedChecks = allChecks.filter(
+                ([, value]) =>
+                  typeof value === "string" &&
+                  (value.startsWith("Re-") || value.includes("Battery replaced") || value.includes("now re-charging"))
+              );
+
+              const hasIssues = issueChecks.length > 0;
+              const hasTasks = taskChecks.length > 0;
+              const hasFixes = fixedChecks.length > 0;
+
+              const overallTone = hasIssues
+                ? "border-red-500/30 hover:border-red-400/40"
+                : hasTasks
+                  ? "border-amber-500/30 hover:border-amber-400/40"
+                  : "border-emerald-500/20 hover:border-emerald-400/30";
+
+              const leftAccent = hasIssues
+                ? "bg-red-500/70 group-hover:bg-red-400/90"
+                : hasTasks
+                  ? "bg-amber-500/70 group-hover:bg-amber-400/90"
+                  : "bg-emerald-500/60 group-hover:bg-emerald-400/80";
+
               return (
                 <Tooltip key={entry._id} delayDuration={500}>
                   <TooltipTrigger asChild>
                     <MaintenanceDialog roomId={room._id} maintenanceEntry={entry}>
                       <div
-                        key={entry._id}
                         className={cn(
-                          "group relative cursor-pointer overflow-hidden rounded-xl border border-neutral-700/50 bg-neutral-800/70 px-3 py-2",
-                          "shadow-sm transition-all duration-200",
-                          "hover:border-amber-500/30 hover:bg-neutral-800/90 hover:shadow-md"
+                          "group relative cursor-pointer overflow-hidden rounded-xl border bg-neutral-800/70 px-3 py-3",
+                          "shadow-sm transition-all duration-200 hover:bg-neutral-800/90 hover:shadow-md",
+                          overallTone
                         )}
                       >
-                        {/* subtle left accent */}
-                        <div className="absolute inset-y-0 left-0 w-1 bg-amber-500/50 transition-all duration-200 group-hover:bg-amber-400/80" />
+                        <div className={cn("absolute inset-y-0 left-0 w-1 transition-all duration-200", leftAccent)} />
 
-                        <div className="flex items-center gap-2">
-                          <CalendarDays className="h-6 w-6 text-amber-400" />
-                          <div className="font-semibold text-lg text-neutral-100">
-                            {monthName} {day}
-                            {dayEnding}
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <CalendarDays className="h-5 w-5 text-neutral-400" />
+                              <div className="font-semibold text-base text-neutral-100 sm:text-lg">
+                                {monthName} {day}
+                                {dayEnding}
+                              </div>
+                            </div>
+
+                            <div className="mt-1 flex items-center gap-1 text-neutral-400 text-xs sm:text-sm">
+                              <UserCog className="h-4 w-4 text-neutral-400" />
+                              <span className="inline-flex h-5 items-center rounded-md bg-neutral-500/15 px-2 font-mono text-neutral-300">
+                                {who}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex shrink-0 flex-col flex-wrap items-end justify-end space-y-1">
+                            {!hasIssues && !hasTasks && (
+                              <span className="rounded-md border border-emerald-500/30 bg-emerald-500/15 px-2 py-0.5 font-semibold text-[11px] text-emerald-300">
+                                clean pass
+                              </span>
+                            )}
+                            {hasIssues && (
+                              <div className="flex text-sm">
+                                <span className="rounded-md rounded-r-none border border-red-500/30 border-r-0 bg-red-500/15 px-2 py-0.5 font-semibold text-[11px] text-red-300">
+                                  {issueChecks.length} blocked
+                                </span>
+                                <span className="rounded-md rounded-l-none border border-red-500/30 bg-red-500/15 px-2 py-0.5 font-semibold text-[11px] text-red-300">
+                                  {issueChecks
+                                    .slice(0, 1)
+                                    .map(([key]) => key)
+                                    .join(", ")}
+                                  {issueChecks.length > 1 ? ` +${issueChecks.length - 1} more` : ""}
+                                </span>
+                              </div>
+                            )}
+
+                            {hasTasks && (
+                              <div className="flex text-sm">
+                                <span className="rounded-md rounded-r-none border border-amber-500/30 border-r-0 bg-amber-500/15 px-2 py-0.5 font-semibold text-[11px] text-amber-300">
+                                  {taskChecks.length} follow-up
+                                </span>
+                                <span className="rounded-md rounded-l-none border border-amber-500/30 bg-amber-500/15 px-2 py-0.5 font-semibold text-[11px] text-amber-300">
+                                  {taskChecks
+                                    .slice(0, 1)
+                                    .map(([key]) => key)
+                                    .join(", ")}
+                                  {taskChecks.length > 1 ? ` +${taskChecks.length - 1} more` : ""}
+                                </span>
+                              </div>
+                            )}
+
+                            {hasFixes && (
+                              <div className="flex text-sm">
+                                <span className="rounded-md rounded-r-none border border-sky-500/30 border-r-0 bg-sky-500/15 px-2 py-0.5 font-semibold text-[11px] text-sky-300">
+                                  {fixedChecks.length} corrected
+                                </span>
+                                <span className="rounded-md rounded-l-none border border-sky-500/30 bg-sky-500/15 px-2 py-0.5 font-semibold text-[11px] text-sky-300">
+                                  {fixedChecks
+                                    .slice(0, 1)
+                                    .map(([key]) => key)
+                                    .join(", ")}
+                                  {fixedChecks.length > 1 ? ` +${fixedChecks.length - 1} more` : ""}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </div>
 
-                        {/* Who (tertiary) */}
-                        <div className="mt-0.5 flex items-center gap-1 text-neutral-400 text-xs sm:text-sm">
-                          <UserCog className="h-6 w-6 text-amber-400" />
-                          <span className="inline-flex h-5 items-center rounded-md bg-amber-500/15 px-2 font-mono text-amber-300">{who}</span>
-                          <span className="text-neutral-500">completed maintenance</span>
+                        <div className="mt-3 flex w-fit flex-col flex-wrap space-y-1.5">
+                          {/* Not entirely useful */}
+                          {/*<span*/}
+                          {/*  className={cn(*/}
+                          {/*    "rounded-md px-2 py-1 font-semibold text-[11px]",*/}
+                          {/*    entry.surfacesWiped ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"*/}
+                          {/*  )}*/}
+                          {/*>*/}
+                          {/*  Surfaces {entry.surfacesWiped ? "wiped" : "not wiped"}*/}
+                          {/*</span>*/}
+
+                          {/*<span*/}
+                          {/*  className={cn(*/}
+                          {/*    "rounded-md px-2 py-1 font-semibold text-[11px]",*/}
+                          {/*    entry.equipmentChecked ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"*/}
+                          {/*  )}*/}
+                          {/*>*/}
+                          {/*  Equipment {entry.equipmentChecked ? "checked" : "not checked"}*/}
+                          {/*</span>*/}
+
+                          {entry.microphone && (
+                            <span className="w-fit rounded-md bg-neutral-700/70 px-2 py-1 font-semibold text-[11px] text-neutral-200">
+                              Mic checked
+                            </span>
+                          )}
+
+                          {entry.dten && (
+                            <span className="w-fit rounded-md bg-neutral-700/70 px-2 py-1 font-semibold text-[11px] text-neutral-200">
+                              DTEN checked
+                            </span>
+                          )}
                         </div>
                       </div>
                     </MaintenanceDialog>
