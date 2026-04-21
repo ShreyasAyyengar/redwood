@@ -1,9 +1,9 @@
-import type { classroomSchema } from "@redwood/contracts";
+import type { classroomSchemaPayload } from "@redwood/contracts";
 import type { Column } from "@tanstack/react-table";
 import { CalendarClock, CircleX, ClockCheck, SlidersHorizontal } from "lucide-react";
 import type { z } from "zod";
 
-export default function AvailabilityHeader({ column }: { column: Column<z.infer<typeof classroomSchema>> }) {
+export default function AvailabilityHeader({ column }: { column: Column<z.infer<typeof classroomSchemaPayload>> }) {
   return (
     <div>
       <div

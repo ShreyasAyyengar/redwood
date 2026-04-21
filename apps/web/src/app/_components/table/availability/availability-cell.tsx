@@ -1,10 +1,10 @@
-import type { classroomSchema } from "@redwood/contracts";
+import type { classroomSchemaPayload } from "@redwood/contracts";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwood/shad-ui/components/tooltip";
 import type { Row } from "@tanstack/react-table";
 import type { z } from "zod";
 import { convertMinutesToReadable, dayAvailability, getBlocksForToday, getCaliClock } from "../../../../util/date-time-utils";
 
-export default function AvailabilityCell({ row }: { row: Row<z.infer<typeof classroomSchema>> }) {
+export default function AvailabilityCell({ row }: { row: Row<z.infer<typeof classroomSchemaPayload>> }) {
   const { weekdayKey, nowMin } = getCaliClock();
   // biome-ignore lint/style/noNonNullAssertion: this can only be invoked by a classroom displayed with a schedule
   const blocks = getBlocksForToday(row.original.schedule!, weekdayKey);

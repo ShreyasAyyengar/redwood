@@ -1,9 +1,9 @@
-import type { classroomSchema } from "@redwood/contracts";
+import type { classroomSchemaPayload } from "@redwood/contracts";
 import type { Column } from "@tanstack/react-table";
 import { SlidersHorizontal, ThumbsUp, TriangleAlert } from "lucide-react";
 import type { z } from "zod";
 
-export default function StatusHeader({ column }: { column: Column<z.infer<typeof classroomSchema>> }) {
+export default function StatusHeader({ column }: { column: Column<z.infer<typeof classroomSchemaPayload>> }) {
   return (
     <div>
       <div

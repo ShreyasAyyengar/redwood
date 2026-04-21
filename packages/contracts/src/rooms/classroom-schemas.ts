@@ -1,7 +1,7 @@
 import { oc } from "@orpc/contract";
 import { z } from "zod";
 import { csvRecordSchema } from "../configuration/config-schemas";
-import { classroomSchema } from "./classroom-contract";
+import { classroomSchema, classroomSchemaPayload } from "./classroom-contract";
 
 export const classroomContract = {
   loadClassrooms: oc
@@ -36,7 +36,7 @@ export const classroomContract = {
       method: "GET",
     })
     .input(classroomSchema.shape._id)
-    .output(classroomSchema)
+    .output(classroomSchemaPayload)
     .errors({
       NOT_FOUND: {
         data: z.object({
@@ -54,7 +54,7 @@ export const classroomContract = {
     .route({
       method: "GET",
     })
-    .output(z.array(classroomSchema))
+    .output(z.array(classroomSchemaPayload))
     .errors({
       INTERNAL_SERVER_ERROR: {
         data: z.object({

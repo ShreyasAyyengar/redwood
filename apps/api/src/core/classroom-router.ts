@@ -1,9 +1,10 @@
-import { classroomSchema } from "@redwood/contracts";
+import { classroomSchema, classroomSchemaPayload } from "@redwood/contracts";
 import { parse } from "csv-parse/sync";
 import { v7 as uuidv7 } from "uuid";
-import type { z } from "zod";
+import { z } from "zod";
 import { ClassroomService } from "../database/classroom-service";
 import { ConfigService } from "../database/config-service";
+import { TaskService } from "../database/task-service";
 import { protectedProcedure, publicProcedure } from "../libs/orpc-procedures";
 import { emptySchedule, processTimeRanges, rowSchema } from "../util/csv-util";
 
@@ -53,7 +54,6 @@ export const classroomRouter = {
               sourceRoomName: roomName,
               displayName: roomName,
               schedule,
-              openTasksCount: 0,
               roomStatus: "GOOD" as const,
               isActive: true,
             };
@@ -110,7 +110,27 @@ export const classroomRouter = {
 
   getRooms: protectedProcedure.classrooms.getRooms.handler(async ({ errors: { INTERNAL_SERVER_ERROR } }) => {
     try {
-      return await ClassroomService.find({ isActive: true });
+      const rooms = await ClassroomService.find({ isActive: true }).lean();
+
+      const openTasks = await TaskService.find({
+        classroomId: { $in: rooms.map((r) => r._id) },
+
+        // 1) no resolution
+        resolution: { $exists: false },
+
+        // 2) visibleAt missing OR already in the past
+        $or: [{ visibleAt: { $exists: false } }, { visibleAt: { $lte: new Date() } }],
+      });
+
+      const roomsWithTasks = rooms.map((room) => ({
+        ...room,
+        openTasksCount: openTasks.filter((task) => task.classroomId === room._id).length,
+      }));
+
+      const test = z.array(classroomSchemaPayload).safeParse(roomsWithTasks);
+      if (!test.success) throw INTERNAL_SERVER_ERROR({ data: { message: test.error.message } });
+
+      return roomsWithTasks;
     } catch (e) {
       console.error(e);
       throw INTERNAL_SERVER_ERROR({ data: { message: String(e) } });

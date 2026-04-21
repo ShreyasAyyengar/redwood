@@ -31,7 +31,6 @@ export const classroomSchema = z.object({
     })
     .optional(),
   roomStatus: z.enum(["GOOD", "NEEDS ATTENTION", "NEEDS URGENT ATTENTION"]).default("GOOD"),
-  openTasksCount: z.number(), // denormalized -> derived by updates from writes // TODO not rlly accurate
   isActive: z.boolean().default(true),
   captioning: z
     .object({
@@ -41,4 +40,8 @@ export const classroomSchema = z.object({
     })
     .optional(),
   attributes: z.array(attributeSchema.shape._id).default([]),
+});
+
+export const classroomSchemaPayload = classroomSchema.extend({
+  openTasksCount: z.number(),
 });

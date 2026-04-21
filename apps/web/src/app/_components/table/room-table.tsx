@@ -1,6 +1,6 @@
 "use client";
 
-import type { classroomSchema } from "@redwood/contracts";
+import type { classroomSchema, classroomSchemaPayload } from "@redwood/contracts";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@redwood/shad-ui/components/table";
 import {
@@ -26,8 +26,8 @@ export function RoomTable({
   data,
   columns,
 }: {
-  data: z.infer<typeof classroomSchema>[];
-  columns: ColumnDef<z.infer<typeof classroomSchema>>[];
+  data: z.infer<typeof classroomSchemaPayload>[];
+  columns: ColumnDef<z.infer<typeof classroomSchemaPayload>>[];
 }) {
   const [sorting, setSorting] = useState<SortingState>(() => {
     const stored = localStorage.getItem(SORTING_STORAGE_KEY);

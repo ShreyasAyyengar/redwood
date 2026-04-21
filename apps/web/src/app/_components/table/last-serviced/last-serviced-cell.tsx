@@ -1,11 +1,11 @@
-import type { classroomSchema } from "@redwood/contracts";
+import type { classroomSchemaPayload } from "@redwood/contracts";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import type { Row } from "@tanstack/react-table";
 import type { z } from "zod";
 import { daysAgo as daysAgoUtil, monthNames, nth } from "../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../util/style-util";
 
-export default function LastServicedCell({ row }: { row: Row<z.infer<typeof classroomSchema>> }) {
+export default function LastServicedCell({ row }: { row: Row<z.infer<typeof classroomSchemaPayload>> }) {
   const lastMaintenance = row.original.lastMaintenance;
   if (!lastMaintenance) return <div className="text-center text-foreground text-lg">No Record Yet</div>;
 

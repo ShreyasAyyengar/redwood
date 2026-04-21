@@ -43,9 +43,6 @@ export const taskRouter = {
 
     try {
       await TaskService.insertOne(newTask);
-      await ClassroomService.findByIdAndUpdate(input.classroomId, {
-        $inc: { openTasksCount: !newTask.task.visibleAt ? 1 : 0 },
-      });
       return true;
     } catch (e) {
       throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });

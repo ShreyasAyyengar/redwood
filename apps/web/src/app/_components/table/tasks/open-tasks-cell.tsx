@@ -1,9 +1,9 @@
-import type { classroomSchema } from "@redwood/contracts";
+import type { classroomSchemaPayload } from "@redwood/contracts";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import type { Row } from "@tanstack/react-table";
 import type { z } from "zod";
 
-export default function OpenTasksCell({ row }: { row: Row<z.infer<typeof classroomSchema>> }) {
+export default function OpenTasksCell({ row }: { row: Row<z.infer<typeof classroomSchemaPayload>> }) {
   const openTasksCount = row.original.openTasksCount; // TODO find a way to make this 'open tasks'
 
   return (

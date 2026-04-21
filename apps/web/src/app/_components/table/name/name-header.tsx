@@ -1,9 +1,9 @@
-import type { classroomSchema } from "@redwood/contracts";
+import type { classroomSchemaPayload } from "@redwood/contracts";
 import type { Column } from "@tanstack/react-table";
 import { ArrowDownAZ, ArrowDownZA, SlidersHorizontal, Tag } from "lucide-react";
 import type { z } from "zod";
 
-export default function NameHeader({ column }: { column: Column<z.infer<typeof classroomSchema>> }) {
+export default function NameHeader({ column }: { column: Column<z.infer<typeof classroomSchemaPayload>> }) {
   return (
     <div>
       <div

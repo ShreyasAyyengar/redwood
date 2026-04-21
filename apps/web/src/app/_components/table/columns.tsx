@@ -1,6 +1,6 @@
 "use client";
 
-import type { classroomSchema } from "@redwood/contracts";
+import type { classroomSchemaPayload } from "@redwood/contracts";
 import { type ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import type { z } from "zod";
 import { dayAvailability, getBlocksForToday, getCaliClock, toSortKey } from "../../../util/date-time-utils";
@@ -21,9 +21,9 @@ const statusOrder: Record<string, number> = {
   GOOD: 2,
 };
 
-const columnHelper = createColumnHelper<z.infer<typeof classroomSchema>>();
+const columnHelper = createColumnHelper<z.infer<typeof classroomSchemaPayload>>();
 
-export const columns: ColumnDef<z.infer<typeof classroomSchema>>[] = [
+export const columns: ColumnDef<z.infer<typeof classroomSchemaPayload>>[] = [
   columnHelper.accessor("roomStatus", {
     header: ({ column }) => <StatusHeader column={column} />,
     cell: ({ row }) => <StatusCell row={row} />,

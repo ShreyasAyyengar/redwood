@@ -1,9 +1,9 @@
-import type { classroomSchema } from "@redwood/contracts";
+import type { classroomSchemaPayload } from "@redwood/contracts";
 import type { Row } from "@tanstack/react-table";
 import { CircleAlert, ThumbsUp, TriangleAlert } from "lucide-react";
 import type { z } from "zod";
 
-export default function StatusCell({ row }: { row: Row<z.infer<typeof classroomSchema>> }) {
+export default function StatusCell({ row }: { row: Row<z.infer<typeof classroomSchemaPayload>> }) {
   const room = row.original;
   const roomStatus = room.roomStatus;
 

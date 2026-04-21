@@ -1,8 +1,8 @@
-import type { classroomSchema } from "@redwood/contracts";
+import type { classroomSchemaPayload } from "@redwood/contracts";
 import type { Row } from "@tanstack/react-table";
 import type { z } from "zod";
 
-export default function NameCell({ row }: { row: Row<z.infer<typeof classroomSchema>> }) {
+export default function NameCell({ row }: { row: Row<z.infer<typeof classroomSchemaPayload>> }) {
   const displayName = row.original.displayName;
   const group = row.original.groupKey;
   return (
