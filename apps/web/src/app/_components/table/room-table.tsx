@@ -1,6 +1,6 @@
 "use client";
 
-import type { classroomSchema, classroomSchemaPayload } from "@redwood/contracts";
+import type { classroomSchemaPayload } from "@redwood/contracts";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@redwood/shad-ui/components/table";
 import {
@@ -9,7 +9,6 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
-  type Row,
   type SortingState,
   useReactTable,
 } from "@tanstack/react-table";
@@ -122,7 +121,7 @@ export function RoomTable({
             <TableCell colSpan={columns.length} className="border-0 p-0" />
           </TableRow>
           {rows.rows.length > 0 ? (
-            rows.rows.map((row) => <RoomRow key={row.id} row={row as Row<z.infer<typeof classroomSchema>>} />)
+            rows.rows.map((row) => <RoomRow key={row.id} row={row} />)
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">

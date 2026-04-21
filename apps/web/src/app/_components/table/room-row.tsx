@@ -1,4 +1,4 @@
-import type { classroomSchema } from "@redwood/contracts";
+import type { classroomSchemaPayload } from "@redwood/contracts";
 import { TableCell, TableRow } from "@redwood/shad-ui/components/table";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { flexRender, type Row } from "@tanstack/react-table";
@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { z } from "zod";
 
-export function RoomRow({ row }: { row: Row<z.infer<typeof classroomSchema>> }) {
+export function RoomRow({ row }: { row: Row<z.infer<typeof classroomSchemaPayload>> }) {
   const cells = row.getVisibleCells();
   const [isHovering, setIsHovering] = useState(false);
   const router = useRouter();
