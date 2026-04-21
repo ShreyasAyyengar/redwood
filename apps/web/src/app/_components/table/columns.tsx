@@ -23,7 +23,7 @@ const statusOrder: Record<string, number> = {
 
 const columnHelper = createColumnHelper<z.infer<typeof classroomSchemaPayload>>();
 
-export const columns: ColumnDef<z.infer<typeof classroomSchemaPayload>>[] = [
+export const columns: ColumnDef<z.infer<typeof classroomSchemaPayload>, any>[] = [
   columnHelper.accessor("roomStatus", {
     header: ({ column }) => <StatusHeader column={column} />,
     cell: ({ row }) => <StatusCell row={row} />,
