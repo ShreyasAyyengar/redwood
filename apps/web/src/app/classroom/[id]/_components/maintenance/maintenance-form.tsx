@@ -117,11 +117,9 @@ export default function MaintenanceForm({
           <div className="flex flex-col items-start">
             <h2 className="mb-3 font-semibold text-lg">General Maintenance</h2>
             <div className="w-full justify-center space-y-3 rounded-md bg-zinc-950/30 p-3 ring-1 ring-white/15">
-              <form.AppField name="surfacesWiped">
-                {(field) => <field.SurfacesWipedField existingValue={maintenanceEntry?.surfacesWiped} />}
-              </form.AppField>
+              <form.AppField name="surfacesWiped">{(field) => <field.SurfacesWipedField existingEntry={maintenanceEntry} />}</form.AppField>
               <form.AppField name="equipmentChecked">
-                {(field) => <field.EquipmentCheckedField existingValue={maintenanceEntry?.equipmentChecked} />}
+                {(field) => <field.EquipmentCheckedField existingEntry={maintenanceEntry} />}
               </form.AppField>
             </div>
           </div>

@@ -1,16 +1,18 @@
+import type { maintenanceEntrySchema } from "@redwood/contracts";
 import { Checkbox } from "@redwood/shad-ui/components/checkbox";
 import { Field, FieldError, FieldLabel } from "@redwood/shad-ui/components/field";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@redwood/shad-ui/components/hover-card";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { CircleQuestionMark } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { z } from "zod";
 import { urgencyStyle } from "../../../../../../util/style-util";
 import { type FormValues, useFieldContext } from "../maintenance-form";
 
-export default function EquipmentCheckedField({ existingValue }: { existingValue?: boolean }) {
+export default function EquipmentCheckedField({ existingEntry }: { existingEntry?: z.infer<typeof maintenanceEntrySchema> }) {
   const field = useFieldContext<FormValues["equipmentChecked"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-  const [value, setValue] = useState<boolean | undefined>(existingValue ?? false);
+  const [value, setValue] = useState<boolean | undefined>(existingEntry?.equipmentChecked ?? false);
 
   useEffect(() => {
     field.handleChange(value as boolean);
@@ -65,7 +67,7 @@ export default function EquipmentCheckedField({ existingValue }: { existingValue
         <Checkbox
           className="h-5 w-5"
           checked={value}
-          disabled={!!existingValue}
+          disabled={!!existingEntry}
           onCheckedChange={(checked) => setValue(checked.valueOf() as boolean)}
         />
       </div>
