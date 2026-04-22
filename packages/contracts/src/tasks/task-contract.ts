@@ -112,6 +112,11 @@ export const taskContract = {
     .route({
       method: "GET",
     })
+    .input(
+      z.object({
+        openOnly: z.coerce.boolean().default(false),
+      })
+    )
     .output(z.array(taskSchema))
     .errors({
       NOT_FOUND: {

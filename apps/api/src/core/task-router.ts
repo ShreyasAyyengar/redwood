@@ -12,9 +12,10 @@ export const taskRouter = {
     return tasks;
   }),
 
-  getAllTasks: protectedProcedure.tasks.getAllTasks.handler(async ({ errors }) => {
-    const tasks = await TaskService.find().sort({ createdAt: -1 });
-    return tasks;
+  getAllTasks: protectedProcedure.tasks.getAllTasks.handler(({ input, errors }) => {
+    const { openOnly } = input;
+    const query = openOnly ? { completion: { $exists: false } } : {};
+    return TaskService.find(query).sort({ createdAt: -1 });
   }),
 
   addTask: protectedProcedure.tasks.addTask.handler(async ({ input, errors, context }) => {
