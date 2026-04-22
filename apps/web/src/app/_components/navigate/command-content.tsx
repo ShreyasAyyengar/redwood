@@ -9,7 +9,7 @@ export default function CommandContent({ closeNavigator }: { closeNavigator: () 
   const { fetchedRooms } = useFetchedRoomsStore();
 
   const router = useRouter();
-  const onSelectClassroom = (roomId: string) => {
+  const navigateToClassroom = (roomId: string) => {
     closeNavigator();
     router.push(`/classroom/${roomId}`);
   };
@@ -31,7 +31,7 @@ export default function CommandContent({ closeNavigator }: { closeNavigator: () 
 
       <CommandGroup heading="Classrooms">
         {fetchedRooms.map((room) => (
-          <CommandItem key={room._id} value={room.displayName} onSelect={() => onSelectClassroom(room._id)}>
+          <CommandItem key={room._id} value={room.displayName} onSelect={() => navigateToClassroom(room._id)}>
             <School className="size-5" />
             <span>{room.displayName}</span>
           </CommandItem>
@@ -43,7 +43,7 @@ export default function CommandContent({ closeNavigator }: { closeNavigator: () 
       <CommandGroup heading="Issues">
         {issuesFetching && <div className="p-4 text-center text-muted-foreground text-sm">Finding issues...</div>}
         {issues?.map((issue) => (
-          <CommandItem key={issue._id} value={issue.issue.description}>
+          <CommandItem key={issue._id} value={issue.issue.description} onSelect={() => navigateToClassroom(issue.classroomId)}>
             <AlertTriangle className="mr-2 size-5" />
             <span>{issue.issue.description}</span>
           </CommandItem>
@@ -55,7 +55,7 @@ export default function CommandContent({ closeNavigator }: { closeNavigator: () 
       <CommandGroup heading="Tasks">
         {tasksFetching && <div className="p-4 text-center text-muted-foreground text-sm">Finding tasks...</div>}
         {tasks?.map((task) => (
-          <CommandItem key={task._id} value={task.task.description}>
+          <CommandItem key={task._id} value={task.task.description} onSelect={() => navigateToClassroom(task.classroomId)}>
             <ClipboardList className="mr-2 size-5" />
             <span>{task.task.description}</span>
           </CommandItem>
