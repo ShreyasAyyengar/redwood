@@ -1,8 +1,7 @@
 "use client";
 
 import { Button } from "@redwood/shad-ui/components/button";
-import { ArrowLeft, Home } from "lucide-react";
-import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const BackButton = () => {
@@ -33,21 +32,11 @@ export default function Page() {
           </div>
 
           <div className="relative z-1 pt-52 text-center">
-            <h1 className="mt-4 text-balance font-semibold text-5xl text-red-800 tracking-tight sm:text-7xl">UNAUTHORIZED</h1>
+            <h1 className="mt-4 text-balance font-semibold text-5xl text-red-800 tracking-wider sm:text-7xl">UNAUTHORIZED</h1>
 
             <p className="mt-6 text-pretty font-medium text-lg text-muted-foreground sm:text-xl/8">
               You do not have permission to view this page. Please contact the ITS IS&T administrators for assistance.
             </p>
-
-            <div className="mt-10 flex flex-col gap-x-4 gap-y-3 sm:flex-row sm:items-center sm:justify-center">
-              <BackButton />
-              <Button className="-order-1 sm:order-0" asChild>
-                <Link href="/">
-                  <Home className="me-2" size={16} />
-                  Home
-                </Link>
-              </Button>
-            </div>
           </div>
         </div>
       </div>
