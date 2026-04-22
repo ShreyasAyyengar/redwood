@@ -103,6 +103,7 @@ export function RoomTable({
   const rows = table.getRowModel();
 
   return (
+    // TODO fix header border issue not being rounded on LHS
     <ScrollArea className="flex h-full w-fit items-center justify-center rounded-lg rounded-l-none bg-neutral-900 p-5 shadow-xl/50 ring-1 ring-black/5">
       <Table className="border-separate border-spacing-0">
         <TableHeader className="sticky top-0 z-1 border">
