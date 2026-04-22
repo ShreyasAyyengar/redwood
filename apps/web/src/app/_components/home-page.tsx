@@ -1,4 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@redwood/shad-ui/components/tabs";
+import Image from "next/image";
 import { authClientWeb } from "../../lib/auth-client-web";
 import AdminPanel from "./admin/admin-panel";
 import RoomList from "./list/room-list";
@@ -25,7 +26,10 @@ export default function HomePage() {
 
       {/* Desktop Layout - Hidden below lg */}
       <div className="hidden h-screen flex-col items-center justify-center font-sans text-white lg:flex">
-        <p className="my-5 text-center font-bold text-3xl">Redwood</p>
+        <div className="flex items-center gap-5">
+          <Image src="/redwood-icon.png" alt="Redwood Logo" height={32} width={32} />
+          <p className="my-5 text-center font-bold text-3xl">Redwood</p>
+        </div>
 
         <Tabs defaultValue="classrooms" className="flex h-full flex-1 flex-col overflow-hidden">
           <TabsList className="mx-auto shrink-0">
@@ -70,4 +74,4 @@ export default function HomePage() {
   );
 }
 
-// wTODO display rooms in use of captioning
+// TODO display rooms in use of captioning
