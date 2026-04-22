@@ -4,7 +4,7 @@ import "@redwood/shad-ui/globals.css";
 import { Suspense } from "react";
 import { env } from "../env";
 import AuthLayer from "./_components/auth-layer";
-import NavigatorCommand from "./_components/navigator-command";
+import NavigatorCommand from "./_components/navigate/navigator-command";
 import Providers from "./_components/providers";
 
 const geistSans = localFont({
@@ -35,7 +35,7 @@ export default function RootLayout({
           <AuthLayer />
         </Suspense>
         <head>{reactScanEnabled && <script crossOrigin="anonymous" src="//unpkg.com/react-scan/dist/auto.global.js" />}</head>
-        <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <body className={`${geistSans.variable} ${geistMono.variable} dark`}>
           <NavigatorCommand />
           {children}
         </body>
