@@ -12,10 +12,12 @@ export const issueRouter = {
 
     return issues;
   }),
-  getAllIssues: protectedProcedure.issues.getAllIssues.handler(async ({ errors }) => {
-    const issues: z.infer<typeof issueSchema>[] = await IssueService.find().lean().sort({ "issue.reportedAt": -1 });
 
-    return issues;
+  getAllIssues: protectedProcedure.issues.getAllIssues.handler(({ input, errors }) => {
+    const { openOnly } = input;
+    const query = openOnly ? { resolution: { $exists: false } } : {};
+
+    return IssueService.find(query).lean().sort({ "issue.reportedAt": -1 });
   }),
 
   createIssue: protectedProcedure.issues.createIssue.handler(async ({ input, errors, context }) => {

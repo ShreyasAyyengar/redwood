@@ -89,6 +89,11 @@ export const issueContract = {
     .route({
       method: "GET",
     })
+    .input(
+      z.object({
+        openOnly: z.coerce.boolean().default(false),
+      })
+    )
     .output(z.array(issueSchema))
     .errors({
       INTERNAL_SERVER_ERROR: {
