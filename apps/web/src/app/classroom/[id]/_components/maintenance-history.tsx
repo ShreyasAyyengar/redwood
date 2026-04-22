@@ -61,12 +61,13 @@ export default function MaintenanceHistory({
 
               return (
                 <Tooltip key={entry._id} delayDuration={500}>
-                  <TooltipTrigger asChild>
-                    <MaintenanceDialog roomId={room._id} maintenanceEntry={entry}>
+                  <MaintenanceDialog roomId={room._id} maintenanceEntry={entry}>
+                    <TooltipTrigger asChild>
                       <div
                         className={cn(
-                          "group relative cursor-pointer overflow-hidden rounded-xl border bg-neutral-800/70 px-3 py-3",
+                          "group relative cursor-pointer overflow-hidden rounded-xl border bg-neutral-800/70 px-3 pt-3",
                           "shadow-sm transition-all duration-200 hover:bg-neutral-800/90 hover:shadow-md",
+                          "duration-150 active:scale-95 active:transform",
                           overallTone
                         )}
                       >
@@ -75,7 +76,7 @@ export default function MaintenanceHistory({
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
-                              <CalendarDays className="h-5 w-5 text-neutral-400" />
+                              <CalendarDays className="size-5 text-neutral-400" />
                               <div className="font-semibold text-base text-neutral-100 sm:text-lg">
                                 {monthName} {day}
                                 {dayEnding}
@@ -83,7 +84,7 @@ export default function MaintenanceHistory({
                             </div>
 
                             <div className="mt-1 flex items-center gap-1 text-neutral-400 text-xs sm:text-sm">
-                              <UserCog className="h-4 w-4 text-neutral-400" />
+                              <UserCog className="size-5 text-neutral-400" />
                               <span className="inline-flex h-5 items-center rounded-md bg-neutral-500/15 px-2 font-mono text-neutral-300">
                                 {who}
                               </span>
@@ -176,8 +177,8 @@ export default function MaintenanceHistory({
                           )}
                         </div>
                       </div>
-                    </MaintenanceDialog>
-                  </TooltipTrigger>
+                    </TooltipTrigger>
+                  </MaintenanceDialog>
                   <TooltipContent className="font-bold">View Maintenance Log</TooltipContent>
                 </Tooltip>
               );
