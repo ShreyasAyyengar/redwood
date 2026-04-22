@@ -3,7 +3,7 @@ import { z } from "zod";
 import { redwoodUserSchema, userSchema } from "./user-schemas";
 
 export const userContract = {
-  createCredentials: oc
+  addUser: oc
     .route({
       method: "POST",
     })
@@ -22,7 +22,7 @@ export const userContract = {
       },
     }),
 
-  removeCredentials: oc
+  removeUser: oc
     .route({
       method: "DELETE",
     })
@@ -64,7 +64,6 @@ export const userContract = {
     .route({
       method: "GET",
     })
-    .input(z.object({}))
     .output(z.array(redwoodUserSchema))
     .errors({
       INTERNAL_SERVER_ERROR: {

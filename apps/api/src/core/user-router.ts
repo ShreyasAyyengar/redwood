@@ -1,11 +1,18 @@
 import type { redwoodUserSchema } from "@redwood/contracts";
 import type { z } from "zod";
 import { ConfigService } from "../database/config-service";
+import { UserService } from "../database/user-service";
 import { adminProcedure } from "../libs/orpc-procedures";
 import { hasCredentials } from "../util/user-util";
 
 export const userRouter = {
-  addCredentials: adminProcedure.users.createCredentials.handler(async ({ input: { email, role }, errors }) => {
+  getUsers: adminProcedure.users.getUsers.handler(async ({ errors }) => {
+    const config = await ConfigService.findOne();
+    if (!config) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Configuration not found." } });
+    return config.users;
+  }),
+
+  addUser: adminProcedure.users.addUser.handler(async ({ input: { email, role }, errors }) => {
     const exists = await hasCredentials(email);
 
     if (exists) throw errors.UNPROCESSABLE_CONTENT({ data: { message: "Credentials already exist." } });
@@ -24,12 +31,14 @@ export const userRouter = {
     return true;
   }),
 
-  removeCredentials: adminProcedure.users.removeCredentials.handler(async ({ input: { email }, errors }) => {
+  removeUser: adminProcedure.users.removeUser.handler(async ({ input: { email }, errors }) => {
     const result = await ConfigService.findOneAndUpdate(
       {}, // empty filter finds the singleton
       { $pull: { users: { email } } },
       { new: true }
     );
+
+    await UserService.deleteOne({ email });
 
     if (!result) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Configuration not found." } });
 
@@ -41,21 +50,25 @@ export const userRouter = {
   }),
 
   changeRole: adminProcedure.users.changeRole.handler(async ({ input: { email, newRole }, errors }) => {
-    const config = await ConfigService.findOne();
-    if (!config) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Configuration not found." } });
+    try {
+      const config = await ConfigService.findOne({ "users.email": email }).lean();
+      if (!config) {
+        throw errors.UNPROCESSABLE_CONTENT({ data: { message: "Credentials not found." } });
+      }
 
-    const userIndex = config.users.findIndex((user) => user.email === email);
-    if (userIndex === -1) throw errors.UNPROCESSABLE_CONTENT({ data: { message: "Credentials not found." } });
+      const authUser = await UserService.findOne({ email }).lean();
+      if (!authUser) {
+        throw errors.UNPROCESSABLE_CONTENT({ data: { message: "Credentials not found." } });
+      }
 
-    // biome-ignore lint/style/noNonNullAssertion: verified above ^
-    config.users[userIndex]!.role = newRole;
-    await config.save();
-    return true;
-  }),
+      await ConfigService.updateOne({ "users.email": email }, { $set: { "users.$.role": newRole } });
 
-  getUsers: adminProcedure.users.getUsers.handler(async ({ errors }) => {
-    const config = await ConfigService.findOne();
-    if (!config) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Configuration not found." } });
-    return config.users;
+      await UserService.updateOne({ email }, { $set: { role: newRole } });
+
+      return true;
+    } catch (e) {
+      console.error(e);
+      throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
+    }
   }),
 };

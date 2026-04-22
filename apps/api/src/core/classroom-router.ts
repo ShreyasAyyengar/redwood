@@ -5,11 +5,11 @@ import { z } from "zod";
 import { ClassroomService } from "../database/classroom-service";
 import { ConfigService } from "../database/config-service";
 import { TaskService } from "../database/task-service";
-import { protectedProcedure, publicProcedure } from "../libs/orpc-procedures";
+import { protectedProcedure } from "../libs/orpc-procedures";
 import { emptySchedule, processTimeRanges, rowSchema } from "../util/csv-util";
 
 export const classroomRouter = {
-  loadClassrooms: publicProcedure.classrooms.loadClassrooms.handler(async ({ input, errors: { INTERNAL_SERVER_ERROR } }) => {
+  loadClassrooms: protectedProcedure.classrooms.loadClassrooms.handler(async ({ input, errors: { INTERNAL_SERVER_ERROR } }) => {
     try {
       const text = await input.csvFile.text();
       const parsedCSV = parse(text, {

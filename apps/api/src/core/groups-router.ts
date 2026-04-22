@@ -3,10 +3,10 @@ import { v7 as uuidv7 } from "uuid";
 import type { z } from "zod";
 import { ClassroomService } from "../database/classroom-service";
 import { GroupService } from "../database/groups-service";
-import { adminProcedure } from "../libs/orpc-procedures";
+import { adminProcedure, protectedProcedure } from "../libs/orpc-procedures";
 
 export const groupsRouter = {
-  getGroups: adminProcedure.groups.getGroups.handler(async ({ errors }) => {
+  getGroups: protectedProcedure.groups.getGroups.handler(async ({ errors }) => {
     const groups = await GroupService.find();
     if (!groups) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Groups not found." } });
     return groups;

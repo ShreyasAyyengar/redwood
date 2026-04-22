@@ -3,6 +3,7 @@ import { AttributeEditor } from "./attributes/attribute-editor";
 import CSVUpload from "./csv/csv-upload";
 import { RoomGroupEditor } from "./groups/room-group-editor";
 import Overview from "./overview/overview";
+import UserEditor from "./users/user-editor";
 
 export default function AdminPanel() {
   // Tabs: Overview, CSV Upload, Room Attributes, Room Groups, Statistics
@@ -12,6 +13,7 @@ export default function AdminPanel() {
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="csv">CSV Upload</TabsTrigger>
+          <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="attributes">Room Attributes</TabsTrigger>
           <TabsTrigger value="groups">Room Groups</TabsTrigger>
           <TabsTrigger value="statistics">Statistics</TabsTrigger>
@@ -22,6 +24,9 @@ export default function AdminPanel() {
         </TabsContent>
         <TabsContent value="csv">
           <CSVUpload />
+        </TabsContent>
+        <TabsContent value="users">
+          <UserEditor />
         </TabsContent>
         <TabsContent value="attributes">
           <AttributeEditor />
