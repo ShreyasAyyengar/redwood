@@ -13,8 +13,10 @@ export default function AuthLayer() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const isAuthErrorPage = pathname === "/auth/error";
+
   useEffect(() => {
-    if (!isPending && !data) {
+    if (!isPending && !data && !isAuthErrorPage) {
       const search = searchParams.toString();
       const currentUrl = `${window.location.origin}${pathname}${search ? `?${search}` : ""}`;
 
@@ -24,7 +26,7 @@ export default function AuthLayer() {
         errorCallbackURL: `${env.NEXT_PUBLIC_WEBSITE_URL}/auth/error`,
       });
     }
-  }, [isPending, data, pathname, searchParams]);
+  }, [isPending, data, pathname, searchParams, isAuthErrorPage]);
 
   const { setRoomsAndFetching } = useFetchedRoomsStore();
 

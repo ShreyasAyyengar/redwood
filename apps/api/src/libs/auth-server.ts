@@ -1,7 +1,9 @@
 import { electron } from "@better-auth/electron";
 import { expo } from "@better-auth/expo";
+import { roles } from "@redwood/contracts";
 import { APIError, betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
+import { ConfigService } from "../database/config-service";
 import { databaseConnection } from "../database/database";
 import { env } from "../env";
 import { hasCredentials } from "../util/user-util";
@@ -16,6 +18,12 @@ export const authServer = betterAuth({
   baseURL: env.API_URL,
   basePath,
   trustedOrigins: [env.WEBSITE_URL, "redwood://", ...(env.ENV === "development" ? ["exp://"] : [])], // TODO
+
+  onAPIError: {
+    errorURL: "http://localhost:3000/auth/error",
+    throw: true,
+  },
+
   socialProviders: {
     google: {
       prompt: "select_account consent",
@@ -32,10 +40,29 @@ export const authServer = betterAuth({
       },
     },
   },
+
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user, context) => {
+          // get their role:
+          const config = await ConfigService.findOne({ "users.email": user.email }).lean();
+          const role = config?.users.find((u) => u.email === user.email)?.role ?? "employee";
+          return {
+            data: {
+              ...user,
+              role,
+            },
+          };
+        },
+      },
+    },
+  },
+
   user: {
     additionalFields: {
       role: {
-        type: ["employee", "supervisor", "admin"],
+        type: roles,
         required: true,
         defaultValue: "employee",
         input: false,
