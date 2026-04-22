@@ -35,8 +35,7 @@ export const classroomSchema = z.object({
   captioning: z
     .object({
       type: z.enum(["DTEN", "MAC"]),
-      name: z.string(),
-      ip: z.string(),
+      identifier: z.string(),
     })
     .optional(),
   attributes: z.array(attributeSchema.shape._id).default([]),
