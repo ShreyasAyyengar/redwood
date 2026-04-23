@@ -1,7 +1,9 @@
 import type { taskSchema } from "@redwood/contracts";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@redwood/shad-ui/components/dialog";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import type React from "react";
+import { useCallback, useState } from "react";
 import type { z } from "zod";
 import { TaskCard } from "./task-card";
 import { TaskDialog } from "./task-dialog";
@@ -15,22 +17,60 @@ export default function TaskHistoryDialog({
   tasks?: z.infer<typeof taskSchema>[];
   children?: React.ReactNode;
 }) {
+  const [viewportElement, setViewportElement] = useState<HTMLDivElement | null>(null);
+  const [open, setOpen] = useState(false);
+
+  const viewportRef = useCallback((node: HTMLDivElement | null) => {
+    setViewportElement((prev) => (prev === node ? prev : node));
+  }, []);
+
+  const rowVirtualizer = useVirtualizer({
+    count: tasks?.length ?? 0,
+    getScrollElement: () => viewportElement,
+    estimateSize: () => 82,
+    overscan: 3,
+  });
+
   if (!tasks?.length) return null;
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
+
       <DialogContent className="bg-zinc-800 p-3">
         <DialogTitle className="text-center font-semibold text-xl">{title}</DialogTitle>
-        {tasks && tasks.length > 0 && (
-          <ScrollArea className="max-h-[50vh] rounded-2xl bg-zinc-900 p-3">
-            {tasks?.map((task) => (
-              <TaskDialog key={task._id} roomId={task.classroomId} existingTask={task}>
-                <TaskCard task={task} />
-              </TaskDialog>
-            ))}
-          </ScrollArea>
-        )}
+
+        <ScrollArea className="max-h-[50vh] rounded-2xl bg-zinc-900 p-3" viewportRef={viewportRef}>
+          <div
+            style={{
+              height: `${rowVirtualizer.getTotalSize()}px`,
+              position: "relative",
+            }}
+          >
+            {rowVirtualizer.getVirtualItems().map((virtualItem) => {
+              const task = tasks[virtualItem.index];
+              if (!task) return null;
+
+              return (
+                <div
+                  key={virtualItem.key}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: `${virtualItem.size}px`,
+                    transform: `translateY(${virtualItem.start}px)`,
+                  }}
+                >
+                  <TaskDialog roomId={task.classroomId} existingTask={task}>
+                    <TaskCard task={task} />
+                  </TaskDialog>
+                </div>
+              );
+            })}
+          </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
