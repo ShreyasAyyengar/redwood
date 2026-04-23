@@ -4,7 +4,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwo
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { CalendarDays, ClipboardClock, UserCog } from "lucide-react";
 import type { z } from "zod";
-import { monthNames, nth } from "../../../../util/date-time-utils";
+import { formatDate, getDateTimeDisplay } from "../../../../util/date-time-utils";
 import MaintenanceDialog from "./maintenance/maintenance-dialog";
 
 export default function MaintenanceHistory({
@@ -26,9 +26,9 @@ export default function MaintenanceHistory({
           <div className="mt-1 space-y-2">
             {history?.map((entry) => {
               const date = new Date(entry.date);
-              const monthName = monthNames[date.getMonth()];
-              const day = date.getDate();
-              const dayEnding = nth(day);
+              const formatDateShort = formatDate(date);
+              const { dateAbsolute } = getDateTimeDisplay(date);
+
               const who = entry.completedBy.split("@")[0];
 
               const microphoneEntries = entry.microphone ? Object.entries(entry.microphone) : [];
@@ -65,7 +65,7 @@ export default function MaintenanceHistory({
                     <TooltipTrigger asChild>
                       <div
                         className={cn(
-                          "group relative cursor-pointer overflow-hidden rounded-xl border bg-neutral-800/70 px-3 pt-3",
+                          "group relative cursor-pointer overflow-hidden rounded-xl border bg-neutral-800/70 px-3 py-3",
                           "shadow-sm transition-all duration-200 hover:bg-neutral-800/90 hover:shadow-md",
                           "duration-150 active:scale-95 active:transform",
                           overallTone
@@ -77,10 +77,17 @@ export default function MaintenanceHistory({
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
                               <CalendarDays className="size-5 text-neutral-400" />
-                              <div className="font-semibold text-base text-neutral-100 sm:text-lg">
-                                {monthName} {day}
-                                {dayEnding}
-                              </div>
+
+                              <Tooltip>
+                                <TooltipProvider>
+                                  <TooltipTrigger asChild>
+                                    <div className="font-semibold text-base text-neutral-100 sm:text-lg">{formatDateShort}</div>
+                                  </TooltipTrigger>
+                                  <TooltipContent className="bg-zinc-900 fill-zinc-900" tooltipArrowClassName="bg-zinc-900 fill-zinc-900">
+                                    <p className="font-bold text-neutral-300 text-sm">{dateAbsolute}</p>
+                                  </TooltipContent>
+                                </TooltipProvider>
+                              </Tooltip>
                             </div>
 
                             <div className="mt-1 flex items-center gap-1 text-neutral-400 text-xs sm:text-sm">
@@ -97,6 +104,7 @@ export default function MaintenanceHistory({
                                 clean pass
                               </span>
                             )}
+
                             {hasIssues && (
                               <div className="flex text-sm">
                                 <span className="rounded-md rounded-r-none border border-red-500/30 border-r-0 bg-red-500/15 px-2 py-0.5 font-semibold text-[11px] text-red-300">
@@ -144,42 +152,46 @@ export default function MaintenanceHistory({
                           </div>
                         </div>
 
-                        <div className="mt-3 flex w-fit flex-col flex-wrap space-y-1.5">
-                          {/* Not entirely useful */}
-                          {/*<span*/}
-                          {/*  className={cn(*/}
-                          {/*    "rounded-md px-2 py-1 font-semibold text-[11px]",*/}
-                          {/*    entry.surfacesWiped ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"*/}
-                          {/*  )}*/}
-                          {/*>*/}
-                          {/*  Surfaces {entry.surfacesWiped ? "wiped" : "not wiped"}*/}
-                          {/*</span>*/}
-
-                          {/*<span*/}
-                          {/*  className={cn(*/}
-                          {/*    "rounded-md px-2 py-1 font-semibold text-[11px]",*/}
-                          {/*    entry.equipmentChecked ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"*/}
-                          {/*  )}*/}
-                          {/*>*/}
-                          {/*  Equipment {entry.equipmentChecked ? "checked" : "not checked"}*/}
-                          {/*</span>*/}
-
-                          {entry.microphone && (
-                            <span className="w-fit rounded-md bg-neutral-700/70 px-2 py-1 font-semibold text-[11px] text-neutral-200">
-                              Mic checked
-                            </span>
+                        <div className="flex w-fit flex-col flex-wrap space-y-1.5">
+                          {(!entry.surfacesWiped || !entry.equipmentChecked) && (
+                            <div className="mt-3 flex items-center gap-2">
+                              <span
+                                className={cn(
+                                  "w-fit rounded-md px-2 py-1 font-semibold text-[11px]",
+                                  entry.surfacesWiped ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"
+                                )}
+                              >
+                                Surfaces {entry.surfacesWiped ? "wiped" : "not wiped"}
+                              </span>
+                              <span
+                                className={cn(
+                                  "w-fit rounded-md px-2 py-1 font-semibold text-[11px]",
+                                  entry.equipmentChecked ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"
+                                )}
+                              >
+                                Equipment {entry.equipmentChecked ? "checked" : "not checked"}
+                              </span>
+                            </div>
                           )}
 
-                          {entry.dten && (
-                            <span className="w-fit rounded-md bg-neutral-700/70 px-2 py-1 font-semibold text-[11px] text-neutral-200">
-                              DTEN checked
-                            </span>
+                          {(entry.microphone || entry.dten) && (
+                            <div className="flex items-center gap-2">
+                              {entry.microphone && (
+                                <span className="w-fit rounded-md bg-neutral-700/70 px-2 py-1 font-semibold text-[11px] text-neutral-200">
+                                  Mic checked
+                                </span>
+                              )}
+                              {entry.dten && (
+                                <span className="w-fit rounded-md bg-neutral-700/70 px-2 py-1 font-semibold text-[11px] text-neutral-200">
+                                  DTEN checked
+                                </span>
+                              )}
+                            </div>
                           )}
                         </div>
                       </div>
                     </TooltipTrigger>
                   </MaintenanceDialog>
-                  <TooltipContent className="font-bold">View Maintenance Log</TooltipContent>
                 </Tooltip>
               );
             })}
