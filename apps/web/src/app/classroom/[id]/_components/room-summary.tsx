@@ -1,11 +1,16 @@
 import type { classroomSchema } from "@redwood/contracts";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwood/shad-ui/components/tooltip";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { Bug, Building2, Info, SquareCheckBig, Wrench } from "lucide-react";
-import { useEffect } from "react";
 import type { z } from "zod";
-import { daysAgo, monthNames, nth } from "../../../../util/date-time-utils";
+import { daysAgoRelative, formatDateAbsolute } from "../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../util/style-util";
 import MaintenanceDialog from "./maintenance/maintenance-dialog";
+
+type LastServiced = {
+  lastServicedAbsolute: string;
+  lastServicedDaysAgo: string;
+} | null;
 
 export default function RoomSummary({
   room,
@@ -16,20 +21,15 @@ export default function RoomSummary({
   issueCount: number;
   taskCount: number;
 }) {
-  let lastServiced: string | undefined;
-  let lastServicedDaysAgo: number | undefined;
+  let lastServiced: LastServiced = null;
+
   if (room.lastMaintenance) {
     const date = new Date(room.lastMaintenance.date);
-    const monthName = monthNames[date.getMonth()];
-    const day = date.getDate();
-    const dayEnding = nth(day);
-    lastServiced = `${monthName} ${day}${dayEnding}`;
-    lastServicedDaysAgo = daysAgo(date);
+    lastServiced = {
+      lastServicedAbsolute: formatDateAbsolute(date),
+      lastServicedDaysAgo: daysAgoRelative(date),
+    };
   }
-
-  useEffect(() => {
-    console.log(lastServiced, lastServicedDaysAgo);
-  }, []);
 
   const roomStateBadge = (
     <div
@@ -69,9 +69,19 @@ export default function RoomSummary({
           <div className="flex items-center font-bold text-neutral-400 text-sm">Last Serviced</div>
           <div className="flex items-center font-normal text-sm text-white/80">
             <div className="flex gap-1">
-              {lastServiced &&
-                `${lastServiced} ${lastServicedDaysAgo !== undefined && `• ${lastServicedDaysAgo} day${lastServicedDaysAgo === 1 ? "" : "s"} ago`}`}
               {!lastServiced && "No Record Yet"}
+              {lastServiced && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="flex items-center text-sm capitalize">{lastServiced.lastServicedDaysAgo}</span>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-zinc-900 fill-zinc-900" tooltipArrowClassName="bg-zinc-900 fill-zinc-900">
+                      <p className="font-bold text-neutral-300 text-sm">{lastServiced.lastServicedAbsolute}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
               {lastServiced && <div className="flex items-center text-sm">• {room.lastMaintenance?.by.split("@")[0]}</div>}
             </div>
           </div>

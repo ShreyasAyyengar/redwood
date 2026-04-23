@@ -6,19 +6,22 @@ import type { z } from "zod";
 import {
   convertMinutesToReadable,
   dayAvailability,
-  daysAgo as daysAgoUtil,
+  daysAgoNumeric,
   getBlocksForToday,
   getCaliClock,
+  getDateTimeDisplay,
 } from "../../../util/date-time-utils";
 import { urgencyStyle } from "../../../util/style-util";
 
 export default function RoomCard({ room }: { room: z.infer<typeof classroomSchema> }) {
   const router = useRouter();
-  const lastServiced = () => {
+
+  const lastServicedDisplay = () => {
     if (!room.lastMaintenance) return <div className="text-center text-foreground text-lg">No Record Yet</div>;
 
     const date = new Date(room.lastMaintenance.date);
-    const daysAgo = daysAgoUtil(date);
+    const daysAgo = daysAgoNumeric(date);
+    const { dateDaysAgo } = getDateTimeDisplay(date);
 
     return (
       <span
@@ -29,7 +32,8 @@ export default function RoomCard({ room }: { room: z.infer<typeof classroomSchem
           daysAgo > 21 && urgencyStyle("red")
         )}
       >
-        {`${daysAgo} day${daysAgo === 1 ? "" : "s"} ago • ${daysAgo <= 14 ? "Up to Date" : daysAgo <= 21 ? "Pending" : "Overdue"}`}
+        <span className="capitalize">{dateDaysAgo}</span>
+        {` • ${daysAgo <= 14 ? "Up to Date" : daysAgo <= 21 ? "Pending" : "Overdue"}`}
       </span>
     );
   };
@@ -96,7 +100,7 @@ export default function RoomCard({ room }: { room: z.infer<typeof classroomSchem
         <div className="flex w-full justify-between">
           <div className="flex flex-col items-start">
             <span className="text-sm">Last Serviced:</span>
-            <span>{lastServiced()}</span>
+            <span>{lastServicedDisplay()}</span>
           </div>
 
           <div className="flex items-center gap-2">

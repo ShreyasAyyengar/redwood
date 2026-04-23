@@ -2,7 +2,7 @@ import type { classroomSchemaPayload } from "@redwood/contracts";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import type { Row } from "@tanstack/react-table";
 import type { z } from "zod";
-import { daysAgo as daysAgoUtil, monthNames, nth } from "../../../../util/date-time-utils";
+import { daysAgoNumeric, formatDate, getDateTimeDisplay, monthNames, nth } from "../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../util/style-util";
 
 export default function LastServicedCell({ row }: { row: Row<z.infer<typeof classroomSchemaPayload>> }) {
@@ -10,13 +10,16 @@ export default function LastServicedCell({ row }: { row: Row<z.infer<typeof clas
   if (!lastMaintenance) return <div className="text-center text-foreground text-lg">No Record Yet</div>;
 
   const date = new Date(lastMaintenance.date);
+  const formatDateShort = formatDate(date);
 
   const month = date.getMonth();
   const monthName = monthNames[month];
   const day = date.getDate();
   const dayEnding = nth(day);
 
-  const daysAgo = daysAgoUtil(date);
+  const daysAgo = daysAgoNumeric(date);
+
+  const { dateDaysAgo } = getDateTimeDisplay(date);
 
   return (
     <div className="flex flex-col">
@@ -30,11 +33,12 @@ export default function LastServicedCell({ row }: { row: Row<z.infer<typeof clas
             daysAgo > 21 && urgencyStyle("red")
           )}
         >
-          {`${daysAgo} day${daysAgo === 1 ? "" : "s"} ago • ${daysAgo <= 14 ? "Up to Date" : daysAgo <= 21 ? "Pending" : "Overdue"}`}
+          <span className="capitalize">{dateDaysAgo}</span>
+          {` • ${daysAgo <= 14 ? "Up to Date" : daysAgo <= 21 ? "Pending" : "Overdue"}`}
         </span>
       </div>
 
-      <div className={cn("mt-1 text-center")}>{`${monthName} ${day}${dayEnding} • ${lastMaintenance.by.split("@")[0]}`}</div>
+      <div className={cn("mt-1 text-center")}>{`${formatDateShort} • ${lastMaintenance.by.split("@")[0]}`}</div>
     </div>
   );
 }

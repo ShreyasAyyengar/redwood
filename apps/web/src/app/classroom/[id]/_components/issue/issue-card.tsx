@@ -1,18 +1,19 @@
 import type { issueSchema } from "@redwood/contracts";
 import { Badge } from "@redwood/shad-ui/components/badge";
 import { Card } from "@redwood/shad-ui/components/card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwood/shad-ui/components/tooltip";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { AlertTriangle, Check, Flag, UserPen } from "lucide-react";
 import { forwardRef } from "react";
 import type { z } from "zod";
-import { daysAgo as daysAgoUtil } from "../../../../../util/date-time-utils";
+import { type DateTimeDisplay, getDateTimeDisplay } from "../../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../../util/style-util";
 
 export const IssueCard = forwardRef<HTMLDivElement, { issue: z.infer<typeof issueSchema> } & React.HTMLAttributes<HTMLDivElement>>(
   ({ issue, ...props }, ref) => {
-    const daysAgo = daysAgoUtil(issue.issue.reportedAt);
-    const editDaysAgo = issue.edited && daysAgoUtil(issue.edited.editDate);
-    const resolutionDaysAgo = issue.resolution && daysAgoUtil(issue.resolution.resolvedAt);
+    const reportedDateDisplay: DateTimeDisplay = getDateTimeDisplay(issue.issue.reportedAt);
+    const resolutionDateDisplay: DateTimeDisplay | undefined = issue.resolution && getDateTimeDisplay(issue.resolution.resolvedAt);
+    const editedDateDisplay: DateTimeDisplay | undefined = issue.edited && getDateTimeDisplay(issue.edited.editDate);
 
     return (
       <Card
@@ -47,9 +48,16 @@ export const IssueCard = forwardRef<HTMLDivElement, { issue: z.infer<typeof issu
               {issue.resolution && (
                 <div className="flex items-center gap-1 text-sm">
                   <Check className="h-5 w-5 text-emerald-400" />
-                  <span>
-                    Resolved {resolutionDaysAgo === 0 ? "today" : resolutionDaysAgo === 1 ? "yesterday" : `${resolutionDaysAgo} days ago`}
-                  </span>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>Resolved {resolutionDateDisplay?.dateDaysAgo}</span>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-zinc-800 fill-zinc-800" tooltipArrowClassName="bg-zinc-800 fill-zinc-800">
+                        <p className="font-bold text-neutral-300 text-sm">{resolutionDateDisplay?.dateAbsolute}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                   <span className="text-zinc-700">•</span>
                   <span>by {issue.resolution.resolvedBy.split("@")[0]}</span>
                 </div>
@@ -57,7 +65,16 @@ export const IssueCard = forwardRef<HTMLDivElement, { issue: z.infer<typeof issu
 
               <div className="flex items-center gap-1 text-sm">
                 <Flag className="h-5 w-5 text-indigo-300" />
-                <span>Reported {daysAgo === 0 ? "today" : daysAgo === 1 ? "yesterday" : `${daysAgo} days ago`}</span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span>Reported {reportedDateDisplay.dateDaysAgo}</span>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-zinc-800 fill-zinc-800" tooltipArrowClassName="bg-zinc-800 fill-zinc-800">
+                      <p className="font-bold text-neutral-300 text-sm">{reportedDateDisplay.dateAbsolute}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
                 <span className="text-zinc-700">•</span>
                 <span>by {issue.issue.reportedBy.split("@")[0]}</span>
               </div>
@@ -65,7 +82,16 @@ export const IssueCard = forwardRef<HTMLDivElement, { issue: z.infer<typeof issu
               {issue.edited && (
                 <div className="flex items-center gap-1 text-sm">
                   <UserPen className="h-5 w-5 text-neutral-400" />
-                  <span>Edited {editDaysAgo === 0 ? "today" : editDaysAgo === 1 ? "yesterday" : `${editDaysAgo} days ago`}</span>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>Edited {editedDateDisplay?.dateDaysAgo}</span>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-zinc-800 fill-zinc-800" tooltipArrowClassName="bg-zinc-800 fill-zinc-800">
+                        <p className="font-bold text-neutral-300 text-sm">{editedDateDisplay?.dateAbsolute}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                   <span className="text-zinc-700">•</span>
                   <span>by {issue.edited.editedBy.split("@")[0]}</span>
                 </div>

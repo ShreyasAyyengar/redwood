@@ -1,19 +1,21 @@
 import type { taskSchema } from "@redwood/contracts";
 import { Badge } from "@redwood/shad-ui/components/badge";
 import { Card } from "@redwood/shad-ui/components/card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwood/shad-ui/components/tooltip";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { Check, ClipboardClock, ClipboardList, Flag, UserPen } from "lucide-react";
 import type React from "react";
 import { forwardRef } from "react";
 import type { z } from "zod";
-import { daysAgo as daysAgoUtil } from "../../../../../util/date-time-utils";
+import { type DateTimeDisplay, daysAgoRelative as daysAgoUtil, getDateTimeDisplay } from "../../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../../util/style-util";
 
 export const TaskCard = forwardRef<HTMLDivElement, { task: z.infer<typeof taskSchema> } & React.HTMLAttributes<HTMLDivElement>>(
   ({ task, ...props }, ref) => {
-    const daysAgo = daysAgoUtil(task.task.createdAt);
-    const editDaysAgo = task.edited && daysAgoUtil(task.edited.editDate);
-    const completionDaysAgo = task.completion && daysAgoUtil(task.completion.completedAt);
+    const reportedDateDisplay: DateTimeDisplay = getDateTimeDisplay(task.task.createdAt);
+    const completionDateDisplay: DateTimeDisplay | undefined = task.completion && getDateTimeDisplay(task.completion.completedAt);
+    const editDateDisplay: DateTimeDisplay | undefined = task.edited && getDateTimeDisplay(task.edited.editDate);
+    const visibleDateDisplay: DateTimeDisplay | undefined = task.task.visibleAt && getDateTimeDisplay(task.task.visibleAt);
 
     const isOverdue = task.task.completeBy && Date.now() > new Date(task.task.completeBy).getTime();
     const isVisible = !task.task.visibleAt || task.task.visibleAt.getTime() <= Date.now();
@@ -52,9 +54,16 @@ export const TaskCard = forwardRef<HTMLDivElement, { task: z.infer<typeof taskSc
               {task.completion && (
                 <div className="flex items-center gap-1 text-sm">
                   <Check className="h-5 w-5 text-emerald-400" />
-                  <span>
-                    Completed {completionDaysAgo === 0 ? "today" : completionDaysAgo === 1 ? "yesterday" : `${completionDaysAgo} days ago`}
-                  </span>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>Completed {completionDateDisplay?.dateDaysAgo}</span>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-zinc-800 fill-zinc-800" tooltipArrowClassName="bg-zinc-800 fill-zinc-800">
+                        <p className="font-bold text-neutral-300 text-sm">{completionDateDisplay?.dateAbsolute}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                   <span className="text-zinc-700">•</span>
                   <span>by {task.completion.completedBy.split("@")[0]}</span>
                 </div>
@@ -62,7 +71,16 @@ export const TaskCard = forwardRef<HTMLDivElement, { task: z.infer<typeof taskSc
 
               <div className="flex items-center gap-1 text-sm">
                 <Flag className="h-5 w-5 text-indigo-300" />
-                <span>Created {daysAgo === 0 ? "today" : daysAgo === 1 ? "yesterday" : `${daysAgo} days ago`}</span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span>Created {reportedDateDisplay.dateDaysAgo}</span>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-zinc-800 fill-zinc-800" tooltipArrowClassName="bg-zinc-800 fill-zinc-800">
+                      <p className="font-bold text-neutral-300 text-sm">{reportedDateDisplay.dateAbsolute}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
                 <span className="text-zinc-700">•</span>
                 <span>by {task.task.createdBy.split("@")[0]}</span>
               </div>
@@ -70,14 +88,32 @@ export const TaskCard = forwardRef<HTMLDivElement, { task: z.infer<typeof taskSc
               {!isVisible && (
                 <div className="flex items-center gap-1 text-sm">
                   <ClipboardClock className="h-5 w-5 text-neutral-400" />
-                  <span>Visible in {visibleIn} days</span>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>Visible {visibleDateDisplay?.dateDaysAgo}</span>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-zinc-800 fill-zinc-800" tooltipArrowClassName="bg-zinc-800 fill-zinc-800">
+                        <p className="font-bold text-neutral-300 text-sm">{visibleDateDisplay?.dateAbsolute}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               )}
 
               {task.edited && (
                 <div className="flex items-center gap-1 text-sm">
                   <UserPen className="h-5 w-5 text-neutral-400" />
-                  <span>Edited {editDaysAgo === 0 ? "today" : editDaysAgo === 1 ? "yesterday" : `${editDaysAgo} days ago`}</span>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>Edited {editDateDisplay?.dateDaysAgo}</span>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-zinc-800 fill-zinc-800" tooltipArrowClassName="bg-zinc-800 fill-zinc-800">
+                        <p className="font-bold text-neutral-300 text-sm">{editDateDisplay?.dateAbsolute}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                   <span className="text-zinc-700">•</span>
                   <span>by {task.edited.editedBy.split("@")[0]}</span>
                 </div>

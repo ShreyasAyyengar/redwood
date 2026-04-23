@@ -76,6 +76,7 @@ export function getBlocksForToday(schedule: z.infer<typeof scheduleSchema>, week
   return schedule?.[weekdayKey] ?? [];
 }
 
+// converts minutes after midnight to a readable time
 export function convertMinutesToReadable(minutes: number): string {
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
@@ -84,6 +85,55 @@ export function convertMinutesToReadable(minutes: number): string {
   return `${displayHours}:${mins.toString().padStart(2, "0")} ${period}`;
 }
 
-export function daysAgo(date: Date): number {
+export type DateTimeDisplay = {
+  dateAbsolute: string;
+  dateDaysAgo: string;
+};
+
+export function getDateTimeDisplay(date: Date): DateTimeDisplay {
+  return {
+    dateAbsolute: formatDateAbsolute(date),
+    dateDaysAgo: daysAgoRelative(date),
+  };
+}
+
+export function daysAgoNumeric(date: Date): number {
   return Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+export function daysAgoRelative(date: Date): string {
+  const number = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+
+  switch (number) {
+    case -1:
+      return "tomorrow";
+    case 0:
+      return "today";
+    case 1:
+      return "yesterday";
+    default:
+      return `${Math.abs(number)} days ${number > 0 ? "ago" : "from now"}`;
+  }
+}
+
+export function formatDate(date: Date): string {
+  const monthName = monthNames[date.getMonth()];
+  const day = date.getDate();
+  const dayEnding = nth(day);
+  return `${monthName} ${day}${dayEnding}`;
+}
+
+export function formatDateAbsolute(date: Date): string {
+  const weekday = date.toLocaleDateString("en-GB", { weekday: "long" });
+  const day = date.getDate();
+  const month = date.toLocaleDateString("en-GB", { month: "long" });
+  const year = date.getFullYear();
+
+  const time = date.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  return `${weekday}, ${day} ${month} ${year} at ${time}`;
 }
