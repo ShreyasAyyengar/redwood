@@ -7,6 +7,7 @@ import IssueHistoryDialog from "../../../classroom/[id]/_components/issue/issue-
 export default function IssueOverview() {
   const { data: issues = [], isFetching } = useQuery(
     webClientORPC.issues.getAllIssues.queryOptions({
+      input: {},
       staleTime: 60_000,
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,

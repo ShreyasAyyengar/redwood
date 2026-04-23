@@ -8,6 +8,7 @@ import TaskHistoryDialog from "../../../classroom/[id]/_components/task/task-his
 export default function TaskOverview() {
   const { data: tasks = [], isFetching } = useQuery(
     webClientORPC.tasks.getAllTasks.queryOptions({
+      input: {},
       staleTime: 60_000,
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
