@@ -29,6 +29,7 @@ export default function TaskHistoryDialog({
     getScrollElement: () => viewportElement,
     estimateSize: () => 82,
     overscan: 3,
+    getItemKey: (index) => tasks?.[index]?._id ?? index,
   });
 
   if (!tasks?.length) return null;
@@ -54,14 +55,15 @@ export default function TaskHistoryDialog({
               return (
                 <div
                   key={virtualItem.key}
+                  data-index={virtualItem.index}
                   style={{
                     position: "absolute",
                     top: 0,
                     left: 0,
                     width: "100%",
-                    height: `${virtualItem.size}px`,
                     transform: `translateY(${virtualItem.start}px)`,
                   }}
+                  ref={rowVirtualizer.measureElement}
                 >
                   <TaskDialog roomId={task.classroomId} existingTask={task}>
                     <TaskCard task={task} />

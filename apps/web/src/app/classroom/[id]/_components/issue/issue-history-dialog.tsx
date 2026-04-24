@@ -29,6 +29,7 @@ export default function IssueHistoryDialog({
     getScrollElement: () => viewportElement,
     estimateSize: () => 82,
     overscan: 3,
+    getItemKey: (index) => issues?.[index]?._id ?? index,
   });
 
   if (!issues?.length) return null;
@@ -54,14 +55,15 @@ export default function IssueHistoryDialog({
               return (
                 <div
                   key={virtualItem.key}
+                  data-index={virtualItem.index}
                   style={{
                     position: "absolute",
                     top: 0,
                     left: 0,
                     width: "100%",
-                    height: `${virtualItem.size}px`,
                     transform: `translateY(${virtualItem.start}px)`,
                   }}
+                  ref={rowVirtualizer.measureElement}
                 >
                   <IssueDialog roomId={issue.classroomId} existingIssue={issue}>
                     <IssueCard issue={issue} />
