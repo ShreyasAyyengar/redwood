@@ -1,29 +1,5 @@
 import z from "zod";
 
-export const VALID_MIME_TYPES = ["image/jpeg", "image/png", "image/heic", "image/heif", "video/mp4", "video/quicktime"] as const;
-
-export const fileUploadSchema = z.object({
-  id: z.uuid(),
-  file: z.file("Invalid file."),
-  mimeType: z.enum(VALID_MIME_TYPES, "Invalid file type."),
-});
-
-export const uploadPhotoInput = z.object({
-  id: z.uuidv7(),
-  file: z.file("Invalid file."),
-});
-
-// Valid MIME types for uploaded files: JPEG, PNG, WebP, GIF, AVIF, TIFF and SVG
-export const VALID_PHOTO_MIME_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-  "image/avif",
-  "image/tiff",
-  "image/svg+xml",
-] as const;
-
 export const commonAdminNotesSchema = z.enum(["Escalated to MSE"]);
 
 const issueDetailsSchema = z.object({
@@ -59,7 +35,7 @@ export const issueSchema = z.object({
   edited: issueEditSchema.optional(),
   resolution: issueResolutionSchema.optional(),
 
-  adminNotes: z.array(z.union([commonAdminNotesSchema, z.string()])),
+  adminNotes: z.array(z.union([commonAdminNotesSchema, z.string()])), // TODO remove
   files: z.array(z.uuid()).optional(),
 });
 
