@@ -189,43 +189,45 @@ export default function MaintenanceHistory({
                             </div>
                           </div>
 
-                          <div className="flex w-fit flex-col flex-wrap space-y-1.5">
-                            {(!entry.surfacesWiped || !entry.equipmentChecked) && (
-                              <div className="mt-3 flex items-center gap-2">
-                                <span
-                                  className={cn(
-                                    "w-fit rounded-md px-2 py-1 font-semibold text-[11px]",
-                                    entry.surfacesWiped ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"
-                                  )}
-                                >
-                                  Surfaces {entry.surfacesWiped ? "wiped" : "not wiped"}
-                                </span>
-                                <span
-                                  className={cn(
-                                    "w-fit rounded-md px-2 py-1 font-semibold text-[11px]",
-                                    entry.equipmentChecked ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"
-                                  )}
-                                >
-                                  Equipment {entry.equipmentChecked ? "checked" : "not checked"}
-                                </span>
-                              </div>
-                            )}
+                          {(!entry.surfacesWiped || !entry.equipmentChecked || entry.microphone || entry.dten) && (
+                            <div className="mt-2 flex w-fit flex-col flex-wrap space-y-1.5">
+                              {(!entry.surfacesWiped || !entry.equipmentChecked) && (
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className={cn(
+                                      "w-fit rounded-md px-2 py-1 font-semibold text-[11px]",
+                                      entry.surfacesWiped ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"
+                                    )}
+                                  >
+                                    Surfaces {entry.surfacesWiped ? "wiped" : "not wiped"}
+                                  </span>
+                                  <span
+                                    className={cn(
+                                      "w-fit rounded-md px-2 py-1 font-semibold text-[11px]",
+                                      entry.equipmentChecked ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"
+                                    )}
+                                  >
+                                    Equipment {entry.equipmentChecked ? "checked" : "not checked"}
+                                  </span>
+                                </div>
+                              )}
 
-                            {(entry.microphone || entry.dten) && (
-                              <div className="flex items-center gap-2">
-                                {entry.microphone && (
-                                  <span className="w-fit rounded-md bg-neutral-700/70 px-2 py-1 font-semibold text-[11px] text-neutral-200">
-                                    Mic checked
-                                  </span>
-                                )}
-                                {entry.dten && (
-                                  <span className="w-fit rounded-md bg-neutral-700/70 px-2 py-1 font-semibold text-[11px] text-neutral-200">
-                                    DTEN checked
-                                  </span>
-                                )}
-                              </div>
-                            )}
-                          </div>
+                              {(entry.microphone || entry.dten) && (
+                                <div className="flex items-center gap-2">
+                                  {entry.microphone && (
+                                    <span className="w-fit rounded-md bg-neutral-700/70 px-2 py-1 font-semibold text-[11px] text-neutral-200">
+                                      Mic checked
+                                    </span>
+                                  )}
+                                  {entry.dten && (
+                                    <span className="w-fit rounded-md bg-neutral-700/70 px-2 py-1 font-semibold text-[11px] text-neutral-200">
+                                      DTEN checked
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </TooltipTrigger>
                     </MaintenanceDialog>
