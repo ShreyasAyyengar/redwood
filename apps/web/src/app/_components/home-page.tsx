@@ -2,11 +2,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@redwood/shad-ui/compo
 import Image from "next/image";
 import { authClientWeb } from "../../lib/auth-client-web";
 import AdminPanel from "./admin/admin-panel";
+import { IssuesFeed } from "./issues-feed/issues-feed";
 import RoomList from "./list/room-list";
 import { useFetchedRoomsStore } from "./room-store";
 import { columns } from "./table/columns";
 import Filters from "./table/filters";
 import { RoomTable } from "./table/room-table";
+import { TasksFeed } from "./tasks-feed/tasks-feed";
 
 export default function HomePage() {
   const { fetchedRooms } = useFetchedRoomsStore();
@@ -47,15 +49,17 @@ export default function HomePage() {
             </div>
           </TabsContent>
 
+          {/* TODO: revamp all of this */}
           <TabsContent value="issues" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
-            <div className="flex w-full flex-1 items-center justify-center overflow-hidden p-5">
-              <h1>Issues</h1>
+            <div className="flex w-full flex-1 overflow-hidden p-5">
+              <IssuesFeed />
             </div>
           </TabsContent>
 
+          {/* TODO: revamp all of this */}
           <TabsContent value="tasks" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
-            <div className="flex w-full flex-1 items-center justify-center overflow-hidden p-5">
-              <h1>Tasks</h1>
+            <div className="flex w-full flex-1 overflow-hidden p-5">
+              <TasksFeed />
             </div>
           </TabsContent>
 
