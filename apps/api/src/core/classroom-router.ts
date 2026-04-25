@@ -116,7 +116,7 @@ export const classroomRouter = {
         classroomId: { $in: rooms.map((r) => r._id) },
 
         // 1) no resolution
-        resolution: { $exists: false },
+        completion: { $exists: false },
 
         // 2) visibleAt missing OR already in the past
         $or: [{ visibleAt: { $exists: false } }, { visibleAt: { $lte: new Date() } }],

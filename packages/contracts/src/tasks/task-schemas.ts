@@ -37,7 +37,7 @@ export const uiTaskFormSchema = z.object({
   completeBy: z.coerce.date().optional(),
   createdBy: z.string().email().optional(),
 
-  // resolution
+  // completion
   completion: z
     .object({
       comment: z.string().optional(),
