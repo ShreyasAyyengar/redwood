@@ -120,7 +120,7 @@ export const classroomRouter = {
 
         // 2) visibleAt missing OR already in the past
         $or: [{ visibleAt: { $exists: false } }, { visibleAt: { $lte: new Date() } }],
-      });
+      }).lean();
 
       return rooms.map((room) => ({
         ...room,
