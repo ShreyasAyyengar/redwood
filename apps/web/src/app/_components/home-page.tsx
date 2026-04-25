@@ -30,7 +30,7 @@ export default function HomePage() {
       {/* Desktop Layout - Hidden below lg */}
       <div className="hidden h-screen flex-col items-center justify-center font-sans text-white lg:flex">
         <div className="flex items-center gap-5">
-          <Image src="/redwood-icon.png" alt="Redwood Logo" height={32} width={32} />
+          <Image src="/redwood-icon.png" alt="Redwood Logo" className="h-8 w-8" height={32} width={32} />
           <p className="my-5 text-center font-bold text-3xl">Redwood</p>
         </div>
 
