@@ -93,7 +93,7 @@ export const classroomRouter = {
         {},
         { $set: { "csvRecords.fileName": input.csvFile.name, "csvRecords.dateUploaded": new Date() } },
         { new: true }
-      );
+      ).lean();
 
       return true;
     } catch (e) {

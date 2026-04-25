@@ -99,7 +99,7 @@ export const issueRouter = {
     if (!isValid.success) throw errors.INTERNAL_SERVER_ERROR({ data: { message: isValid.error.message } });
 
     try {
-      await IssueService.replaceOne({ _id: input._id }, updatedIssue);
+      await IssueService.replaceOne({ _id: input._id }, updatedIssue).lean();
 
       // biome-ignore lint/complexity/noVoid: fire-and-forget
       void recomputeRoomStatus(updatedIssue.classroomId);
@@ -115,7 +115,7 @@ export const issueRouter = {
     if (!issue) throw errors.NOT_FOUND({ data: { message: `Issue with id ${input.issueId} not found` } });
 
     try {
-      await IssueService.findByIdAndDelete(input.issueId);
+      await IssueService.findByIdAndDelete(input.issueId).lean();
 
       // biome-ignore lint/complexity/noVoid: fire-and-forget
       void recomputeRoomStatus(issue.classroomId);
@@ -145,7 +145,7 @@ async function recomputeRoomStatus(classroomId: string) {
 
     if (currentStatus === "GOOD" && issues.length > 0) currentStatus = "NEEDS ATTENTION";
 
-    await ClassroomService.updateOne({ _id: classroomId }, { roomStatus: currentStatus });
+    await ClassroomService.updateOne({ _id: classroomId }, { roomStatus: currentStatus }).lean();
   } catch (e) {
     console.error("Failed to recompute room status:", e);
   }

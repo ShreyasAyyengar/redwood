@@ -6,20 +6,19 @@ import { TaskService } from "../database/task-service";
 import { protectedProcedure } from "../libs/orpc-procedures";
 
 export const taskRouter = {
-  getTasks: protectedProcedure.tasks.getTasks.handler(async ({ input, errors }) => {
+  getTasks: protectedProcedure.tasks.getTasks.handler(({ input, errors }) => {
     const { classroomId } = input;
-    const tasks = await TaskService.find({ classroomId }).sort({ createdAt: -1 });
-    return tasks;
+    return TaskService.find({ classroomId }).lean().sort({ createdAt: -1 });
   }),
 
   getAllTasks: protectedProcedure.tasks.getAllTasks.handler(({ input, errors }) => {
     const { openOnly } = input;
     const query = openOnly ? { completion: { $exists: false } } : {};
-    return TaskService.find(query).sort({ createdAt: -1 });
+    return TaskService.find(query).lean().sort({ createdAt: -1 });
   }),
 
   addTask: protectedProcedure.tasks.addTask.handler(async ({ input, errors, context }) => {
-    const classroom = await ClassroomService.findById(input.classroomId);
+    const classroom = await ClassroomService.findById(input.classroomId).lean();
     if (!classroom) throw errors.NOT_FOUND({ data: { message: `Classroom with id ${input.classroomId} not found` } });
 
     if (!classroom.isActive) throw errors.UNPROCESSABLE_CONTENT({ data: { message: `Classroom ${input.classroomId} is not active.` } });
@@ -87,7 +86,7 @@ export const taskRouter = {
     if (!isValid.success) throw errors.INTERNAL_SERVER_ERROR({ data: { message: isValid.error.message } });
 
     try {
-      await TaskService.replaceOne({ _id: input._id }, updatedTask);
+      await TaskService.replaceOne({ _id: input._id }, updatedTask).lean();
       return true;
     } catch (e) {
       throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
@@ -99,7 +98,7 @@ export const taskRouter = {
     if (!task) throw errors.NOT_FOUND({ data: { message: `Task with id ${input.taskId} not found` } });
 
     try {
-      await TaskService.findByIdAndDelete(input.taskId);
+      await TaskService.findByIdAndDelete(input.taskId).lean();
       return true;
     } catch (e) {
       throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });

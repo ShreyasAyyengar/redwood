@@ -7,7 +7,7 @@ import { protectedProcedure } from "../libs/orpc-procedures";
 
 export const maintenanceRouter = {
   addMaintenanceEntry: protectedProcedure.maintenance.addMaintenanceEntry.handler(async ({ input, errors, context }) => {
-    const classroom = await ClassroomService.findById(input.classroomId);
+    const classroom = await ClassroomService.findById(input.classroomId).lean();
     if (!classroom) throw errors.NOT_FOUND({ data: { message: `Classroom with id ${input.classroomId} not found` } });
 
     if (!classroom.isActive) throw errors.UNPROCESSABLE_CONTENT({ data: { message: `Classroom ${input.classroomId} is not active.` } });
@@ -24,7 +24,7 @@ export const maintenanceRouter = {
     if (!isValid.success) throw errors.INTERNAL_SERVER_ERROR({ data: { message: isValid.error.message } });
 
     try {
-      await ClassroomService.findByIdAndUpdate(input.classroomId, { lastMaintenance: { date: input.date, by: context.user.email } });
+      await ClassroomService.findByIdAndUpdate(input.classroomId, { lastMaintenance: { date: input.date, by: context.user.email } }).lean();
       await MaintenanceService.insertOne(newEntry);
 
       return true;
@@ -33,8 +33,8 @@ export const maintenanceRouter = {
     }
   }),
 
-  getHistory: protectedProcedure.maintenance.getHistory.handler(async ({ input, errors }) => {
+  getHistory: protectedProcedure.maintenance.getHistory.handler(({ input, errors }) => {
     const { classroomId } = input;
-    return await MaintenanceService.find({ classroomId }).sort({ date: -1 });
+    return MaintenanceService.find({ classroomId }).lean().sort({ date: -1 });
   }),
 };

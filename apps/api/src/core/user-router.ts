@@ -7,7 +7,7 @@ import { hasCredentials } from "../util/user-util";
 
 export const userRouter = {
   getUsers: adminProcedure.users.getUsers.handler(async ({ errors }) => {
-    const config = await ConfigService.findOne();
+    const config = await ConfigService.findOne().lean();
     if (!config) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Configuration not found." } });
     return config.users;
   }),
@@ -26,7 +26,7 @@ export const userRouter = {
       {}, // empty filter finds the singleton
       { $push: { users: basicNewUser } },
       { new: true }
-    );
+    ).lean();
 
     return true;
   }),
@@ -36,9 +36,9 @@ export const userRouter = {
       {}, // empty filter finds the singleton
       { $pull: { users: { email } } },
       { new: true }
-    );
+    ).lean();
 
-    await UserService.deleteOne({ email });
+    await UserService.deleteOne({ email }).lean();
 
     if (!result) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Configuration not found." } });
 
@@ -61,9 +61,9 @@ export const userRouter = {
         throw errors.UNPROCESSABLE_CONTENT({ data: { message: "Credentials not found." } });
       }
 
-      await ConfigService.updateOne({ "users.email": email }, { $set: { "users.$.role": newRole } });
+      await ConfigService.updateOne({ "users.email": email }, { $set: { "users.$.role": newRole } }).lean();
 
-      await UserService.updateOne({ email }, { $set: { role: newRole } });
+      await UserService.updateOne({ email }, { $set: { role: newRole } }).lean();
 
       return true;
     } catch (e) {

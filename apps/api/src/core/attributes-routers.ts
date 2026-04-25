@@ -7,13 +7,13 @@ import { adminProcedure } from "../libs/orpc-procedures";
 
 export const attributesRouter = {
   getAttributes: adminProcedure.attributes.getAttributes.handler(async ({ errors }) => {
-    const attributes = await AttributeService.find();
+    const attributes = await AttributeService.find().lean();
     if (!attributes) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Attributes not found." } });
     return attributes;
   }),
 
   addAttribute: adminProcedure.attributes.addAttribute.handler(async ({ input, errors }) => {
-    const existingAttribute = await AttributeService.findOne({ label: input.label });
+    const existingAttribute = await AttributeService.findOne({ label: input.label }).lean();
     if (existingAttribute) throw errors.UNPROCESSABLE_CONTENT({ data: { message: "Attribute with this label already exists." } });
 
     const newAttribute: z.infer<typeof attributeSchema> = {
@@ -27,16 +27,16 @@ export const attributesRouter = {
   }),
 
   deleteAttribute: adminProcedure.attributes.deleteAttribute.handler(async ({ input, errors }) => {
-    const res = await AttributeService.deleteOne({ _id: input.id });
+    const res = await AttributeService.deleteOne({ _id: input.id }).lean();
     if (!res.deletedCount) throw errors.NOT_FOUND({ data: { message: "Attribute not found." } });
 
-    await ClassroomService.updateMany({ attributes: input.id }, { $pull: { attributes: input.id } });
+    await ClassroomService.updateMany({ attributes: input.id }, { $pull: { attributes: input.id } }).lean();
 
     return { success: true };
   }),
 
   updateAttribute: adminProcedure.attributes.updateAttribute.handler(async ({ input, errors }) => {
-    const attribute = await AttributeService.findOneAndUpdate({ _id: input._id }, input);
+    const attribute = await AttributeService.findOneAndUpdate({ _id: input._id }, input).lean();
     if (!attribute) throw errors.NOT_FOUND({ data: { message: "Attribute not found." } });
     return { success: true };
   }),

@@ -7,13 +7,13 @@ import { adminProcedure, protectedProcedure } from "../libs/orpc-procedures";
 
 export const groupsRouter = {
   getGroups: protectedProcedure.groups.getGroups.handler(async ({ errors }) => {
-    const groups = await GroupService.find();
+    const groups = await GroupService.find().lean();
     if (!groups) throw errors.INTERNAL_SERVER_ERROR({ data: { message: "Groups not found." } });
     return groups;
   }),
 
   addGroup: adminProcedure.groups.addGroup.handler(async ({ input, errors }) => {
-    const existingGroup = await GroupService.findOne({ label: input.label });
+    const existingGroup = await GroupService.findOne({ label: input.label }).lean();
     if (existingGroup) throw errors.UNPROCESSABLE_CONTENT({ data: { message: "Group with this label already exists." } });
 
     const newGroup: z.infer<typeof groupSchema> = {
@@ -27,7 +27,7 @@ export const groupsRouter = {
   }),
 
   deleteGroup: adminProcedure.groups.deleteGroup.handler(async ({ input, errors }) => {
-    const group = await GroupService.findOne({ _id: input.id });
+    const group = await GroupService.findOne({ _id: input.id }).lean();
     if (!group) throw errors.NOT_FOUND({ data: { message: "Group not found." } });
 
     const res = await GroupService.deleteOne({ _id: input.id });
@@ -39,7 +39,7 @@ export const groupsRouter = {
   }),
 
   updateGroup: adminProcedure.groups.updateGroup.handler(async ({ input, errors }) => {
-    const oldGroup = await GroupService.findOne({ _id: input._id });
+    const oldGroup = await GroupService.findOne({ _id: input._id }).lean();
     if (!oldGroup) throw errors.NOT_FOUND({ data: { message: "Group not found." } });
 
     const group = await GroupService.findOneAndUpdate({ _id: input._id }, input);
