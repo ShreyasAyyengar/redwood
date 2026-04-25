@@ -1,7 +1,7 @@
-import { classroomSchema, classroomSchemaPayload } from "@redwood/contracts";
+import { classroomSchema } from "@redwood/contracts";
 import { parse } from "csv-parse/sync";
 import { v7 as uuidv7 } from "uuid";
-import { z } from "zod";
+import type { z } from "zod";
 import { ClassroomService } from "../database/classroom-service";
 import { ConfigService } from "../database/config-service";
 import { TaskService } from "../database/task-service";
@@ -122,15 +122,10 @@ export const classroomRouter = {
         $or: [{ visibleAt: { $exists: false } }, { visibleAt: { $lte: new Date() } }],
       });
 
-      const roomsWithTasks = rooms.map((room) => ({
+      return rooms.map((room) => ({
         ...room,
         openTasksCount: openTasks.filter((task) => task.classroomId === room._id).length,
       }));
-
-      const test = z.array(classroomSchemaPayload).safeParse(roomsWithTasks);
-      if (!test.success) throw INTERNAL_SERVER_ERROR({ data: { message: test.error.message } });
-
-      return roomsWithTasks;
     } catch (e) {
       console.error(e);
       throw INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
