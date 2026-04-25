@@ -27,6 +27,17 @@ new Elysia()
       allowedHeaders: ["Content-Type", "Authorization"],
     })
   )
+  .get("/debug/memory", () => {
+    const usage = process.memoryUsage();
+    return {
+      rss: `${Math.round(usage.rss / 1024 / 1024)} MB`,
+      heapUsed: `${Math.round(usage.heapUsed / 1024 / 1024)} MB`,
+    };
+  })
+  .get("/debug/gc", () => {
+    Bun.gc(true); // Forces a full Garbage Collection cycle
+    return { message: "GC triggered" };
+  })
   .all(authRoute, async ({ request }: { request: Request }) => authServer.handler(request), {
     parse: "none",
   })
