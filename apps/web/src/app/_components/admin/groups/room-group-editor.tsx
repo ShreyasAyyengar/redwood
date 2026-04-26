@@ -11,7 +11,7 @@ export function RoomGroupEditor() {
   const [availableGroups, setAvailableGroups] = useState<z.infer<typeof groupSchema>[]>([]);
   const { setClassrooms } = useGroupStore();
 
-  const { data: rooms } = useQuery(webClientORPC.classrooms.getRooms.queryOptions({}));
+  const { data: rooms } = useQuery(webClientORPC.classrooms.getRooms.queryOptions());
   const { data: groups } = useQuery(webClientORPC.groups.getGroups.queryOptions());
 
   useEffect(() => {

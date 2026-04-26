@@ -11,7 +11,7 @@ export function AttributeEditor() {
   const [availableAttributes, setAvailableAttributes] = useState<z.infer<typeof attributeSchema>[]>([]);
   const { setClassrooms } = useAttributeStore();
 
-  const { data: rooms } = useQuery(webClientORPC.classrooms.getRooms.queryOptions({}));
+  const { data: rooms } = useQuery(webClientORPC.classrooms.getRooms.queryOptions());
   const { data: attributes } = useQuery(webClientORPC.attributes.getAttributes.queryOptions());
 
   useEffect(() => {

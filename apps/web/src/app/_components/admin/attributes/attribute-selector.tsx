@@ -20,7 +20,7 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
     webClientORPC.attributes.bulkUpdateClassrooms.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries({ queryKey: webClientORPC.attributes.getAttributes.queryKey() });
-        await queryClient.invalidateQueries({ queryKey: webClientORPC.classrooms.getRooms.queryKey({}) });
+        await queryClient.invalidateQueries({ queryKey: webClientORPC.classrooms.getRooms.queryKey() });
         useAttributeStore.getState().clearSelection();
       },
     })

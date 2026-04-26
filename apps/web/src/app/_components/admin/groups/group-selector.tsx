@@ -20,7 +20,7 @@ export function GroupSelector({ availableGroups }: { availableGroups: z.infer<ty
     webClientORPC.groups.bulkUpdateClassrooms.mutationOptions({
       onSuccess: async () => {
         await queryClient.invalidateQueries({ queryKey: webClientORPC.groups.getGroups.queryKey() });
-        await queryClient.invalidateQueries({ queryKey: webClientORPC.classrooms.getRooms.queryKey({}) });
+        await queryClient.invalidateQueries({ queryKey: webClientORPC.classrooms.getRooms.queryKey() });
         useGroupStore.getState().clearSelection();
       },
     })

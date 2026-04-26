@@ -21,13 +21,7 @@ export const { useAppForm } = createFormHook({
   formComponents: {},
 });
 
-export function GroupForm({
-  existingGroup,
-  onSuccess,
-}: {
-  existingGroup?: z.infer<typeof groupSchema>;
-  onSuccess?: () => void;
-}) {
+export function GroupForm({ existingGroup, onSuccess }: { existingGroup?: z.infer<typeof groupSchema>; onSuccess?: () => void }) {
   const queryClient = useQueryClient();
 
   const addGroup = useMutation(
@@ -43,7 +37,7 @@ export function GroupForm({
     webClientORPC.groups.updateGroup.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: webClientORPC.groups.getGroups.queryKey() });
-        queryClient.invalidateQueries({ queryKey: webClientORPC.classrooms.getRooms.queryKey({}) });
+        queryClient.invalidateQueries({ queryKey: webClientORPC.classrooms.getRooms.queryKey() });
         onSuccess?.();
       },
     })
@@ -53,7 +47,7 @@ export function GroupForm({
     webClientORPC.groups.deleteGroup.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: webClientORPC.groups.getGroups.queryKey() });
-        queryClient.invalidateQueries({ queryKey: webClientORPC.classrooms.getRooms.queryKey({}) });
+        queryClient.invalidateQueries({ queryKey: webClientORPC.classrooms.getRooms.queryKey() });
         onSuccess?.();
       },
     })
@@ -159,13 +153,7 @@ export function GroupForm({
   );
 }
 
-export default function GroupDialog({
-  children,
-  existingGroup,
-}: {
-  children?: React.ReactNode;
-  existingGroup?: z.infer<typeof groupSchema>;
-}) {
+export default function GroupDialog({ children, existingGroup }: { children?: React.ReactNode; existingGroup?: z.infer<typeof groupSchema> }) {
   const [open, setOpen] = useState(false);
 
   return (
