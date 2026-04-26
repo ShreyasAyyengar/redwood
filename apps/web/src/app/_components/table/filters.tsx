@@ -89,7 +89,7 @@ export default function Filters() {
                 <h3 className="font-bold text-[10px] text-neutral-600 uppercase tracking-[0.2em]">Room Groups</h3>
               </div>
               <Select value={group || "ALL"} onValueChange={(val) => setGroup(val === "ALL" ? undefined : val)}>
-                <SelectTrigger className="h-10 w-full border-white/5 bg-neutral-800/40 shadow-sm transition-colors hover:bg-neutral-800/60">
+                <SelectTrigger className="h-10 w-full min-w-0 max-w-[11rem] border-white/5 bg-neutral-800/40 shadow-sm transition-colors hover:bg-neutral-800/60 [&>span]:min-w-0 [&>span]:truncate">
                   <SelectValue placeholder="All Groups" />
                 </SelectTrigger>
                 <SelectContent className="border-white/10 bg-neutral-900 text-neutral-200">
@@ -113,7 +113,7 @@ export default function Filters() {
                 value={status || "ALL"}
                 onValueChange={(val) => setStatus(val === "ALL" ? undefined : (val as z.infer<typeof classroomSchema>["roomStatus"]))}
               >
-                <SelectTrigger className="h-10 w-full border-white/5 bg-neutral-800/40 shadow-sm transition-colors hover:bg-neutral-800/60">
+                <SelectTrigger className="h-10 w-full min-w-0 max-w-[11rem] border-white/5 bg-neutral-800/40 shadow-sm transition-colors hover:bg-neutral-800/60 [&>span]:min-w-0 [&>span]:truncate">
                   <SelectValue placeholder="All Statuses" />
                 </SelectTrigger>
                 <SelectContent className="border-white/10 bg-neutral-900 text-neutral-200">
