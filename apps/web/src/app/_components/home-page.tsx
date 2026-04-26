@@ -44,7 +44,7 @@ export default function HomePage() {
           </TabsList>
 
           <TabsContent value="classrooms" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
-            <div className="flex w-full flex-1 items-center justify-center overflow-hidden p-5">
+            <div className="flex w-full flex-1 items-center justify-center overflow-hidden p-5 pt-0">
               <Filters />
               <RoomTable data={fetchedRooms} columns={columns} />
             </div>
