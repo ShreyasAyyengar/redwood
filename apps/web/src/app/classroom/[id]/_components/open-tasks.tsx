@@ -3,7 +3,7 @@ import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { BookAlert, ClipboardList, Plus } from "lucide-react";
 import type { z } from "zod";
-import { TaskCard } from "./task/task-card";
+import { TaskCard, TaskCardSkeleton } from "./task/task-card";
 import { TaskDialog } from "./task/task-dialog";
 import TaskHistoryDialog from "./task/task-history-dialog";
 
@@ -69,6 +69,44 @@ export default function OpenTasks({ tasks, room }: { tasks?: z.infer<typeof task
             <span className="rounded-md bg-zinc-950/85 p-5">No Open Tasks!</span>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+export function OpenTasksSkeleton() {
+  return (
+    <div className="group relative flex h-full flex-1">
+      <div className="relative flex h-full w-full flex-1 flex-col overflow-hidden rounded-2xl bg-zinc-900 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/50 sm:text-2xl">
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <ClipboardList className="h-6 w-6 text-blue-500" />
+              <div>Open Tasks</div>
+
+              {/* task count */}
+              <span className="flex h-6 w-6 animate-pulse rounded-full bg-zinc-700/50" />
+            </div>
+
+            <button type="button" disabled className="flex w-full items-center gap-3 font-normal text-zinc-300/80 sm:text-lg">
+              <BookAlert className="h-5 w-5" />
+              <span className="font-normal text-md">See Task History</span>
+            </button>
+          </div>
+
+          <div className="flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg">
+            <Plus className="mr-2 h-5 w-5" />
+            New Task
+          </div>
+        </div>
+
+        <ScrollArea className="mt-5 h-full min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
+          <div className="space-y-2">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <TaskCardSkeleton key={index} />
+            ))}
+          </div>
+        </ScrollArea>
       </div>
     </div>
   );

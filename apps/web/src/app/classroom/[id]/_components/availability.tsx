@@ -9,6 +9,7 @@ import type { z } from "zod";
 import { convertMinutesToReadable } from "../../../../util/date-time-utils";
 
 const SHORT_BREAK_MINUTES = 15;
+const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
 
 // TODO redo
 export default function Availability({ room }: { room: z.infer<typeof classroomSchema> }) {
@@ -27,7 +28,6 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
   }, []);
 
   const dayToday = new Date().getDay();
-  const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
   const todayName = dayNames[dayToday];
 
   const schedule = room.schedule ?? {};
@@ -502,6 +502,131 @@ export default function Availability({ room }: { room: z.infer<typeof classroomS
           animation: shimmy 1s linear infinite;
         }
       `}</style>
+    </div>
+  );
+}
+
+export function AvailabilitySkeleton() {
+  const todayName = dayNames[new Date().getDay()];
+
+  return (
+    <div className="flex h-full flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/80 sm:text-2xl">
+      <div className="flex items-center">
+        <CalendarClock className="mr-2 h-6 w-6" />
+        <div>Availability</div>
+      </div>
+
+      {/* Desktop View */}
+      <Tabs defaultValue={todayName} orientation="vertical" className="mt-3 hidden min-h-0 flex-1 gap-2 xl:flex">
+        <TabsList className="h-full! rounded-xl border bg-zinc-950/40">
+          {dayNames.map((day) => (
+            <TabsTrigger
+              key={day}
+              value={day}
+              className={cn(
+                "justify-start capitalize",
+                "rounded-lg px-3 py-2 font-semibold text-sm text-zinc-300/80",
+                "data-[state=active]:bg-white/10 data-[state=active]:text-zinc-100",
+                "hover:bg-white/5"
+              )}
+            >
+              {day}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+
+        <div className="min-h-0 flex-1">
+          {dayNames.map((day) => (
+            <TabsContent key={day} value={day} className="m-0 h-full">
+              <AvailabilitySkeletonPanel day={day} />
+            </TabsContent>
+          ))}
+        </div>
+      </Tabs>
+
+      {/* Mobile View */}
+      <Tabs defaultValue={todayName} className="mt-3 flex min-h-0 flex-1 flex-col gap-4 xl:hidden">
+        <TabsList className="mx-auto ml-5 w-full flex-row items-stretch gap-1 overflow-x-auto rounded-xl border bg-zinc-950/40 p-2">
+          {dayNames.map((day) => (
+            <TabsTrigger
+              key={day}
+              value={day}
+              className={cn(
+                "shrink-0 justify-center capitalize",
+                "rounded-lg px-3 py-2 font-semibold text-sm text-zinc-300/80",
+                "data-[state=active]:bg-white/10 data-[state=active]:text-zinc-100",
+                "hover:bg-white/5"
+              )}
+            >
+              {day}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+
+        <div className="min-h-0 flex-1">
+          {dayNames.map((day) => (
+            <TabsContent key={day} value={day} className="m-0 h-full">
+              <AvailabilitySkeletonPanel day={day} />
+            </TabsContent>
+          ))}
+        </div>
+      </Tabs>
+    </div>
+  );
+}
+
+function AvailabilitySkeletonPanel({ day }: { day: string }) {
+  return (
+    <div className="flex h-full flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950/30">
+      <div className="flex shrink-0 items-center justify-between border-zinc-800 border-b px-4 py-3">
+        <div className="flex flex-col items-start gap-1">
+          <div className="font-bold text-base text-zinc-200/90 capitalize sm:text-lg">{day}</div>
+
+          <div className="flex cursor-pointer items-center gap-1">
+            <Checkbox checked={false} disabled className="border border-neutral-400" />
+            <span className="animate-pulse font-normal text-sm text-zinc-600">Omit short breaks</span>
+          </div>
+        </div>
+
+        {/* block count skeleton */}
+        <div className="h-4 w-16 animate-pulse rounded bg-zinc-700/50" />
+      </div>
+
+      <ScrollArea className="mb-2 h-full min-h-0 flex-1">
+        <div className="space-y-2 p-3">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <AvailabilityBlockSkeleton key={index} />
+          ))}
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}
+
+function AvailabilityBlockSkeleton() {
+  return (
+    <div className="group relative overflow-hidden rounded-lg border border-white/5 bg-zinc-800/40 px-3 py-2">
+      <div className="absolute inset-y-0 left-0 w-1 bg-white/10" />
+
+      <div className="flex items-center justify-between gap-3 pl-2">
+        <div className="flex items-center gap-2">
+          {/* start time */}
+          <div className="h-6 w-16 animate-pulse rounded bg-zinc-700/50" />
+
+          <span className="text-zinc-500">→</span>
+
+          {/* end time */}
+          <div className="h-6 w-16 animate-pulse rounded bg-zinc-700/50" />
+        </div>
+
+        <div className="flex flex-col items-center gap-2">
+          {/* optional NOW / SOON badge placeholder */}
+          <div className="h-5 w-10 animate-pulse rounded-md bg-zinc-700/40" />
+
+          {/* duration */}
+          <div className="h-5 w-12 animate-pulse rounded-md bg-zinc-700/50" />
+        </div>
+      </div>
     </div>
   );
 }

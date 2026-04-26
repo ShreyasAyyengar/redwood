@@ -3,7 +3,7 @@ import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { BookAlert, Plus, TriangleAlert } from "lucide-react";
 import type { z } from "zod";
-import { IssueCard } from "./issue/issue-card";
+import { IssueCard, IssueCardSkeleton } from "./issue/issue-card";
 import { IssueDialog } from "./issue/issue-dialog";
 import IssueHistoryDialog from "./issue/issue-history-dialog";
 
@@ -74,3 +74,105 @@ export default function ActiveIssues({ issues, room }: { issues?: z.infer<typeof
     </div>
   );
 }
+
+export function ActiveIssuesSkeleton() {
+  return (
+    <div className="group relative flex h-full flex-1">
+      <div className="relative flex h-full w-full flex-1 flex-col overflow-hidden rounded-2xl bg-zinc-900 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/50 sm:text-2xl">
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <TriangleAlert className="h-6 w-6 text-yellow-500" />
+              <div>Active Issues</div>
+
+              {/* issue count */}
+              <span className="flex h-6 w-6 animate-pulse items-center justify-center rounded-full bg-zinc-700/50" />
+            </div>
+
+            <button type="button" disabled className="flex w-full items-center gap-3 font-normal text-zinc-300/80 sm:text-lg">
+              <BookAlert className="h-5 w-5" />
+              <span className="font-normal text-md">See Issue History</span>
+            </button>
+          </div>
+
+          <div className="flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg">
+            <Plus className="mr-2 h-5 w-5" />
+            New Issue
+          </div>
+        </div>
+
+        <ScrollArea className="mt-5 h-full min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
+          <div className="space-y-2">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <IssueCardSkeleton key={index} />
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+    </div>
+  );
+}
+
+// export function ActiveIssuesSkeleton() {
+//   return (
+//     <div className="group relative flex h-full flex-1">
+//       <div className="relative flex h-full w-full flex-1 flex-col overflow-hidden rounded-2xl bg-zinc-900 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/50 sm:text-2xl">
+//         <div className="flex items-center justify-between">
+//           <div className="flex flex-col">
+//             <div className="flex items-center gap-2">
+//               <TriangleAlert className="h-6 w-6 text-yellow-500" />
+//               <div>Active Issues</div>
+//
+//               {/* openIssues.length */}
+//               <span className="flex h-6 w-6 animate-pulse items-center justify-center rounded-full bg-zinc-700/50" />
+//             </div>
+//
+//             <button type="button" disabled className="flex w-full items-center gap-3 font-normal text-zinc-300/80 sm:text-lg">
+//               <BookAlert className="h-5 w-5" />
+//               <span className="font-normal text-md">See Issue History</span>
+//             </button>
+//           </div>
+//
+//           <div className="flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg">
+//             <Plus className="mr-2 h-5 w-5" />
+//             New Issue
+//           </div>
+//         </div>
+//
+//         <ScrollArea className="mt-5 h-full min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
+//           <div className="space-y-3">
+//             {Array.from({ length: 3 }).map((_, index) => (
+//               <ActiveIssueCardSkeleton key={index} />
+//             ))}
+//           </div>
+//         </ScrollArea>
+//       </div>
+//     </div>
+//   );
+// }
+//
+// function ActiveIssueCardSkeleton() {
+//   return (
+//     <div className="flex flex-col rounded-2xl bg-neutral-900 p-4 shadow-xl/50">
+//       <div className="flex items-start justify-between gap-4">
+//         <div className="flex min-w-0 flex-1 flex-col gap-2">
+//           {/* issue title */}
+//           <div className="h-5 w-2/3 animate-pulse rounded bg-zinc-700/50" />
+//
+//           {/* issue description */}
+//           <div className="h-4 w-full animate-pulse rounded bg-zinc-700/40" />
+//           <div className="h-4 w-3/4 animate-pulse rounded bg-zinc-700/40" />
+//         </div>
+//
+//         {/* urgent / status badge */}
+//         <div className="h-6 w-16 shrink-0 animate-pulse rounded-md bg-zinc-700/50" />
+//       </div>
+//
+//       <div className="mt-4 flex items-center gap-2">
+//         {/* created by / date / metadata */}
+//         <div className="h-5 w-20 animate-pulse rounded-md bg-zinc-700/50" />
+//         <div className="h-5 w-24 animate-pulse rounded-md bg-zinc-700/40" />
+//       </div>
+//     </div>
+//   );
+// }

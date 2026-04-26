@@ -125,3 +125,40 @@ export const TaskCard = forwardRef<HTMLDivElement, { task: z.infer<typeof taskSc
     );
   }
 );
+
+export function TaskCardSkeleton() {
+  return (
+    <div className="my-1 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5">
+          <ClipboardList className="size-5 text-zinc-600" />
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
+            {/* description */}
+            <div className="flex flex-1 flex-col">
+              <div className="h-5 w-full max-w-[420px] animate-pulse rounded bg-zinc-700/50" />
+            </div>
+
+            {/* badges */}
+            <div className="flex shrink-0 gap-1.5">
+              <div className="h-5 w-16 animate-pulse rounded-md bg-zinc-700/50" />
+              <div className="h-5 w-16 animate-pulse rounded-md bg-zinc-700/40" />
+            </div>
+          </div>
+
+          <div className="flex flex-col items-start gap-1 font-normal text-xs text-zinc-500">
+            {/* created metadata */}
+            <div className="flex items-center gap-1 text-sm">
+              <Flag className="h-5 w-5 text-indigo-300/60" />
+              <div className="h-4 w-24 animate-pulse rounded bg-zinc-700/50" />
+              <span className="text-zinc-700">•</span>
+              <div className="h-4 w-16 animate-pulse rounded bg-zinc-700/40" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

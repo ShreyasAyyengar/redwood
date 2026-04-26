@@ -8,11 +8,11 @@ import { useEffect, useState } from "react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../lib/orpc-web-client";
 import { useFetchedRoomsStore } from "../../_components/room-store";
-import ActiveIssues from "./_components/active-issues";
-import Availability from "./_components/availability";
-import MaintenanceHistory from "./_components/maintenance-history";
-import OpenTasks from "./_components/open-tasks";
-import RoomSummary from "./_components/room-summary";
+import ActiveIssues, { ActiveIssuesSkeleton } from "./_components/active-issues";
+import Availability, { AvailabilitySkeleton } from "./_components/availability";
+import MaintenanceHistory, { MaintenanceHistorySkeleton } from "./_components/maintenance-history";
+import OpenTasks, { OpenTasksSkeleton } from "./_components/open-tasks";
+import RoomSummary, { RoomSummarySkeleton } from "./_components/room-summary";
 
 // TODO loading states for each component
 export default function Page() {
@@ -27,29 +27,28 @@ export default function Page() {
     setRoom(foundRoom || null);
   }, [fetchedRooms, roomId]);
 
-  const { data: maintenanceHistory } = useQuery(
+  const { data: maintenanceHistory, isLoading: maintenanceHistoryLoading } = useQuery(
     webClientORPC.maintenance.getHistory.queryOptions({
       input: { classroomId: roomId },
       enabled: !!room,
     })
   );
 
-  const { data: issues } = useQuery(
+  const { data: issues, isLoading: issuesLoading } = useQuery(
     webClientORPC.issues.getIssues.queryOptions({
       input: { classroomId: roomId },
       enabled: !!room,
     })
   );
 
-  const { data: tasks } = useQuery(
+  const { data: tasks, isLoading: tasksLoading } = useQuery(
     webClientORPC.tasks.getTasks.queryOptions({
       input: { classroomId: roomId },
       enabled: !!room,
     })
   );
 
-  if (isFetching) return <div>Loading...</div>;
-  if (!room) return <div>Room not found</div>;
+  const showLoading = isFetching || !room || maintenanceHistoryLoading || issuesLoading || tasksLoading;
 
   return (
     <>
@@ -69,22 +68,20 @@ export default function Page() {
           Back to Classrooms
         </div>
         <div className="mb-10 flex flex-col gap-10">
-          <RoomSummary
-            room={room}
-            issueCount={issues?.filter((issue) => !issue.resolution).length ?? 0}
-            taskCount={tasks?.filter((task) => !task.completion).length ?? 0}
-          />
-          <div className="h-[50dvh]">
-            <Availability room={room} />
-          </div>
-          <div className="h-[45dvh]">
-            <ActiveIssues issues={issues} room={room} />
-          </div>
-          <div className="h-[45dvh]">
-            <OpenTasks tasks={tasks} room={room} />
-          </div>
+          {showLoading ? (
+            <RoomSummarySkeleton />
+          ) : (
+            <RoomSummary
+              room={room}
+              issueCount={issues?.filter((issue) => !issue.resolution).length ?? 0}
+              taskCount={tasks?.filter((task) => !task.completion).length ?? 0}
+            />
+          )}
+          <div className="h-[50dvh]">{showLoading ? <AvailabilitySkeleton /> : <Availability room={room} />}</div>
+          <div className="h-[45dvh]">{showLoading ? <ActiveIssuesSkeleton /> : <ActiveIssues issues={issues} room={room} />}</div>
+          <div className="h-[45dvh]">{/*{showLoading ? <OpenTasksSkeleton /> : <OpenTasks tasks={tasks} room={room} />}*/}</div>
           <div className="h-[40dvh]">
-            <MaintenanceHistory history={maintenanceHistory} room={room} />
+            {showLoading ? <MaintenanceHistorySkeleton /> : <MaintenanceHistory history={maintenanceHistory} room={room} />}
           </div>
         </div>
       </div>
@@ -106,17 +103,21 @@ export default function Page() {
         </div>
 
         <div className="flex h-[40dvh] gap-5">
-          <RoomSummary
-            room={room}
-            issueCount={issues?.filter((issue) => !issue.resolution).length ?? 0}
-            taskCount={tasks?.filter((task) => !task.completion).length ?? 0}
-          />
-          <Availability room={room} />
-          <MaintenanceHistory history={maintenanceHistory} room={room} />
+          {showLoading ? (
+            <RoomSummarySkeleton />
+          ) : (
+            <RoomSummary
+              room={room}
+              issueCount={issues?.filter((issue) => !issue.resolution).length ?? 0}
+              taskCount={tasks?.filter((task) => !task.completion).length ?? 0}
+            />
+          )}
+          {showLoading ? <AvailabilitySkeleton /> : <Availability room={room} />}
+          {showLoading ? <MaintenanceHistorySkeleton /> : <MaintenanceHistory history={maintenanceHistory} room={room} />}
         </div>
         <div className="mt-10 flex h-[45dvh] gap-10">
-          <ActiveIssues issues={issues} room={room} />
-          <OpenTasks tasks={tasks} room={room} />
+          {showLoading ? <ActiveIssuesSkeleton /> : <ActiveIssues issues={issues} room={room} />}
+          {showLoading ? <OpenTasksSkeleton /> : <OpenTasks tasks={tasks} room={room} />}
         </div>
       </div>
     </>

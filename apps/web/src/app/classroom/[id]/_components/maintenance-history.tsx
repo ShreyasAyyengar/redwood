@@ -127,7 +127,7 @@ export default function MaintenanceHistory({
                                 </Tooltip>
                               </div>
 
-                              <div className="mt-1 flex items-center gap-1 text-neutral-400 text-xs sm:text-sm">
+                              <div className="mt-1 flex items-center gap-2 text-neutral-400 text-xs sm:text-sm">
                                 <UserCog className="size-5 text-neutral-400" />
                                 <span className="inline-flex h-5 items-center rounded-md bg-neutral-500/15 px-2 font-mono text-neutral-300">
                                   {who}
@@ -238,6 +238,75 @@ export default function MaintenanceHistory({
           </div>
         </TooltipProvider>
       </ScrollArea>
+    </div>
+  );
+}
+
+export function MaintenanceHistorySkeleton() {
+  return (
+    <div className="flex h-full flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/80 sm:text-2xl">
+      <div className="flex items-center">
+        <ClipboardClock className="mr-2 h-6 w-6 text-amber-400" />
+        <div>Maintenance History</div>
+      </div>
+
+      <ScrollArea className="mt-3 h-full min-h-0 flex-1 rounded-2xl bg-zinc-950/50 p-3">
+        <div className="mt-1 space-y-2">
+          {Array.from({ length: 1 }).map((_, index) => (
+            <MaintenanceHistoryCardSkeleton key={index} />
+          ))}
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}
+
+function MaintenanceHistoryCardSkeleton() {
+  return (
+    <div className="group relative overflow-hidden rounded-xl border border-zinc-700/40 bg-neutral-800/70 px-3 py-3 shadow-sm">
+      <div className="absolute inset-y-0 left-0 w-1 bg-zinc-700/60" />
+
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          {/* Date row */}
+          <div className="flex items-center gap-2">
+            <CalendarDays className="size-5 text-neutral-400" />
+            <div className="h-5 w-28 animate-pulse rounded bg-zinc-700/50" />
+          </div>
+
+          {/* Completed by row */}
+          <div className="mt-1 flex items-center gap-2 text-neutral-400 text-xs sm:text-sm">
+            <UserCog className="size-5 text-neutral-400" />
+            <div className="h-5 w-20 animate-pulse rounded-md bg-zinc-700/50" />
+          </div>
+        </div>
+
+        {/* Summary badges */}
+        <div className="flex shrink-0 flex-col flex-wrap items-end justify-end space-y-1">
+          <div className="flex text-sm">
+            <div className="h-5 w-20 animate-pulse rounded-md rounded-r-none bg-zinc-700/50" />
+            <div className="h-5 w-24 animate-pulse rounded-md rounded-l-none bg-zinc-700/40" />
+          </div>
+
+          <div className="flex text-sm">
+            <div className="h-5 w-20 animate-pulse rounded-md rounded-r-none bg-zinc-700/50" />
+            <div className="h-5 w-28 animate-pulse rounded-md rounded-l-none bg-zinc-700/40" />
+          </div>
+        </div>
+      </div>
+
+      {/* Detail badges */}
+      <div className="mt-2 flex w-fit flex-col flex-wrap space-y-1.5">
+        <div className="flex items-center gap-2">
+          <div className="h-5 w-24 animate-pulse rounded-md bg-zinc-700/50" />
+          <div className="h-5 w-28 animate-pulse rounded-md bg-zinc-700/50" />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="h-5 w-20 animate-pulse rounded-md bg-zinc-700/40" />
+          <div className="h-5 w-24 animate-pulse rounded-md bg-zinc-700/40" />
+        </div>
+      </div>
     </div>
   );
 }
