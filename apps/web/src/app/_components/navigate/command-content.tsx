@@ -1,6 +1,6 @@
 import { CommandEmpty, CommandGroup, CommandItem, CommandList, CommandSeparator } from "@redwood/shad-ui/components/command";
 import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle, ClipboardList, School } from "lucide-react";
+import { TriangleAlert, ClipboardList, School } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { webClientORPC } from "../../../lib/orpc-web-client";
 import { useFetchedRoomsStore } from "../room-store";
@@ -44,7 +44,7 @@ export default function CommandContent({ closeNavigator }: { closeNavigator: () 
         {issuesFetching && <div className="p-4 text-center text-muted-foreground text-sm">Finding issues...</div>}
         {issues?.map((issue) => (
           <CommandItem key={issue._id} value={issue.issue.description} onSelect={() => navigateToClassroom(issue.classroomId)}>
-            <AlertTriangle className="mr-2 size-5" />
+            <TriangleAlert className="mr-2 size-5" />
             <span>{issue.issue.description}</span>
           </CommandItem>
         ))}

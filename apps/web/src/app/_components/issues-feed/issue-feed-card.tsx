@@ -2,7 +2,7 @@ import type { issueSchema } from "@redwood/contracts";
 import { Badge } from "@redwood/shad-ui/components/badge";
 import { Card } from "@redwood/shad-ui/components/card";
 import { cn } from "@redwood/shad-ui/lib/utils";
-import { AlertTriangle, Clock3, MessageSquare, Paperclip, ShieldAlert, User, UserCheck } from "lucide-react";
+import { TriangleAlert, Clock3, MessageSquare, Paperclip, ShieldAlert, User, UserCheck } from "lucide-react";
 import { forwardRef } from "react";
 import type { z } from "zod";
 import { getDateTimeDisplay } from "../../../util/date-time-utils";
@@ -39,7 +39,7 @@ export const IssueFeedCard = forwardRef<HTMLDivElement, { issue: z.infer<typeof 
                 issue.issue.urgent ? "border-red-500/20 bg-red-500/10" : "border-amber-500/20 bg-amber-500/10"
               )}
             >
-              <AlertTriangle className={cn("size-6", issue.issue.urgent ? "text-red-400" : "text-amber-400")} />
+              <TriangleAlert className={cn("size-6", issue.issue.urgent ? "text-red-400" : "text-amber-400")} />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex flex-col gap-2">
