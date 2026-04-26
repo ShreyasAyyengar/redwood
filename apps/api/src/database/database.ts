@@ -5,14 +5,23 @@ import { env } from "../env";
 import { logger } from "../libs/logger";
 
 setup({ z }); // mongoose-zod will add new functions to the prototype of `z`
-await mongoose.connect(env.DATABASE_URL);
 
 export const databaseConnection = mongoose.connection;
 
-databaseConnection.once("open", () => {
-  logger.info("[MongoDB] Connection opened!");
+databaseConnection.on("connected", () => {
+  logger.info("[MongoDB] Connection connected!");
 });
 
 databaseConnection.on("error", (_error) => {
   logger.error("[MongoDB] Connection error: ", _error);
 });
+
+await mongoose.connect(env.DATABASE_URL, {
+  maxPoolSize: 10,
+  minPoolSize: 0,
+  maxIdleTimeMS: 30_000,
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45_000,
+});
+
+logger.info("[MongoDB] Initial connection established!");
