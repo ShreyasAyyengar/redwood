@@ -25,7 +25,7 @@ export const TaskCard = forwardRef<HTMLDivElement, { task: z.infer<typeof taskSc
       <Card
         ref={ref}
         key={task._id}
-        className="my-1 border-zinc-800 bg-zinc-900/50 p-4 transition-all duration-100 hover:border-zinc-700 active:scale-95"
+        className="my-1 border-zinc-800 bg-zinc-900/50 p-4 shadow-md/100 transition-all duration-100 hover:border-zinc-700 active:scale-95"
         {...props}
       >
         <div className="flex items-start gap-3">
@@ -128,7 +128,7 @@ export const TaskCard = forwardRef<HTMLDivElement, { task: z.infer<typeof taskSc
 
 export function TaskCardSkeleton() {
   return (
-    <div className="my-1 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4">
+    <div className="my-1 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 shadow-md/100">
       <div className="flex items-start gap-3">
         <div className="mt-0.5">
           <ClipboardList className="size-5 text-zinc-600" />
