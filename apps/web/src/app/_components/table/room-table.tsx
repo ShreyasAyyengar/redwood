@@ -61,7 +61,7 @@ export function RoomTable({
       sorting,
       globalFilter: filterState,
     },
-    globalFilterFn: (row, columnId, filterValue) => {
+    globalFilterFn: (row) => {
       const { exclusive, status, hasIssues, incompleteTasks, overdueTasks, availableNow, group } = filterState;
 
       const room = row.original;
