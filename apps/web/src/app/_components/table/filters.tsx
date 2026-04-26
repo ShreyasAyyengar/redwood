@@ -181,7 +181,7 @@ export default function Filters() {
           <div className="flex flex-col gap-3 rounded-lg border bg-neutral-800/20 p-3">
             <div className="flex items-center justify-between">
               <Label htmlFor="exclusive" className="cursor-pointer font-medium text-neutral-300 text-sm">
-                Exclusive {exclusive ? "(AND)" : "(OR)"}
+                {exclusive ? "Exclusive (AND)" : "Inclusive (OR)"}
               </Label>
               <Switch id="exclusive" checked={exclusive} onCheckedChange={setExclusive} />
             </div>
