@@ -10,7 +10,6 @@ import Filters from "./table/filters";
 import { RoomTable } from "./table/room-table";
 import { TasksFeed } from "./tasks-feed/tasks-feed";
 
-// TODO implement empty states and loading states across the app
 export default function HomePage() {
   const { fetchedRooms } = useFetchedRoomsStore();
 
