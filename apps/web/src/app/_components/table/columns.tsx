@@ -8,8 +8,8 @@ import AvailabilityCell from "./availability/availability-cell";
 import AvailabilityHeader from "./availability/availability-header";
 import LastServicedCell from "./last-serviced/last-serviced-cell";
 import LastServicedHeader from "./last-serviced/last-serviced-header";
-import NameCell from "./name/name-cell";
-import NameHeader from "./name/name-header";
+import ClassroomNameCell from "./name/classroom-name-cell";
+import ClassroomNameHeader from "./name/classroom-name-header";
 import StatusCell from "./status/status-cell";
 import StatusHeader from "./status/status-header";
 import OpenTasksCell from "./tasks/open-tasks-cell";
@@ -32,8 +32,8 @@ export const columns: ColumnDef<z.infer<typeof classroomSchemaPayload>, any>[] =
   }),
 
   columnHelper.accessor("displayName", {
-    header: ({ column }) => <NameHeader column={column} />,
-    cell: ({ row }) => <NameCell row={row} />,
+    header: ({ column }) => <ClassroomNameHeader column={column} />,
+    cell: ({ row }) => <ClassroomNameCell row={row} />,
     sortingFn: (rowA, rowB) => rowA.original.displayName.localeCompare(rowB.original.displayName),
   }),
 
