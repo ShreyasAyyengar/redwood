@@ -51,7 +51,7 @@ export default function Filters() {
     <motion.aside
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
-      className="flex h-full w-72 shrink-0 flex-col gap-6 overflow-hidden rounded-xl rounded-r-none bg-neutral-900 p-6 shadow-2xl"
+      className="flex h-full w-60 shrink-0 flex-col gap-6 overflow-hidden rounded-xl rounded-r-none bg-neutral-900 p-6 shadow-2xl"
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">

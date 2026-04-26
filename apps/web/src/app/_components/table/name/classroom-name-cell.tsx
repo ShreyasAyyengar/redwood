@@ -7,6 +7,7 @@ export default function NameCell({ row }: { row: Row<z.infer<typeof classroomSch
   const group = row.original.groupKey;
   return (
     <div className="flex w-full flex-col items-start">
+    <div className="flex w-fit flex-col items-start">
       <p className="font-bold text-lg text-white/80">{displayName}</p>
       {group !== "Ungrouped" && <p className="text-neutral-400 text-sm">{group}</p>}
     </div>

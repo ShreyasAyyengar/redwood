@@ -34,7 +34,7 @@ export default function HomePage() {
           <p className="my-5 text-center font-bold text-3xl">Redwood</p>
         </div>
 
-        <Tabs defaultValue="classrooms" className="flex h-full flex-1 flex-col overflow-hidden">
+        <Tabs defaultValue="classrooms" className="flex h-full w-full flex-1 flex-col overflow-hidden">
           <TabsList className="mx-auto shrink-0">
             <TabsTrigger value="classrooms">Classrooms</TabsTrigger>
             <TabsTrigger value="issues">Issues</TabsTrigger>
