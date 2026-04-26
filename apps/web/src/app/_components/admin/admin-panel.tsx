@@ -8,7 +8,7 @@ import UserEditor from "./users/user-editor";
 export default function AdminPanel() {
   // Tabs: Overview, CSV Upload, Room Attributes, Room Groups, Statistics
   return (
-    <div className="w-full!">
+    <div className="flex justify-center">
       <Tabs defaultValue="overview" orientation="vertical">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
