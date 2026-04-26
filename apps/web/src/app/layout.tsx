@@ -17,7 +17,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Redwood",
+  title: env.NEXT_PUBLIC_NODE_ENV === "development" ? "DEV — Redwood" : "Redwood",
   description: "Redwood UCSC",
 };
 
