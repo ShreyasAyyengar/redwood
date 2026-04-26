@@ -14,7 +14,6 @@ import MaintenanceHistory, { MaintenanceHistorySkeleton } from "./_components/ma
 import OpenTasks, { OpenTasksSkeleton } from "./_components/open-tasks";
 import RoomSummary, { RoomSummarySkeleton } from "./_components/room-summary";
 
-// TODO loading states for each component
 export default function Page() {
   const params = useParams();
   const roomId = params.id as string;
@@ -79,7 +78,7 @@ export default function Page() {
           )}
           <div className="h-[50dvh]">{showLoading ? <AvailabilitySkeleton /> : <Availability room={room} />}</div>
           <div className="h-[45dvh]">{showLoading ? <ActiveIssuesSkeleton /> : <ActiveIssues issues={issues} room={room} />}</div>
-          <div className="h-[45dvh]">{/*{showLoading ? <OpenTasksSkeleton /> : <OpenTasks tasks={tasks} room={room} />}*/}</div>
+          <div className="h-[45dvh]">{showLoading ? <OpenTasksSkeleton /> : <OpenTasks tasks={tasks} room={room} />}</div>
           <div className="h-[40dvh]">
             {showLoading ? <MaintenanceHistorySkeleton /> : <MaintenanceHistory history={maintenanceHistory} room={room} />}
           </div>
