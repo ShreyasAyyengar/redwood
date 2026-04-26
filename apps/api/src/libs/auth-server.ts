@@ -1,5 +1,3 @@
-import { electron } from "@better-auth/electron";
-import { expo } from "@better-auth/expo";
 import { roles } from "@redwood/contracts";
 import { APIError, betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
@@ -14,10 +12,9 @@ const basePath = env.ENV === "development" ? "/api/auth" : "/auth";
 
 export const authServer = betterAuth({
   database: mongodbAdapter(database),
-  plugins: [electron(), expo()],
   baseURL: env.API_URL,
   basePath,
-  trustedOrigins: [env.WEBSITE_URL, "redwood://", ...(env.ENV === "development" ? ["exp://"] : [])], // TODO
+  trustedOrigins: [env.WEBSITE_URL],
 
   onAPIError: {
     errorURL: "http://localhost:3000/auth/error",

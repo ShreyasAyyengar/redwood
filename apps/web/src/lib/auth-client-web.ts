@@ -1,4 +1,3 @@
-import { electronProxyClient } from "@better-auth/electron/proxy";
 import type { authServer } from "@redwood/api/auth-server";
 // biome-ignore lint/correctness/noUnusedImports: fixes TS compile error of (The inferred type of 'authClientWeb' cannot be named without a reference to 'InferSignUpEmailCtx')
 import type { InferSignUpEmailCtx } from "better-auth/client";
@@ -11,12 +10,5 @@ const basePath = env.NEXT_PUBLIC_NODE_ENV === "development" ? "/api/auth" : "/au
 export const authClientWeb = createAuthClient({
   baseURL: env.NEXT_PUBLIC_API_URL,
   basePath,
-  plugins: [
-    inferAdditionalFields<typeof authServer>(),
-    electronProxyClient({
-      protocol: {
-        scheme: "redwood", // TODO
-      },
-    }),
-  ],
+  plugins: [inferAdditionalFields<typeof authServer>()],
 });
