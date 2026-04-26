@@ -25,7 +25,7 @@ export default function MaintenanceHistory({
   const rowVirtualizer = useVirtualizer({
     count: history?.length ?? 0,
     getScrollElement: () => viewportElement,
-    estimateSize: () => 140, // estimate high, not exact
+    estimateSize: () => 140,
     overscan: 3,
     getItemKey: (index) => history?.[index]?._id ?? index,
   });
