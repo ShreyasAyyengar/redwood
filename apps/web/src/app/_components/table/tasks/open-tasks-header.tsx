@@ -7,7 +7,7 @@ export default function OpenTasksHeader({ column }: { column: Column<z.infer<typ
   return (
     <div>
       <div
-        className="flex cursor-pointer items-center justify-center rounded-md border border-black/0 bg-neutral-700/50 px-5 py-1 transition-all duration-100 hover:border hover:border-neutral-700/50 hover:bg-neutral-700/75 hover:shadow-xl/100 active:scale-95 active:transform"
+        className="flex cursor-pointer items-center justify-center rounded-md border border-black/0 bg-neutral-700/50 px-3 py-0.5 transition-all duration-100 hover:border hover:border-neutral-700/50 hover:bg-neutral-700/75 hover:shadow-xl/100 active:scale-95 active:transform"
         onClick={() => {
           // cycle between asd, desc, and default
           const currentSort = column.getIsSorted();
