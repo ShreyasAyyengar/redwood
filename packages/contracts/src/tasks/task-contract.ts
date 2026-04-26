@@ -108,6 +108,7 @@ export const taskContract = {
       },
     }),
 
+  // TODO paginate with inf queries
   getAllTasks: oc
     .route({
       method: "GET",

@@ -85,6 +85,7 @@ export const issueContract = {
       },
     }),
 
+  // TODO paginate with inf queries
   getAllIssues: oc
     .route({
       method: "GET",
