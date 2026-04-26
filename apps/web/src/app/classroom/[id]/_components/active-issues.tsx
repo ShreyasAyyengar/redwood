@@ -18,7 +18,7 @@ export default function ActiveIssues({ issues, room }: { issues?: z.infer<typeof
       )}
 
       {/* actual content - now with 'relative' to sit above the blur */}
-      <div className="relative flex h-full w-full flex-1 flex-col overflow-hidden rounded-2xl bg-zinc-900 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/50 sm:text-2xl">
+      <div className="relative flex h-full w-full flex-1 flex-col overflow-hidden rounded-2xl bg-neutral-900/95 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/50 sm:text-2xl">
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
