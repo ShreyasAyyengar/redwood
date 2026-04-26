@@ -14,6 +14,10 @@ const ClassroomSchemaMongoose = toMongooseSchema(
   })
 );
 
+ClassroomSchemaMongoose.index({ sourceRoomName: 1 });
+ClassroomSchemaMongoose.index({ groupKey: 1 });
+ClassroomSchemaMongoose.index({ isActive: 1 });
+
 export interface IClassroomSchemaMongoose extends z.infer<typeof ClassroomSchemaMongooseZod> {}
 
 export const ClassroomService = databaseConnection.model<IClassroomSchemaMongoose>("classrooms", ClassroomSchemaMongoose, "classrooms");

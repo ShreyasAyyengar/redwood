@@ -14,6 +14,8 @@ const GroupSchemaMongoose = toMongooseSchema(
   })
 );
 
+GroupSchemaMongoose.index({ label: 1 });
+
 export interface IGroupSchemaMongoose extends z.infer<typeof GroupSchemaMongooseZod> {}
 
 export const GroupService = databaseConnection.model<IGroupSchemaMongoose>("groups", GroupSchemaMongoose, "groups");

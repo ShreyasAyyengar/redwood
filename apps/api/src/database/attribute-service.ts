@@ -14,6 +14,8 @@ const AttributeSchemaMongoose = toMongooseSchema(
   })
 );
 
+AttributeSchemaMongoose.index({ label: 1 });
+
 export interface IAttributeSchemaMongoose extends z.infer<typeof AttributeSchemaMongooseZod> {}
 
 export const AttributeService = databaseConnection.model<IAttributeSchemaMongoose>("attributes", AttributeSchemaMongoose, "attributes");

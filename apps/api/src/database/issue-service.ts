@@ -14,6 +14,10 @@ const IssueSchemaMongoose = toMongooseSchema(
   })
 );
 
+IssueSchemaMongoose.index({ classroomId: 1, "issue.reportedAt": -1 });
+IssueSchemaMongoose.index({ resolution: 1, "issue.reportedAt": -1 });
+IssueSchemaMongoose.index({ classroomId: 1, resolution: 1 });
+
 export interface IIssueSchemaMongoose extends z.infer<typeof IssueSchemaMongooseZod> {}
 
 export const IssueService = databaseConnection.model<IIssueSchemaMongoose>("issues", IssueSchemaMongoose, "issues");
