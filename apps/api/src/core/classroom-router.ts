@@ -4,7 +4,6 @@ import { v7 as uuidv7 } from "uuid";
 import type { z } from "zod";
 import { ClassroomService } from "../database/classroom-service";
 import { ConfigService } from "../database/config-service";
-import { TaskService } from "../database/task-service";
 import { protectedProcedure } from "../libs/orpc-procedures";
 import { emptySchedule, processTimeRanges, rowSchema } from "../util/csv-util";
 
@@ -110,22 +109,41 @@ export const classroomRouter = {
 
   getRooms: protectedProcedure.classrooms.getRooms.handler(async ({ errors: { INTERNAL_SERVER_ERROR } }) => {
     try {
-      const rooms = await ClassroomService.find({ isActive: true }).lean();
+      return await ClassroomService.aggregate([
+        // 1. Filter for active rooms
+        { $match: { isActive: true } },
 
-      const openTasks = await TaskService.find({
-        classroomId: { $in: rooms.map((r) => r._id) },
+        // 2. Join with tasks collection
+        {
+          $lookup: {
+            from: "tasks",
+            let: { roomId: "$_id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ["$classroomId", "$$roomId"] },
+                  completion: { $exists: false },
+                  $or: [{ visibleAt: { $exists: false } }, { visibleAt: { $lte: new Date() } }],
+                },
+              },
+              { $count: "count" },
+            ],
+            as: "taskCountResult",
+          },
+        },
 
-        // 1) no resolution
-        completion: { $exists: false },
+        // 3. Format the output
+        {
+          $addFields: {
+            openTasksCount: {
+              $ifNull: [{ $arrayElemAt: ["$taskCountResult.count", 0] }, 0],
+            },
+          },
+        },
 
-        // 2) visibleAt missing OR already in the past
-        $or: [{ visibleAt: { $exists: false } }, { visibleAt: { $lte: new Date() } }],
-      }).lean();
-
-      return rooms.map((room) => ({
-        ...room,
-        openTasksCount: openTasks.filter((task) => task.classroomId === room._id).length,
-      }));
+        // 4. Remove the temporary lookup field
+        { $project: { taskCountResult: 0 } },
+      ]);
     } catch (e) {
       console.error(e);
       throw INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
