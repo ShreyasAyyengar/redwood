@@ -1,4 +1,4 @@
-import type { redwoodUserSchema, issueSchema } from "@redwood/contracts";
+import type { issueSchema, redwoodUserSchema } from "@redwood/contracts";
 import { Button } from "@redwood/shad-ui/components/button";
 import { Calendar } from "@redwood/shad-ui/components/calendar";
 import { Checkbox } from "@redwood/shad-ui/components/checkbox";
@@ -132,7 +132,11 @@ export default function ResolutionField({ existingValue }: { existingValue?: z.i
                         className="inline-flex h-auto w-auto rounded-md border bg-neutral-900 p-1 text-muted-foreground text-sm shadow-none hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 data-[empty=true]:text-muted-foreground"
                       >
                         <CalendarDays className="h-4! w-4!" />
-                        <span>{localResolvedAt ? localResolvedAt.toLocaleDateString() : "Pick a date"}</span>
+                        <span>
+                          {localResolvedAt
+                            ? localResolvedAt.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" })
+                            : "Pick a date"}
+                        </span>
                       </Button>
                     </PopoverTrigger>
 

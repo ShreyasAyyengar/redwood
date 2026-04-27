@@ -31,7 +31,11 @@ export default function IssueDateField({ existingDate }: { existingDate: Date })
             <Button variant="outline" data-empty={!date} className="max-w-fit text-lg data-[empty=true]:text-muted-foreground">
               <div className="flex items-center gap-3">
                 <CalendarDays className="h-5! w-5!" />
-                {date ? <span className="leading-none">{date.toLocaleDateString()}</span> : <span className="leading-none">Pick a date</span>}
+                {date ? (
+                  <span className="leading-none">{date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" })}</span>
+                ) : (
+                  <span className="leading-none">Pick a date</span>
+                )}
                 <ChevronDownIcon />
               </div>
             </Button>

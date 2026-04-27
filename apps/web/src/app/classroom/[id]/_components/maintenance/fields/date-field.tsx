@@ -33,7 +33,11 @@ export default function DateField({ existingDate }: { existingDate?: Date }) {
             >
               <div className="flex items-center gap-3">
                 <CalendarDays className="h-6! w-6!" />
-                {date ? <span>{date.toLocaleDateString()}</span> : <span>Pick a date</span>}
+                {date ? (
+                  <span>{date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" })}</span>
+                ) : (
+                  <span>Pick a date</span>
+                )}
               </div>
               <ChevronDownIcon />
             </Button>

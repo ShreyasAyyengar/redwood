@@ -6,15 +6,7 @@ import { CalendarDays, ChevronDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { type FormValues, useFieldContext } from "../task-form";
 
-export default function TaskDateField({
-  label,
-  name,
-  existingDate,
-}: {
-  label: string;
-  name: "visibleAt" | "completeBy";
-  existingDate?: Date;
-}) {
+export default function TaskDateField({ label, name, existingDate }: { label: string; name: "visibleAt" | "completeBy"; existingDate?: Date }) {
   const field = useFieldContext<FormValues["visibleAt" | "completeBy"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
   const [date, setDate] = useState<Date | undefined>(existingDate ?? undefined);
@@ -35,7 +27,11 @@ export default function TaskDateField({
             <Button variant="outline" data-empty={!date} className="max-w-fit text-lg data-[empty=true]:text-muted-foreground">
               <div className="flex items-center gap-3">
                 <CalendarDays className="h-6! w-6!" />
-                {date ? <span>{date.toLocaleDateString()}</span> : <span>Pick a date</span>}
+                {date ? (
+                  <span>{date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" })}</span>
+                ) : (
+                  <span>Pick a date</span>
+                )}
               </div>
               <ChevronDownIcon />
             </Button>
