@@ -119,7 +119,7 @@ function AvailabilityFrame({ children }: { children: React.ReactNode }) {
 
 function AvailabilityTabs({ children, defaultValue }: { children: React.ReactNode; defaultValue: DayName }) {
   return (
-    <Tabs defaultValue={defaultValue} className="mt-3 flex min-h-0 flex-1 flex-col gap-4 xl:flex-row xl:gap-2">
+    <Tabs defaultValue={defaultValue} className="mt-3 flex min-h-0 flex-1 flex-col">
       {children}
     </Tabs>
   );
@@ -127,25 +127,19 @@ function AvailabilityTabs({ children, defaultValue }: { children: React.ReactNod
 
 function DayTabList() {
   return (
-    <TabsList
-      className={cn(
-        "h-9 w-full flex-row items-stretch gap-1 overflow-x-auto rounded-xl border bg-zinc-950/40 p-2",
-        "xl:h-full! xl:w-fit xl:flex-col! xl:items-center xl:gap-0 xl:overflow-visible xl:p-[3px]"
-      )}
-    >
+    <TabsList className="grid w-full grid-cols-7 items-stretch gap-1 overflow-hidden rounded-xl border bg-zinc-950/40 p-1">
       {DAY_NAMES.map((day, index) => (
         <TabsTrigger
           key={day}
           value={day}
           className={cn(
-            "w-auto shrink-0 justify-center capitalize xl:w-full xl:justify-start",
-            "rounded-lg px-3 py-2 font-semibold text-sm text-zinc-300/80",
+            "min-w-0 justify-center",
+            "rounded-lg font-semibold text-sm text-zinc-300/80 leading-none",
             "data-[state=active]:bg-white/10 data-[state=active]:text-zinc-100",
             "hover:bg-white/5"
           )}
         >
-          <span className="xl:hidden">{SHORT_DAY_NAMES[index]}</span>
-          <span className="hidden xl:inline">{day}</span>
+          {SHORT_DAY_NAMES[index]}
         </TabsTrigger>
       ))}
     </TabsList>
@@ -238,7 +232,7 @@ function AvailabilityPanelHeader({
 }) {
   return (
     <div className="flex shrink-0 items-center justify-between border-zinc-800 border-b px-4 py-3">
-      <div className="flex flex-row items-center gap-5 xl:flex-col xl:items-start xl:gap-1">
+      <div className="flex flex-row items-center gap-5">
         <div className="font-bold text-base text-zinc-200/90 capitalize sm:text-lg">{day}</div>
         <OmitShortBreaksControl checked={omitShortBreaks} onCheckedChange={onOmitShortBreaksChange} />
       </div>
@@ -252,7 +246,7 @@ function OmitShortBreaksControl({ checked, onCheckedChange }: { checked: boolean
   const checkboxId = useId();
 
   return (
-    <label className="flex cursor-pointer items-center gap-2 xl:gap-1" htmlFor={checkboxId}>
+    <label className="flex cursor-pointer items-center gap-2" htmlFor={checkboxId}>
       <Checkbox
         checked={checked}
         className="border border-neutral-400"
