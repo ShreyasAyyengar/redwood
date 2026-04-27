@@ -1,5 +1,6 @@
 import { attributesRouter } from "../core/attributes-routers";
 import { classroomRouter } from "../core/classroom-router";
+import { feedbackRouter } from "../core/feedback-router";
 import { groupsRouter } from "../core/groups-router";
 import { issueRouter } from "../core/issue-router";
 import { maintenanceRouter } from "../core/maintenance-router";
@@ -14,4 +15,5 @@ export const httpRouter = {
   users: userRouter,
   attributes: attributesRouter,
   groups: groupsRouter,
+  feedback: feedbackRouter,
 };

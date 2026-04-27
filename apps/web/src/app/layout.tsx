@@ -4,6 +4,7 @@ import "@redwood/shad-ui/globals.css";
 import { Suspense } from "react";
 import { env } from "../env";
 import AuthLayer from "./_components/auth-layer";
+import FeedbackDialog from "./_components/feedback/feedback-dialog";
 import NavigatorCommand from "./_components/navigate/navigator-command";
 import Providers from "./_components/providers";
 
@@ -36,6 +37,9 @@ export default function RootLayout({
         </Suspense>
         <head>{reactScanEnabled && <script crossOrigin="anonymous" src="//unpkg.com/react-scan/dist/auto.global.js" />}</head>
         <body className={`${geistSans.variable} ${geistMono.variable} dark`}>
+          <div className="fixed right-4 bottom-4 z-50">
+            <FeedbackDialog />
+          </div>
           <NavigatorCommand />
           {children}
         </body>

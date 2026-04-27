@@ -1,5 +1,6 @@
 import { cn } from "@redwood/shad-ui/lib/utils";
 import {
+  type ComponentProps,
   createContext,
   forwardRef,
   useCallback,
@@ -14,7 +15,7 @@ import {
   FileRejection,
   useDropzone as rootUseDropzone,
 } from "react-dropzone";
-import { Button, ButtonProps } from "./ui/button";
+import { Button } from "./button";
 
 type DropzoneResult<TUploadRes, TUploadError> =
   | {
@@ -345,7 +346,10 @@ const useDropzone = <TUploadRes, TUploadError = string>(
 
       const onDropFilePromises = slicedNewFiles.map(async (file, index) => {
         if (fileCount + 1 > maxNewFiles) {
-          await onRemoveFile(fileStatuses[index].id);
+          const fileStatus = fileStatuses[index];
+          if (fileStatus !== undefined) {
+            await onRemoveFile(fileStatus.id);
+          }
         }
 
         const id = crypto.randomUUID();
@@ -655,7 +659,7 @@ const DropzoneMessage = forwardRef<HTMLParagraphElement, DropzoneMessageProps>(
 );
 DropzoneMessage.displayName = "DropzoneMessage";
 
-interface DropzoneRemoveFileProps extends ButtonProps {}
+interface DropzoneRemoveFileProps extends ComponentProps<typeof Button> {}
 
 const DropzoneRemoveFile = forwardRef<
   HTMLButtonElement,
@@ -686,7 +690,7 @@ const DropzoneRemoveFile = forwardRef<
 });
 DropzoneRemoveFile.displayName = "DropzoneRemoveFile";
 
-interface DropzoneRetryFileProps extends ButtonProps {}
+interface DropzoneRetryFileProps extends ComponentProps<typeof Button> {}
 
 const DropzoneRetryFile = forwardRef<HTMLButtonElement, DropzoneRetryFileProps>(
   ({ className, ...props }, ref) => {
