@@ -1,6 +1,6 @@
 import type { classroomSchemaPayload } from "@redwood/contracts";
 import type { Column } from "@tanstack/react-table";
-import { CalendarClock, CircleX, ClockCheck, SlidersHorizontal } from "lucide-react";
+import { CalendarClock, ClockCheck, SlidersHorizontal } from "lucide-react";
 import type { z } from "zod";
 
 export default function AvailabilityHeader({ column }: { column: Column<z.infer<typeof classroomSchemaPayload>> }) {
@@ -12,7 +12,6 @@ export default function AvailabilityHeader({ column }: { column: Column<z.infer<
           // cycle between asd, desc, and default
           const currentSort = column.getIsSorted();
           if (currentSort === false) column.toggleSorting(false);
-          else if (currentSort === "asc") column.toggleSorting(true);
           else column.clearSorting();
         }}
         onKeyDown={(e) => {
@@ -22,7 +21,6 @@ export default function AvailabilityHeader({ column }: { column: Column<z.infer<
 
             const currentSort = column.getIsSorted();
             if (currentSort === false) column.toggleSorting(false);
-            else if (currentSort === "asc") column.toggleSorting(true);
             else column.clearSorting();
           }
         }}
@@ -30,11 +28,7 @@ export default function AvailabilityHeader({ column }: { column: Column<z.infer<
         <CalendarClock className="mr-2 h-6 w-6" />
         <p className="text-lg">Availability</p>
         {column.getIsSorted() ? (
-          column.getIsSorted() === "asc" ? (
-            <ClockCheck className="ml-2 h-6 w-6 text-green-500" />
-          ) : (
-            <CircleX className="ml-2 h-6 w-6 text-red-800" />
-          )
+          <ClockCheck className="ml-2 h-6 w-6 text-green-500" />
         ) : (
           <SlidersHorizontal className="ml-2 h-6 w-6 rotate-90" />
         )}
