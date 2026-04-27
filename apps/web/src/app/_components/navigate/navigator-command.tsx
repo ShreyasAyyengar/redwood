@@ -9,15 +9,11 @@ export default function NavigatorCommand() {
   const [navigateOpen, setNavigateOpen] = useState(false);
   useHotkey("Mod+F", () => setNavigateOpen(true));
 
-  const onSearch = (input: string) => {
-    console.log(input);
-  };
-
   return (
     <div className="flex flex-col gap-4">
       <CommandDialog open={navigateOpen} onOpenChange={setNavigateOpen}>
         <Command>
-          <CommandInput placeholder="Type a command or search..." onValueChange={onSearch} />
+          <CommandInput placeholder="Type a command or search..." />
           <CommandContent closeNavigator={() => setNavigateOpen(false)} />
         </Command>
       </CommandDialog>

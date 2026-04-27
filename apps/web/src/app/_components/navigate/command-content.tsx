@@ -1,6 +1,6 @@
 import { CommandEmpty, CommandGroup, CommandItem, CommandList, CommandSeparator } from "@redwood/shad-ui/components/command";
 import { useQuery } from "@tanstack/react-query";
-import { TriangleAlert, ClipboardList, School } from "lucide-react";
+import { ClipboardList, School, TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { webClientORPC } from "../../../lib/orpc-web-client";
 import { useFetchedRoomsStore } from "../room-store";
@@ -40,10 +40,10 @@ export default function CommandContent({ closeNavigator }: { closeNavigator: () 
 
       <CommandSeparator />
 
-      <CommandGroup heading="Issues">
-        {issuesFetching && <div className="p-4 text-center text-muted-foreground text-sm">Finding issues...</div>}
+      <CommandGroup heading="Active Issues">
+        {issuesFetching && <div className="p-4 text-center text-muted-foreground text-sm">Finding active issues...</div>}
         {issues?.map((issue) => (
-          <CommandItem key={issue._id} value={issue.issue.description} onSelect={() => navigateToClassroom(issue.classroomId)}>
+          <CommandItem key={issue._id} value={issue.issue.description + issue._id} onSelect={() => navigateToClassroom(issue.classroomId)}>
             <TriangleAlert className="mr-2 size-5" />
             <span>{issue.issue.description}</span>
           </CommandItem>
@@ -52,10 +52,10 @@ export default function CommandContent({ closeNavigator }: { closeNavigator: () 
 
       <CommandSeparator />
 
-      <CommandGroup heading="Tasks">
-        {tasksFetching && <div className="p-4 text-center text-muted-foreground text-sm">Finding tasks...</div>}
+      <CommandGroup heading="Open Tasks">
+        {tasksFetching && <div className="p-4 text-center text-muted-foreground text-sm">Finding open tasks...</div>}
         {tasks?.map((task) => (
-          <CommandItem key={task._id} value={task.task.description} onSelect={() => navigateToClassroom(task.classroomId)}>
+          <CommandItem key={task._id} value={task.task.description + task._id} onSelect={() => navigateToClassroom(task.classroomId)}>
             <ClipboardList className="mr-2 size-5" />
             <span>{task.task.description}</span>
           </CommandItem>
