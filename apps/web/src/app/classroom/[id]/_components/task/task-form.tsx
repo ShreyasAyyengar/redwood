@@ -121,7 +121,7 @@ export function TaskForm({
 
           <Separator className="bg-indigo-500" />
 
-          <div className="mx-auto flex w-full flex-col justify-between space-y-5 md:flex-row md:space-y-0">
+          <div className="mx-auto flex w-full flex-col justify-between space-y-5 sm:flex-row sm:space-y-0">
             <div>
               <form.AppField name="visibleAt">
                 {(field) => (
