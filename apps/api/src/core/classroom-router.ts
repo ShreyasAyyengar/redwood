@@ -107,6 +107,40 @@ export const classroomRouter = {
     return config.csvRecords ?? null;
   }),
 
+  getRoom: protectedProcedure.classrooms.getRoom.handler(async ({ input, errors: { NOT_FOUND, INTERNAL_SERVER_ERROR } }) => {
+    const room = await ClassroomService.aggregate([
+      { $match: { _id: input.id } },
+      {
+        $lookup: {
+          from: "tasks",
+          let: { roomId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$classroomId", "$$roomId"] },
+                completion: { $exists: false },
+                $or: [{ visibleAt: { $exists: false } }, { visibleAt: { $lte: new Date() } }],
+              },
+            },
+            { $count: "count" },
+          ],
+          as: "taskCountResult",
+        },
+      },
+      {
+        $addFields: {
+          openTasksCount: {
+            $ifNull: [{ $arrayElemAt: ["$taskCountResult.count", 0] }, 0],
+          },
+        },
+      },
+      { $project: { taskCountResult: 0 } },
+    ]).then((results) => results[0]);
+    if (!room) throw NOT_FOUND({ data: { message: `Room with id ${input.id} not found` } });
+
+    return room;
+  }),
+
   getRooms: protectedProcedure.classrooms.getRooms.handler(async ({ errors: { INTERNAL_SERVER_ERROR } }) => {
     try {
       return await ClassroomService.aggregate([

@@ -35,7 +35,11 @@ export const classroomContract = {
     .route({
       method: "GET",
     })
-    .input(classroomSchema.shape._id)
+    .input(
+      z.object({
+        id: classroomSchema.shape._id,
+      })
+    )
     .output(classroomSchemaPayload)
     .errors({
       NOT_FOUND: {
