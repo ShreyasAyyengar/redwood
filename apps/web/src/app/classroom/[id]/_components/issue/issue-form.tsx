@@ -9,6 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../../lib/orpc-web-client";
+import { useFetchedRoomsStore } from "../../../../_components/room-store";
 import CruzfixField from "./fields/cruzfix-field";
 import DescriptionField from "./fields/description-field";
 import IssueDateField from "./fields/issue-date-field";
@@ -47,15 +48,24 @@ export function IssueForm({
   existingIssue?: z.infer<typeof issueSchema>;
 }) {
   const queryClient = useQueryClient();
+  const { updateRoom } = useFetchedRoomsStore();
+
+  const refreshRoom = async () => {
+    const roomQuery = webClientORPC.classrooms.getRoom.queryOptions({ input: { id: roomId } });
+
+    await queryClient.invalidateQueries({ queryKey: roomQuery.queryKey });
+    const data = await queryClient.fetchQuery({ ...roomQuery, staleTime: 0 });
+    if (data) updateRoom(roomId, data);
+  };
 
   const createIssue = useMutation(
     webClientORPC.issues.createIssue.mutationOptions({
       onSuccess: async () => {
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: webClientORPC.issues.getIssues.queryOptions({ input: { classroomId: roomId } }).queryKey }),
-          queryClient.invalidateQueries({ queryKey: webClientORPC.classrooms.getRooms.queryKey() }),
-        ]);
         onSuccess?.();
+        await queryClient.invalidateQueries({
+          queryKey: webClientORPC.issues.getIssues.queryOptions({ input: { classroomId: roomId } }).queryKey,
+        });
+        await refreshRoom();
       },
     })
   );
@@ -63,11 +73,11 @@ export function IssueForm({
   const editIssue = useMutation(
     webClientORPC.issues.editIssue.mutationOptions({
       onSuccess: async () => {
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: webClientORPC.issues.getIssues.queryOptions({ input: { classroomId: roomId } }).queryKey }),
-          queryClient.invalidateQueries({ queryKey: webClientORPC.classrooms.getRooms.queryKey() }),
-        ]);
         onSuccess?.();
+        await queryClient.invalidateQueries({
+          queryKey: webClientORPC.issues.getIssues.queryOptions({ input: { classroomId: roomId } }).queryKey,
+        });
+        await refreshRoom();
       },
     })
   );

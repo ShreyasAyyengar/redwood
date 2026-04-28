@@ -7,6 +7,7 @@ import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../../lib/orpc-web-client";
+import { useFetchedRoomsStore } from "../../../../_components/room-store";
 
 export function DeleteIssueDialog({
   roomId,
@@ -20,13 +21,23 @@ export function DeleteIssueDialog({
   const [open, setOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const queryClient = useQueryClient();
+  const { updateRoom } = useFetchedRoomsStore();
+
+  const refreshRoom = async () => {
+    const roomQuery = webClientORPC.classrooms.getRoom.queryOptions({ input: { id: roomId } });
+
+    await queryClient.invalidateQueries({ queryKey: roomQuery.queryKey });
+    const data = await queryClient.fetchQuery({ ...roomQuery, staleTime: 0 });
+    if (data) updateRoom(roomId, data);
+  };
+
   const deleteIssueMutation = useMutation(
     webClientORPC.issues.deleteIssue.mutationOptions({
       onMutate: async () => setDeleting(true),
       onSuccess: async () => {
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: webClientORPC.issues.getIssues.queryOptions({ input: { classroomId: roomId } }).queryKey }),
-          queryClient.invalidateQueries({ queryKey: webClientORPC.classrooms.getRooms.queryKey() }),
+          refreshRoom(),
         ]);
         setOpen(false);
         setDeleting(false);

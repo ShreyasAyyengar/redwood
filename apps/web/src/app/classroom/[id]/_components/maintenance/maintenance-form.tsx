@@ -9,6 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../../lib/orpc-web-client";
+import { useFetchedRoomsStore } from "../../../../_components/room-store";
 import { IssueDialog } from "../issue/issue-dialog";
 import { TaskDialog } from "../task/task-dialog";
 import DateField from "./fields/date-field";
@@ -53,12 +54,16 @@ export default function MaintenanceForm({
     setAideOpen(true);
   };
 
+  const { updateRoom } = useFetchedRoomsStore();
   const queryClient = useQueryClient();
   const createMaintenanceLog = useMutation(
     webClientORPC.maintenance.addMaintenanceEntry.mutationOptions({
-      onSuccess: async (data) => {
-        await queryClient.invalidateQueries({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
           queryKey: webClientORPC.maintenance.getHistory.queryOptions({ input: { classroomId: roomId } }).queryKey,
+        });
+        queryClient.fetchQuery(webClientORPC.classrooms.getRoom.queryOptions({ input: { id: roomId } })).then((data) => {
+          if (data) updateRoom(roomId, data);
         });
         onSuccess?.();
       },

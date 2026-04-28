@@ -49,7 +49,6 @@ export const issueRouter = {
     try {
       await IssueService.insertOne(newIssue);
 
-      // biome-ignore lint/complexity/noVoid: fire-and-forget
       void recomputeRoomStatus(newIssue.classroomId);
 
       return true;
@@ -100,8 +99,6 @@ export const issueRouter = {
 
     try {
       await IssueService.replaceOne({ _id: input._id }, updatedIssue).lean();
-
-      // biome-ignore lint/complexity/noVoid: fire-and-forget
       void recomputeRoomStatus(updatedIssue.classroomId);
 
       return true;
@@ -117,7 +114,6 @@ export const issueRouter = {
     try {
       await IssueService.findByIdAndDelete(input.issueId).lean();
 
-      // biome-ignore lint/complexity/noVoid: fire-and-forget
       void recomputeRoomStatus(issue.classroomId);
 
       return true;

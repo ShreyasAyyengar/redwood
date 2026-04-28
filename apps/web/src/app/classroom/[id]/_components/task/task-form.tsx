@@ -44,8 +44,8 @@ export function TaskForm({
 
   const createTask = useMutation(
     webClientORPC.tasks.addTask.mutationOptions({
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
           queryKey: webClientORPC.tasks.getTasks.queryOptions({ input: { classroomId: roomId } }).queryKey,
         });
         onSuccess?.();
@@ -55,8 +55,8 @@ export function TaskForm({
 
   const editTask = useMutation(
     webClientORPC.tasks.editTask.mutationOptions({
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
           queryKey: webClientORPC.tasks.getTasks.queryOptions({ input: { classroomId: roomId } }).queryKey,
         });
         onSuccess?.();
