@@ -19,10 +19,28 @@ export function GroupClassroomSelector() {
   );
 
   const handleToggleSelectAll = () => {
-    if (isAllSelected) {
-      deselectAllClassrooms();
+    const isFiltered = searchQuery.trim().length > 0;
+
+    if (!isFiltered) {
+      if (isAllSelected) deselectAllClassrooms();
+      else selectAllClassrooms();
+      return;
+    }
+
+    const filteredIds = filteredClassrooms.map((c) => c._id);
+    const filteredIdSet = new Set(filteredIds);
+    const selectedIdSet = new Set(selectedClassroomIds);
+
+    const allFilteredSelected = filteredIds.every((id) => selectedIdSet.has(id));
+
+    if (allFilteredSelected) {
+      useGroupStore.setState({
+        selectedClassroomIds: selectedClassroomIds.filter((id) => !filteredIdSet.has(id)),
+      });
     } else {
-      selectAllClassrooms();
+      useGroupStore.setState({
+        selectedClassroomIds: Array.from(new Set([...selectedClassroomIds, ...filteredIds])),
+      });
     }
   };
 

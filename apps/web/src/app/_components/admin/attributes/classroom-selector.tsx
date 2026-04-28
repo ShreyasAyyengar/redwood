@@ -18,13 +18,30 @@ export function ClassroomSelector({ availableAttributes }: { availableAttributes
   );
 
   const handleToggleSelectAll = () => {
-    if (isAllSelected) {
-      deselectAllClassrooms();
+    const isFiltered = searchQuery.trim().length > 0;
+
+    if (!isFiltered) {
+      if (isAllSelected) deselectAllClassrooms();
+      else selectAllClassrooms();
+      return;
+    }
+
+    const filteredIds = filteredClassrooms.map((c) => c._id);
+    const filteredIdSet = new Set(filteredIds);
+    const selectedIdSet = new Set(selectedClassroomIds);
+
+    const allFilteredSelected = filteredIds.every((id) => selectedIdSet.has(id));
+
+    if (allFilteredSelected) {
+      useAttributeStore.setState({
+        selectedClassroomIds: selectedClassroomIds.filter((id) => !filteredIdSet.has(id)),
+      });
     } else {
-      selectAllClassrooms();
+      useAttributeStore.setState({
+        selectedClassroomIds: Array.from(new Set([...selectedClassroomIds, ...filteredIds])),
+      });
     }
   };
-
   return (
     <div className="flex h-full flex-col rounded-lg border border-zinc-800 bg-neutral-900 p-5">
       <div className="mb-4 flex shrink-0 flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
