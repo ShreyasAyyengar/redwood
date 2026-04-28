@@ -102,7 +102,12 @@ export function daysAgoNumeric(date: Date): number {
 }
 
 export function daysAgoRelative(date: Date): string {
-  const number = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+  const now = new Date();
+
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+  const number = Math.round((today.getTime() - target.getTime()) / (1000 * 60 * 60 * 24));
 
   switch (number) {
     case -1:
