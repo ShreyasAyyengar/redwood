@@ -201,16 +201,15 @@ export default function UserEditor() {
                         </DialogTrigger>
                         <DialogContent className="border-white/10 bg-zinc-950 text-zinc-100 sm:max-w-md">
                           <DialogHeader>
-                            <DialogTitle className="text-zinc-100">Remove User</DialogTitle>
-                            <DialogDescription className="text-zinc-400">
-                              This will permanently remove <span className="font-semibold text-zinc-200">{user.email}</span> from the system.
-                              This action cannot be undone.
+                            <DialogTitle className="text-zinc-100">Remove {user.email.split("@")[0]}?</DialogTitle>
+                            <DialogDescription className="text-md text-zinc-400">
+                              This will remove <span className="font-semibold text-zinc-200">{user.email}</span>'s access to Redwood immediately.
                             </DialogDescription>
                           </DialogHeader>
                           <DialogFooter className="mt-4">
                             <Button
-                              variant="destructive"
-                              className="w-full bg-red-500/10 text-red-500 hover:bg-red-600/10 hover:text-red-600 sm:w-auto"
+                              variant="default"
+                              className="w-full bg-red-600 font-bold text-white hover:bg-red-900 sm:w-auto"
                               onClick={() => removeUserMutation.mutate({ email: user.email })}
                               disabled={removeUserMutation.isPending}
                             >
