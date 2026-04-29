@@ -108,10 +108,13 @@ export function ActiveIssuesSkeleton() {
             </button>
           </div>
 
-          <div className="flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg">
-            <Plus className="mr-2 size-5" />
+          <Button
+            disabled
+            className="flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg transition-all duration-150 hover:bg-neutral-400 focus:ring-5! focus:ring-neutral-600! active:scale-95 active:transform"
+          >
+            <Plus className="size-5" />
             New Issue
-          </div>
+          </Button>
         </div>
 
         <ScrollArea className="mt-5 h-full min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
