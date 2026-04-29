@@ -24,7 +24,7 @@ export default function LastServicedCell({ row }: { row: Row<z.infer<typeof clas
             "rounded-full px-2 py-0.5 text-lg",
             // under 14, green, between 14 and 21, orange, over 21, red
             daysAgo < 14 && urgencyStyle("green"),
-            daysAgo >= 14 && daysAgo <= 21 && urgencyStyle("orange"),
+            daysAgo >= 14 && daysAgo <= 30 && urgencyStyle("orange"),
             daysAgo > 30 && urgencyStyle("red")
           )}
         >
