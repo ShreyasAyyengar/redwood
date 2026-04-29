@@ -1,7 +1,5 @@
 import z from "zod";
 
-export const commonAdminNotesSchema = z.enum(["Escalated to MSE"]);
-
 const issueDetailsSchema = z.object({
   reportedBy: z.email("Issue reportedBy must be provided."),
   reportedAt: z.coerce.date("Issue reportedAt must be provided"),
@@ -34,9 +32,6 @@ export const issueSchema = z.object({
   issue: issueDetailsSchema,
   edited: issueEditSchema.optional(),
   resolution: issueResolutionSchema.optional(),
-
-  adminNotes: z.array(z.union([commonAdminNotesSchema, z.string()])), // TODO remove
-  files: z.array(z.uuid()).optional(),
 });
 
 export const uiIssueFormSchema = z.object({
