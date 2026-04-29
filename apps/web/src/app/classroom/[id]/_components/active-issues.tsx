@@ -1,4 +1,5 @@
 import type { classroomSchema, issueSchema } from "@redwood/contracts";
+import { Button } from "@redwood/shad-ui/components/button";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { BookAlert, Plus, TriangleAlert } from "lucide-react";
@@ -50,10 +51,10 @@ export default function ActiveIssues({ issues, room }: { issues?: z.infer<typeof
           </div>
 
           <IssueDialog roomId={room._id}>
-            <div className="flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg transition-all duration-150 hover:bg-neutral-400 active:scale-95 active:transform">
-              <Plus className="mr-2 h-5 w-5" />
+            <Button className="flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg transition-all duration-150 hover:bg-neutral-400 focus:ring-5! focus:ring-neutral-600! active:scale-95 active:transform">
+              <Plus className="size-5" />
               New Issue
-            </div>
+            </Button>
           </IssueDialog>
         </div>
 
