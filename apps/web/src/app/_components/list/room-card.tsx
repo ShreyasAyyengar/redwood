@@ -27,9 +27,9 @@ export default function RoomCard({ room }: { room: z.infer<typeof classroomSchem
       <span
         className={cn(
           "p rounded-full px-1 py-0.5 text-xs",
-          daysAgo <= 14 && urgencyStyle("green"),
-          daysAgo > 14 && daysAgo <= 21 && urgencyStyle("orange"),
-          daysAgo > 21 && urgencyStyle("red")
+          daysAgo < 14 && urgencyStyle("green"),
+          daysAgo >= 14 && daysAgo <= 21 && urgencyStyle("orange"),
+          daysAgo > 30 && urgencyStyle("red")
         )}
       >
         <span className="capitalize">{dateDaysAgo}</span>
