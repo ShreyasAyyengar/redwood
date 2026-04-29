@@ -23,7 +23,7 @@ export function RoomGroupEditor() {
   }, [groups]);
 
   return (
-    <div className="mx-auto h-[calc(100vh-145px)] w-7xl text-zinc-100">
+    <div className="mx-auto h-[calc(100vh-145px)] w-7xl pb-5 text-zinc-100">
       <div className="grid h-full grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="min-h-0 lg:col-span-2">
           <GroupClassroomSelector />
