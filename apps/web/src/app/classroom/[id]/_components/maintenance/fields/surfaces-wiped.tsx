@@ -30,7 +30,7 @@ export default function SurfacesWipedField({ existingEntry }: { existingEntry?: 
           </FieldLabel>
           <HoverCard openDelay={500} closeDelay={50}>
             <HoverCardTrigger asChild>
-              <CircleQuestionMark className="h-4 w-4 text-neutral-400" />
+              <CircleQuestionMark className="size-4 text-neutral-400" />
             </HoverCardTrigger>
             <HoverCardContent className="flex w-64 flex-col justify-center gap-0.5 text-sm">
               <div>

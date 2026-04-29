@@ -63,7 +63,7 @@ export default function Page() {
             }
           }}
         >
-          <CornerUpLeft className="h-6 w-6" />
+          <CornerUpLeft className="size-6" />
           Back to Classrooms
         </div>
         <div className="mb-10 flex flex-col gap-10">
@@ -97,7 +97,7 @@ export default function Page() {
             }
           }}
         >
-          <CornerUpLeft className="h-6 w-6" />
+          <CornerUpLeft className="size-6" />
           Back to Classrooms
         </div>
 

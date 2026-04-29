@@ -22,23 +22,13 @@ const BackButton = () => {
 
   return (
     <Button variant="secondary" className="group" onClick={() => router.back()}>
-      <ArrowLeft
-        className="ms-0 me-2 opacity-60 transition-transform group-hover:-translate-x-0.5"
-        size={16}
-        strokeWidth={2}
-        aria-hidden="true"
-      />
+      <ArrowLeft className="ms-0 size-5 stroke-2 opacity-60 transition-transform group-hover:-translate-x-0.5" aria-hidden="true" />
       Go back
     </Button>
   );
 };
 
 export default function NotFoundPage() {
-  // const { data, isPending } = authClientWeb.useSession();
-  // const { fetchedRooms } = useFetchedRoomsStore();
-  //
-  // if (isPending || !data || fetchedRooms.length === 0) return <LoadingComponent />;
-
   return (
     <div className="mt-30">
       <div className="relative flex min-h-[60svh] w-full flex-col justify-center bg-background p-6 md:p-10">
@@ -53,7 +43,7 @@ export default function NotFoundPage() {
               <BackButton />
               <Button className="-order-1 sm:order-0" asChild>
                 <Link href="/">
-                  <Home className="me-2" size={16} />
+                  <Home className="size-5" />
                   Home
                 </Link>
               </Button>

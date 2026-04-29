@@ -25,12 +25,12 @@ export default function AvailabilityHeader({ column }: { column: Column<z.infer<
           }
         }}
       >
-        <CalendarClock className="mr-2 h-6 w-6" />
+        <CalendarClock className="mr-2 size-6" />
         <p className="text-lg">Availability</p>
         {column.getIsSorted() ? (
-          <ClockCheck className="ml-2 h-6 w-6 text-green-500" />
+          <ClockCheck className="ml-2 size-6 text-green-500" />
         ) : (
-          <SlidersHorizontal className="ml-2 h-6 w-6 rotate-90" />
+          <SlidersHorizontal className="ml-2 size-6 rotate-90" />
         )}
       </div>
     </div>

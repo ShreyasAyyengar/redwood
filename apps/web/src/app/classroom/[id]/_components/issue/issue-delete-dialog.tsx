@@ -64,7 +64,7 @@ export function DeleteIssueDialog({
             className={cn("bg-red-500/10 text-red-500 hover:bg-red-600/10 hover:text-red-600", `${deleting ? "cursor-wait" : "cursor-default"}`)}
             onClick={() => deleteIssueMutation.mutateAsync({ issueId: existingIssue._id })}
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="size-4" />
 
             {deleting ? "Deleting..." : "Delete Issue"}
           </Button>

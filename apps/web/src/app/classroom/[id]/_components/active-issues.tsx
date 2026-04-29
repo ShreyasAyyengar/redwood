@@ -23,7 +23,7 @@ export default function ActiveIssues({ issues, room }: { issues?: z.infer<typeof
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <TriangleAlert className="h-6 w-6 text-yellow-500" />
+              <TriangleAlert className="size-6 text-yellow-500" />
               <div>Active Issues</div>
               {openIssues && (
                 <span
@@ -44,7 +44,7 @@ export default function ActiveIssues({ issues, room }: { issues?: z.infer<typeof
                 type="button"
                 className="flex w-full cursor-pointer items-center gap-3 font-normal transition-colors hover:text-neutral-200 sm:text-lg"
               >
-                <BookAlert className="h-5 w-5" />
+                <BookAlert className="size-5" />
                 <span className="font-normal text-md">See Issue History</span>
               </button>
             </IssueHistoryDialog>
@@ -83,7 +83,7 @@ export function ActiveIssuesSkeleton() {
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <TriangleAlert className="h-6 w-6 text-yellow-500" />
+              <TriangleAlert className="size-6 text-yellow-500" />
               <div>Active Issues</div>
 
               {/* issue count */}
@@ -91,13 +91,13 @@ export function ActiveIssuesSkeleton() {
             </div>
 
             <button type="button" disabled className="flex w-full items-center gap-3 font-normal text-zinc-300/80 sm:text-lg">
-              <BookAlert className="h-5 w-5" />
+              <BookAlert className="size-5" />
               <span className="font-normal text-md">See Issue History</span>
             </button>
           </div>
 
           <div className="flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg">
-            <Plus className="mr-2 h-5 w-5" />
+            <Plus className="mr-2 size-5" />
             New Issue
           </div>
         </div>

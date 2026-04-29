@@ -50,7 +50,7 @@ export const IssueCard = ({
           <div className="flex flex-col items-start gap-1 font-normal text-xs text-zinc-500">
             {issue.resolution && (
               <div className="flex items-center gap-1 text-sm">
-                <Check className="h-5 w-5 text-emerald-400" />
+                <Check className="size-5 text-emerald-400" />
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -67,7 +67,7 @@ export const IssueCard = ({
             )}
 
             <div className="flex items-center gap-1 text-sm">
-              <Flag className="h-5 w-5 text-indigo-300" />
+              <Flag className="size-5 text-indigo-300" />
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -84,7 +84,7 @@ export const IssueCard = ({
 
             {issue.edited && (
               <div className="flex items-center gap-1 text-sm">
-                <UserPen className="h-5 w-5 text-neutral-400" />
+                <UserPen className="size-5 text-neutral-400" />
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -131,7 +131,7 @@ export function IssueCardSkeleton() {
           <div className="flex flex-col items-start gap-1 font-normal text-xs text-zinc-500">
             {/* reported metadata */}
             <div className="flex items-center gap-1 text-sm">
-              <Flag className="h-5 w-5 text-indigo-300/60" />
+              <Flag className="size-5 text-indigo-300/60" />
               <div className="h-4 w-24 animate-pulse rounded bg-zinc-700/50" />
               <span className="text-zinc-700">•</span>
               <div className="h-4 w-16 animate-pulse rounded bg-zinc-700/40" />

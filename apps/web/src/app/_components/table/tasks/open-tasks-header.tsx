@@ -27,16 +27,16 @@ export default function OpenTasksHeader({ column }: { column: Column<z.infer<typ
           }
         }}
       >
-        <SquareCheckBig className="mr-2 h-6 w-6" />
+        <SquareCheckBig className="mr-2 size-6" />
         <p className="text-lg">Tasks</p>
         {column.getIsSorted() ? (
           column.getIsSorted() === "asc" ? (
-            <ArrowDown01 className="ml-2 h-6 w-6" />
+            <ArrowDown01 className="ml-2 size-6" />
           ) : (
-            <ArrowDown10 className="ml-2 h-6 w-6" />
+            <ArrowDown10 className="ml-2 size-6" />
           )
         ) : (
-          <SlidersHorizontal className="ml-2 h-6 w-6 rotate-90" />
+          <SlidersHorizontal className="ml-2 size-6 rotate-90" />
         )}
       </div>
     </div>

@@ -30,12 +30,12 @@ export default function StatusHeader({ column }: { column: Column<z.infer<typeof
         <p className="text-lg">Status</p>
         {column.getIsSorted() ? (
           column.getIsSorted() === "asc" ? (
-            <TriangleAlert className="ml-2 h-6 w-6 text-red-500" />
+            <TriangleAlert className="ml-2 size-6 text-red-500" />
           ) : (
-            <ThumbsUp className="ml-2 h-6 w-6" />
+            <ThumbsUp className="ml-2 size-6" />
           )
         ) : (
-          <SlidersHorizontal className="ml-2 h-6 w-6 rotate-90" />
+          <SlidersHorizontal className="ml-2 size-6 rotate-90" />
         )}
       </div>
     </div>

@@ -41,7 +41,7 @@ export function ClassroomCard({
             isSelected ? "border-blue-700 bg-blue-800" : "border-zinc-700 bg-zinc-800"
           }`}
         >
-          {isSelected && <Check className="h-3.5 w-3.5 text-blue-100" strokeWidth={3} />}
+          {isSelected && <Check className="size-3.5 text-blue-100" strokeWidth={3} />}
         </div>
       </div>
 

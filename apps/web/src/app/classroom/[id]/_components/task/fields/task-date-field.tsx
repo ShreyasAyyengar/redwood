@@ -26,7 +26,7 @@ export default function TaskDateField({ label, name, existingDate }: { label: st
           <PopoverTrigger asChild className="border border-white/30 bg-zinc-950/30 p-5">
             <Button variant="outline" data-empty={!date} className="max-w-fit text-lg data-[empty=true]:text-muted-foreground">
               <div className="flex items-center gap-3">
-                <CalendarDays className="h-6! w-6!" />
+                <CalendarDays className="size-6!" />
                 {date ? (
                   <span>{date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" })}</span>
                 ) : (

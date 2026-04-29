@@ -22,7 +22,7 @@ export default function FeedbackDialog() {
                 className="h-12 w-12 rounded-full bg-zinc-900 shadow-lg hover:bg-zinc-800 active:scale-95"
                 aria-label="Open feedback dialog"
               >
-                <MessageSquareText className="h-6! w-6! text-white" />
+                <MessageSquareText className="size-6! text-white" />
               </Button>
             </DialogTrigger>
           </TooltipTrigger>

@@ -57,7 +57,7 @@ export default function RoomSummary({
       {room.displayName}
 
       <div className="flex items-center gap-2">
-        <Building2 className="h-5 w-5" />
+        <Building2 className="size-5" />
         <div className="mt-2 flex flex-col">
           <div className="flex items-center font-bold text-neutral-400 text-sm">Building Group</div>
           <div className="flex items-center font-normal text-sm text-white/80">{room.groupKey}</div>
@@ -65,7 +65,7 @@ export default function RoomSummary({
       </div>
 
       <div className="flex items-center gap-2">
-        <Wrench className="h-5 w-5" />
+        <Wrench className="size-5" />
         <div className="mt-2 flex flex-col">
           <div className="flex items-center font-bold text-neutral-400 text-sm">Last Serviced</div>
           <div className="flex items-center font-normal text-sm text-white/80">
@@ -90,7 +90,7 @@ export default function RoomSummary({
       </div>
 
       <div className="mt-2 flex items-center gap-2">
-        <Info className="h-5 w-5" />
+        <Info className="size-5" />
         <div className="flex flex-col">
           <div className="flex font-bold text-neutral-400 text-sm">Classroom Status</div>
           <div className="flex font-normal text-sm text-white/80">{roomStateBadge}</div>
@@ -98,7 +98,7 @@ export default function RoomSummary({
       </div>
 
       <div className="flex items-center gap-2">
-        <Bug className="h-5 w-5" />
+        <Bug className="size-5" />
         <div className="mt-2 flex flex-col">
           <div className="flex items-center font-bold text-neutral-400 text-sm">Active Issues</div>
           <div className="flex items-center font-normal text-sm text-white/80">
@@ -108,7 +108,7 @@ export default function RoomSummary({
       </div>
 
       <div className="flex items-center gap-2">
-        <SquareCheckBig className="h-5 w-5" />
+        <SquareCheckBig className="size-5" />
         <div className="mt-2 flex flex-col">
           <div className="flex items-center font-bold text-neutral-400 text-sm">Open Tasks</div>
           <div className="flex items-center font-normal text-sm text-white/80">
@@ -137,7 +137,7 @@ export function RoomSummarySkeleton() {
 
       {/* Building Group */}
       <div className="flex items-center gap-2">
-        <Building2 className="h-5 w-5 opacity-70" />
+        <Building2 className="size-5 opacity-70" />
         <div className="mt-2 flex flex-col">
           <div className="font-bold text-neutral-400 text-sm">Building Group</div>
           <div className="mt-1 h-4 w-24 animate-pulse rounded bg-neutral-700/50" />
@@ -146,7 +146,7 @@ export function RoomSummarySkeleton() {
 
       {/* Last Serviced */}
       <div className="flex items-center gap-2">
-        <Wrench className="h-5 w-5 opacity-70" />
+        <Wrench className="size-5 opacity-70" />
         <div className="mt-2 flex flex-col">
           <div className="font-bold text-neutral-400 text-sm">Last Serviced</div>
           <div className="mt-1 flex items-center gap-1">
@@ -159,7 +159,7 @@ export function RoomSummarySkeleton() {
 
       {/* Status */}
       <div className="mt-2 flex items-center gap-2">
-        <Info className="h-5 w-5 opacity-70" />
+        <Info className="size-5 opacity-70" />
         <div className="flex flex-col">
           <div className="font-bold text-neutral-400 text-sm">Classroom Status</div>
           <div className="h-5 w-28 animate-pulse rounded-2xl bg-neutral-700/50" />
@@ -168,7 +168,7 @@ export function RoomSummarySkeleton() {
 
       {/* Issues */}
       <div className="flex items-center gap-2">
-        <Bug className="h-5 w-5 opacity-70" />
+        <Bug className="size-5 opacity-70" />
         <div className="mt-2 flex flex-col">
           <div className="font-bold text-neutral-400 text-sm">Active Issues</div>
           <div className="mt-1 h-4 w-16 animate-pulse rounded bg-neutral-700/50" />
@@ -177,7 +177,7 @@ export function RoomSummarySkeleton() {
 
       {/* Tasks */}
       <div className="flex items-center gap-2">
-        <SquareCheckBig className="h-5 w-5 opacity-70" />
+        <SquareCheckBig className="size-5 opacity-70" />
         <div className="mt-2 flex flex-col">
           <div className="font-bold text-neutral-400 text-sm">Open Tasks</div>
           <div className="mt-1 h-4 w-16 animate-pulse rounded bg-neutral-700/50" />

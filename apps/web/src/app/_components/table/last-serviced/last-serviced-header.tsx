@@ -27,16 +27,16 @@ export default function LastServicedHeader({ column }: { column: Column<z.infer<
           }
         }}
       >
-        <Wrench className="mr-2 h-6 w-6" />
+        <Wrench className="mr-2 size-6" />
         <p className="text-lg">Last Serviced</p>
         {column.getIsSorted() ? (
           column.getIsSorted() === "asc" ? (
-            <CalendarArrowUp className="ml-2 h-6 w-6 text-green-500" />
+            <CalendarArrowUp className="ml-2 size-6 text-green-500" />
           ) : (
-            <CalendarArrowDown className="ml-2 h-6 w-6 text-yellow-500" />
+            <CalendarArrowDown className="ml-2 size-6 text-yellow-500" />
           )
         ) : (
-          <SlidersHorizontal className="ml-2 h-6 w-6 rotate-90" />
+          <SlidersHorizontal className="ml-2 size-6 rotate-90" />
         )}
       </div>
     </div>

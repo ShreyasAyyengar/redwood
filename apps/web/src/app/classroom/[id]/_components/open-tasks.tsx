@@ -23,7 +23,7 @@ export default function OpenTasks({ tasks, room }: { tasks?: z.infer<typeof task
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <ClipboardList className="h-6 w-6 text-blue-500" />
+              <ClipboardList className="size-6 text-blue-500" />
               <div>Open Tasks</div>
               {openTasks && (
                 <span
@@ -44,7 +44,7 @@ export default function OpenTasks({ tasks, room }: { tasks?: z.infer<typeof task
                 type="button"
                 className="flex w-full cursor-pointer items-center gap-3 font-normal transition-colors hover:text-neutral-200 sm:text-lg"
               >
-                <BookAlert className="h-5 w-5" />
+                <BookAlert className="size-5" />
                 <span className="font-normal text-md">See Task History</span>
               </button>
             </TaskHistoryDialog>
@@ -82,7 +82,7 @@ export function OpenTasksSkeleton() {
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <ClipboardList className="h-6 w-6 text-blue-500" />
+              <ClipboardList className="size-6 text-blue-500" />
               <div>Open Tasks</div>
 
               {/* task count */}
@@ -90,13 +90,13 @@ export function OpenTasksSkeleton() {
             </div>
 
             <button type="button" disabled className="flex w-full items-center gap-3 font-normal text-zinc-300/80 sm:text-lg">
-              <BookAlert className="h-5 w-5" />
+              <BookAlert className="size-5" />
               <span className="font-normal text-md">See Task History</span>
             </button>
           </div>
 
           <div className="flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg">
-            <Plus className="mr-2 h-5 w-5" />
+            <Plus className="mr-2 size-5" />
             New Task
           </div>
         </div>

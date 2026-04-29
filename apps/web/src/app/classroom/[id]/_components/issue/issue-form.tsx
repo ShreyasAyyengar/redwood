@@ -167,7 +167,7 @@ export function IssueForm({
           {existingIssue && (
             <DeleteIssueDialog roomId={roomId} existingIssue={existingIssue}>
               <Button variant="ghost" className="bg-red-500/10 text-red-500 hover:bg-red-600/10 hover:text-red-600">
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="size-4" />
                 Delete Issue
               </Button>
             </DeleteIssueDialog>

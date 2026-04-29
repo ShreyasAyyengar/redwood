@@ -32,7 +32,7 @@ export default function IssueOverview() {
     <div>
       <div className="flex items-center">
         <div className="rounded-lg border bg-zinc-700 p-1">
-          <TriangleAlert className="h-5 w-5" />
+          <TriangleAlert className="size-5" />
         </div>
         <div className="ml-2 flex flex-col">
           <span className="font-bold text-md">Issues Overview: </span>

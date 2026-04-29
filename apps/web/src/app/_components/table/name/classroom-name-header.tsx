@@ -26,16 +26,16 @@ export default function ClassroomNameHeader({ column }: { column: Column<z.infer
         }
       }}
     >
-      <Tag className="mr-2 h-6 w-6" />
+      <Tag className="mr-2 size-6" />
       <p className="text-lg">Classroom</p>
       {column.getIsSorted() ? (
         column.getIsSorted() === "asc" ? (
-          <ArrowDownAZ className="ml-2 h-6 w-6" />
+          <ArrowDownAZ className="ml-2 size-6" />
         ) : (
-          <ArrowDownZA className="ml-2 h-6 w-6" />
+          <ArrowDownZA className="ml-2 size-6" />
         )
       ) : (
-        <SlidersHorizontal className="ml-2 h-6 w-6 rotate-90" />
+        <SlidersHorizontal className="ml-2 size-6 rotate-90" />
       )}
     </div>
   );

@@ -131,7 +131,7 @@ export default function ResolutionField({ existingValue }: { existingValue?: z.i
                         data-empty={!localResolvedAt}
                         className="inline-flex h-auto w-auto rounded-md border bg-neutral-900 p-1 text-muted-foreground text-sm shadow-none hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 data-[empty=true]:text-muted-foreground"
                       >
-                        <CalendarDays className="h-4! w-4!" />
+                        <CalendarDays className="size-4!" />
                         <span>
                           {localResolvedAt
                             ? localResolvedAt.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" })

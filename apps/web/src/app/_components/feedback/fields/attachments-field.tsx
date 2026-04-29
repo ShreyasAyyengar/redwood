@@ -89,7 +89,7 @@ export function FeedbackAttachmentsField({
         <Dropzone {...dropzone}>
           <DropZoneArea className="min-h-36 border border-white/30 bg-zinc-950/30 p-4">
             <div className="flex flex-col items-center gap-3 text-center">
-              <Upload className="h-7 w-7 text-zinc-300" />
+              <Upload className="size-7 text-zinc-300" />
               <DropzoneDescription className="text-zinc-300">Drag files here, or choose files below.</DropzoneDescription>
               <DropzoneTrigger className="bg-zinc-800 text-zinc-100 ring-1 ring-white/15 hover:bg-zinc-700">Choose Files</DropzoneTrigger>
               <p className="text-muted-foreground text-sm">
@@ -106,7 +106,7 @@ export function FeedbackAttachmentsField({
                 <DropzoneFileListItem key={fileStatus.id} file={fileStatus} className="gap-3 border border-white/10 bg-zinc-950/30">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
-                      <FileText className="mt-0.5 h-4 w-4 shrink-0 text-zinc-300" />
+                      <FileText className="mt-0.5 size-4 shrink-0 text-zinc-300" />
                       <div className="min-w-0">
                         <p className="truncate font-medium text-sm">{fileStatus.fileName}</p>
                         <p className="text-muted-foreground text-xs">{formatBytes(fileStatus.file.size)}</p>
@@ -116,11 +116,11 @@ export function FeedbackAttachmentsField({
                     <div className="flex shrink-0 items-center gap-1">
                       {fileStatus.status === "error" && (
                         <DropzoneRetryFile variant="ghost" size="icon-sm" className="text-zinc-300 hover:bg-zinc-800">
-                          <RefreshCw className="h-4 w-4" />
+                          <RefreshCw className="size-4" />
                         </DropzoneRetryFile>
                       )}
                       <DropzoneRemoveFile variant="ghost" size="icon-sm" className="text-zinc-300 hover:bg-zinc-800">
-                        <X className="h-4 w-4" />
+                        <X className="size-4" />
                       </DropzoneRemoveFile>
                     </div>
                   </div>

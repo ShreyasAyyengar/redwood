@@ -30,7 +30,7 @@ export default function IssueDateField({ existingDate }: { existingDate: Date })
           <PopoverTrigger asChild className="border border-white/30 bg-zinc-950/30" disabled={!isAdmin}>
             <Button variant="outline" data-empty={!date} className="max-w-fit text-lg data-[empty=true]:text-muted-foreground">
               <div className="flex items-center gap-3">
-                <CalendarDays className="h-5! w-5!" />
+                <CalendarDays className="size-5!" />
                 {date ? (
                   <span className="leading-none">{date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" })}</span>
                 ) : (

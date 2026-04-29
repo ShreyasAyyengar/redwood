@@ -108,7 +108,7 @@ function AvailabilityFrame({ children }: { children: React.ReactNode }) {
       )}
     >
       <div className="flex items-center">
-        <CalendarClock className="mr-2 h-6 w-6" />
+        <CalendarClock className="mr-2 size-6" />
         <div>Availability</div>
       </div>
 

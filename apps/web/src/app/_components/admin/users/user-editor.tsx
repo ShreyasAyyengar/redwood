@@ -108,10 +108,10 @@ export default function UserEditor() {
             className="w-full bg-white text-black hover:bg-zinc-200 sm:w-auto"
           >
             {addUserMutation.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="size-4 animate-spin" />
             ) : (
               <>
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-2 size-4" />
                 Add User
               </>
             )}
@@ -149,7 +149,7 @@ export default function UserEditor() {
                 <TableRow>
                   <TableCell colSpan={3} className="h-32 border-0 text-center text-zinc-500">
                     <div className="flex flex-col items-center gap-2">
-                      <Loader2 className="h-6 w-6 animate-spin" />
+                      <Loader2 className="size-6 animate-spin" />
                       <span>Fetching users...</span>
                     </div>
                   </TableCell>
@@ -196,7 +196,7 @@ export default function UserEditor() {
                             className="bg-red-500/10 text-red-500 transition-all hover:bg-red-600/10 hover:text-red-600"
                             disabled={removeUserMutation.isPending}
                           >
-                            <Trash2 className="h-4.5 w-4.5" />
+                            <Trash2 className="size-4.5" />
                           </Button>
                         </DialogTrigger>
                         <DialogContent className="border-white/10 bg-zinc-950 text-zinc-100 sm:max-w-md">
@@ -215,7 +215,7 @@ export default function UserEditor() {
                             >
                               {removeUserMutation.isPending ? (
                                 <>
-                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  <Loader2 className="mr-2 size-4 animate-spin" />
                                   Removing...
                                 </>
                               ) : (

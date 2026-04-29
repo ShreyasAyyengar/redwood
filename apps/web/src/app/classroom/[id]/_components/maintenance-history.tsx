@@ -33,7 +33,7 @@ export default function MaintenanceHistory({
   return (
     <div className="flex h-full flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/80 sm:text-2xl">
       <div className="flex items-center">
-        <ClipboardClock className="mr-2 h-6 w-6" />
+        <ClipboardClock className="mr-2 size-6" />
         <div>Maintenance History</div>
       </div>
 
@@ -246,7 +246,7 @@ export function MaintenanceHistorySkeleton() {
   return (
     <div className="flex h-full flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/80 sm:text-2xl">
       <div className="flex items-center">
-        <ClipboardClock className="mr-2 h-6 w-6" />
+        <ClipboardClock className="mr-2 size-6" />
         <div>Maintenance History</div>
       </div>
 

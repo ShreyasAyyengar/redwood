@@ -51,7 +51,7 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
           <h2 className="font-medium text-md text-zinc-100">Available Attributes</h2>
           <AttributeDialog>
             <Button variant="outline" className="">
-              <Plus className="h-4 w-4" />
+              <Plus className="size-4" />
             </Button>
           </AttributeDialog>
         </div>
@@ -75,7 +75,7 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
       </div>
       {!hasSelection ? (
         <div className="flex items-start gap-3 rounded-lg border border-amber-800 bg-amber-950 p-4">
-          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+          <AlertCircle className="mt-0.5 size-5 shrink-0 text-amber-300" />
           <div>
             <p className="font-medium text-amber-100 text-sm">No classrooms selected</p>
             <p className="mt-1 text-amber-300 text-xs">Select one or more classrooms to apply attributes</p>
@@ -93,7 +93,7 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
             <ScrollArea className="h-full min-h-0 rounded-lg bg-zinc-950/50 p-3">
               {availableAttributes.length === 0 && selectedCount > 0 ? (
                 <div className="flex items-start gap-3 rounded-lg border border-red-800 bg-red-950 p-4">
-                  <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-300" />
+                  <AlertCircle className="mt-0.5 size-5 shrink-0 text-red-300" />
                   <div>
                     <p className="font-medium text-red-100 text-sm">No attributes created</p>
                     <p className="mt-1 text-red-300 text-xs">Click the 'plus' button to create one.</p>
@@ -145,7 +145,7 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
                                 className="rounded border border-emerald-800 bg-emerald-950 p-1.5 text-emerald-100 transition-colors hover:bg-emerald-900"
                                 title="Add attribute"
                               >
-                                <Plus className="h-4 w-4" />
+                                <Plus className="size-4" />
                               </button>
                             )}
                             {!noneHaveIt && (
@@ -155,7 +155,7 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
                                 className="rounded border border-red-800 bg-red-950 p-1.5 text-red-100 transition-colors hover:bg-red-900"
                                 title="Remove attribute"
                               >
-                                <Minus className="h-4 w-4" />
+                                <Minus className="size-4" />
                               </button>
                             )}
                           </div>
@@ -181,7 +181,7 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
               disabled={isUpdating || selectedCount === 0}
               className="flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-800 bg-emerald-950/40 px-4 py-2.5 font-semibold text-emerald-100 transition-all hover:bg-emerald-900/50 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isUpdating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Apply Changes"}
+              {isUpdating ? <Loader2 className="size-4 animate-spin" /> : "Apply Changes"}
             </button>
             <p className="mt-2 text-center text-xs text-zinc-500">
               Saves changes to {selectedCount} room{selectedCount !== 1 ? "s" : ""}

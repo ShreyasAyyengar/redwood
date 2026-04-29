@@ -55,7 +55,7 @@ export function ClassroomSelector({ availableAttributes }: { availableAttributes
 
         <div className="flex w-full items-center gap-2 sm:w-auto">
           <div className="relative flex-1 sm:min-w-[200px]">
-            <Search className="absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+            <Search className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-zinc-500" />
             <input
               type="text"
               placeholder="Search rooms..."
@@ -88,7 +88,7 @@ export function ClassroomSelector({ availableAttributes }: { availableAttributes
       ) : (
         <div className="flex flex-1 flex-col items-center justify-center rounded-xl border border-zinc-800 border-dashed bg-zinc-950/50 py-12 text-center">
           <div className="mb-3 rounded-full bg-zinc-800 p-3">
-            <Search className="h-6 w-6 text-zinc-500" />
+            <Search className="size-6 text-zinc-500" />
           </div>
           <h3 className="font-medium text-sm text-zinc-100">No rooms found</h3>
           <p className="mt-1 text-xs text-zinc-400">Try adjusting your search query</p>

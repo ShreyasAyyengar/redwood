@@ -32,7 +32,7 @@ export default function DateField({ existingDate }: { existingDate?: Date }) {
               disabled={!!existingDate}
             >
               <div className="flex items-center gap-3">
-                <CalendarDays className="h-6! w-6!" />
+                <CalendarDays className="size-6!" />
                 {date ? (
                   <span>{date.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric" })}</span>
                 ) : (
