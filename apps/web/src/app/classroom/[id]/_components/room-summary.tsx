@@ -179,7 +179,15 @@ export function RoomSummarySkeleton() {
       </div>
 
       {/* Button */}
-      <div className="mt-4 flex h-8 w-40 animate-pulse justify-start rounded-md bg-neutral-600/50" />
+      <div className="flex justify-start lg:justify-center">
+        <Button
+          disabled
+          className="mt-4 flex w-fit items-center rounded-md bg-neutral-300 px-2 py-0.5 text-center font-semibold text-base text-black transition-all duration-150 hover:bg-neutral-400 focus:ring-5! focus:ring-neutral-600! active:scale-95 active:transform"
+        >
+          <Wrench className="size-5" />
+          Perform Maintenance
+        </Button>
+      </div>
     </div>
   );
 }
