@@ -1,53 +1,28 @@
 "use client";
 
-import type { classroomSchema } from "@redwood/contracts";
-import { useQuery } from "@tanstack/react-query";
+import type { classroomSchemaPayload } from "@redwood/contracts";
 import { CornerUpLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { z } from "zod";
-import { webClientORPC } from "../../../lib/orpc-web-client";
 import { useFetchedRoomsStore } from "../../_components/room-store";
-import ActiveIssues, { ActiveIssuesSkeleton } from "./_components/active-issues";
-import Availability, { AvailabilitySkeleton } from "./_components/availability";
-import MaintenanceHistory, { MaintenanceHistorySkeleton } from "./_components/maintenance-history";
-import OpenTasks, { OpenTasksSkeleton } from "./_components/open-tasks";
-import RoomSummary, { RoomSummarySkeleton } from "./_components/room-summary";
+import ActiveIssues from "./_components/active-issues";
+import Availability from "./_components/availability";
+import MaintenanceHistory from "./_components/maintenance-history";
+import OpenTasks from "./_components/open-tasks";
+import RoomSummary from "./_components/room-summary";
 
 export default function Page() {
   const params = useParams();
   const roomId = params.id as string;
-  const { isFetching, fetchedRooms } = useFetchedRoomsStore();
-  const [room, setRoom] = useState<z.infer<typeof classroomSchema> | null>(null);
+  const { fetchedRooms } = useFetchedRoomsStore();
+  const [room, setRoom] = useState<z.infer<typeof classroomSchemaPayload> | undefined>(undefined);
   const router = useRouter();
 
   useEffect(() => {
     const foundRoom = fetchedRooms.find((room) => room._id === roomId);
-    setRoom(foundRoom || null);
+    setRoom(foundRoom || undefined);
   }, [fetchedRooms, roomId]);
-
-  const { data: maintenanceHistory, isLoading: maintenanceHistoryLoading } = useQuery(
-    webClientORPC.maintenance.getHistory.queryOptions({
-      input: { classroomId: roomId },
-      enabled: !!room,
-    })
-  );
-
-  const { data: issues, isLoading: issuesLoading } = useQuery(
-    webClientORPC.issues.getIssues.queryOptions({
-      input: { classroomId: roomId },
-      enabled: !!room,
-    })
-  );
-
-  const { data: tasks, isLoading: tasksLoading } = useQuery(
-    webClientORPC.tasks.getTasks.queryOptions({
-      input: { classroomId: roomId },
-      enabled: !!room,
-    })
-  );
-
-  const showLoading = isFetching || !room || maintenanceHistoryLoading || issuesLoading || tasksLoading;
 
   return (
     <>
@@ -67,20 +42,19 @@ export default function Page() {
           Back to Classrooms
         </div>
         <div className="mb-10 flex flex-col gap-10">
-          {showLoading ? (
-            <RoomSummarySkeleton />
-          ) : (
-            <RoomSummary
-              room={room}
-              issueCount={issues?.filter((issue) => !issue.resolution).length ?? 0}
-              taskCount={tasks?.filter((task) => !task.completion).length ?? 0}
-            />
-          )}
-          <div className="h-[50dvh]">{showLoading ? <AvailabilitySkeleton /> : <Availability room={room} />}</div>
-          <div className="h-[45dvh]">{showLoading ? <ActiveIssuesSkeleton /> : <ActiveIssues issues={issues} room={room} />}</div>
-          <div className="h-[45dvh]">{showLoading ? <OpenTasksSkeleton /> : <OpenTasks tasks={tasks} room={room} />}</div>
+          <RoomSummary room={room} />
+
+          <div className="h-[50dvh]">
+            <Availability room={room} />
+          </div>
+          <div className="h-[45dvh]">
+            <ActiveIssues room={room} />
+          </div>
+          <div className="h-[45dvh]">
+            <OpenTasks room={room} />
+          </div>
           <div className="h-[40dvh]">
-            {showLoading ? <MaintenanceHistorySkeleton /> : <MaintenanceHistory history={maintenanceHistory} room={room} />}
+            <MaintenanceHistory roomId={room?._id} />
           </div>
         </div>
       </div>
@@ -102,21 +76,13 @@ export default function Page() {
         </div>
 
         <div className="flex h-[40dvh] gap-5">
-          {showLoading ? (
-            <RoomSummarySkeleton />
-          ) : (
-            <RoomSummary
-              room={room}
-              issueCount={issues?.filter((issue) => !issue.resolution).length ?? 0}
-              taskCount={tasks?.filter((task) => !task.completion).length ?? 0}
-            />
-          )}
-          {showLoading ? <AvailabilitySkeleton /> : <Availability room={room} />}
-          {showLoading ? <MaintenanceHistorySkeleton /> : <MaintenanceHistory history={maintenanceHistory} room={room} />}
+          <RoomSummary room={room} />
+          <Availability room={room} />
+          <MaintenanceHistory roomId={roomId} />
         </div>
         <div className="mt-10 flex h-[45dvh] gap-10">
-          {showLoading ? <ActiveIssuesSkeleton /> : <ActiveIssues issues={issues} room={room} />}
-          {showLoading ? <OpenTasksSkeleton /> : <OpenTasks tasks={tasks} room={room} />}
+          <ActiveIssues room={room} />
+          <OpenTasks room={room} />
         </div>
       </div>
     </>

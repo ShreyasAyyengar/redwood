@@ -1,16 +1,28 @@
-import type { classroomSchema, issueSchema } from "@redwood/contracts";
+import type { classroomSchema } from "@redwood/contracts";
 import { Button } from "@redwood/shad-ui/components/button";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { cn } from "@redwood/shad-ui/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import { BookAlert, Plus, TriangleAlert } from "lucide-react";
 import type { z } from "zod";
+import { webClientORPC } from "../../../../lib/orpc-web-client";
 import { IssueCard, IssueCardSkeleton } from "./issue/issue-card";
 import { IssueDialog } from "./issue/issue-dialog";
 import IssueHistoryDialog from "./issue/issue-history-dialog";
 
-export default function ActiveIssues({ issues, room }: { issues?: z.infer<typeof issueSchema>[]; room: z.infer<typeof classroomSchema> }) {
-  const openIssues = issues?.filter((issue) => !issue.resolution);
+export default function ActiveIssues({ room }: { room: z.infer<typeof classroomSchema> | undefined }) {
+  const { data: issues, isLoading } = useQuery(
+    webClientORPC.issues.getIssues.queryOptions({
+      // biome-ignore lint/suspicious/noNonNullAssertedOptionalChain: query only runs if room is defined
+      // biome-ignore lint/style/noNonNullAssertion: query only runs if room is defined
+      input: { classroomId: room?._id! },
+      enabled: !!room,
+    })
+  );
 
+  if (isLoading || !issues || !room) return <ActiveIssuesSkeleton />;
+
+  const openIssues = issues?.filter((issue) => !issue.resolution);
   return (
     <div className="group relative flex h-full flex-1">
       {/* gradient blur background */}

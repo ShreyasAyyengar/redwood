@@ -112,6 +112,22 @@ export const classroomRouter = {
       { $match: { _id: input.id } },
       {
         $lookup: {
+          from: "issues",
+          let: { roomId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$classroomId", "$$roomId"] },
+                resolution: { $exists: false },
+              },
+            },
+            { $count: "count" },
+          ],
+          as: "activeIssueCountResult",
+        },
+      },
+      {
+        $lookup: {
           from: "tasks",
           let: { roomId: "$_id" },
           pipeline: [
@@ -129,12 +145,15 @@ export const classroomRouter = {
       },
       {
         $addFields: {
+          activeIssuesCount: {
+            $ifNull: [{ $arrayElemAt: ["$activeIssueCountResult.count", 0] }, 0],
+          },
           openTasksCount: {
             $ifNull: [{ $arrayElemAt: ["$taskCountResult.count", 0] }, 0],
           },
         },
       },
-      { $project: { taskCountResult: 0 } },
+      { $project: { activeIssueCountResult: 0, taskCountResult: 0 } },
     ]).then((results) => results[0]);
     if (!room) throw NOT_FOUND({ data: { message: `Room with id ${input.id} not found` } });
 
@@ -147,7 +166,27 @@ export const classroomRouter = {
         // 1. Filter for active rooms
         { $match: { isActive: true } },
 
-        // 2. Join with tasks collection
+        // 2. Join with tasks & issues collection to append counts
+
+        // append activeIssuesCount
+        {
+          $lookup: {
+            from: "issues",
+            let: { roomId: "$_id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ["$classroomId", "$$roomId"] },
+                  resolution: { $exists: false },
+                },
+              },
+              { $count: "count" },
+            ],
+            as: "activeIssueCountResult",
+          },
+        },
+
+        // append openTasksCount
         {
           $lookup: {
             from: "tasks",
@@ -169,6 +208,9 @@ export const classroomRouter = {
         // 3. Format the output
         {
           $addFields: {
+            activeIssuesCount: {
+              $ifNull: [{ $arrayElemAt: ["$activeIssueCountResult.count", 0] }, 0],
+            },
             openTasksCount: {
               $ifNull: [{ $arrayElemAt: ["$taskCountResult.count", 0] }, 0],
             },
@@ -176,7 +218,7 @@ export const classroomRouter = {
         },
 
         // 4. Remove the temporary lookup field
-        { $project: { taskCountResult: 0 } },
+        { $project: { activeIssueCountResult: 0, taskCountResult: 0 } },
       ]);
     } catch (e) {
       console.error(e);

@@ -43,4 +43,5 @@ export const classroomSchema = z.object({
 
 export const classroomSchemaPayload = classroomSchema.extend({
   openTasksCount: z.number(),
+  activeIssuesCount: z.number(),
 });

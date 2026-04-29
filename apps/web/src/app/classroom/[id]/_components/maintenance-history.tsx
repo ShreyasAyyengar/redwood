@@ -1,21 +1,25 @@
-import type { classroomSchema, maintenanceEntrySchema } from "@redwood/contracts";
+import type { classroomSchema } from "@redwood/contracts";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwood/shad-ui/components/tooltip";
 import { cn } from "@redwood/shad-ui/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { CalendarDays, ClipboardClock, UserCog } from "lucide-react";
 import { useCallback, useState } from "react";
 import type { z } from "zod";
+import { webClientORPC } from "../../../../lib/orpc-web-client";
 import { formatDate, getDateTimeDisplay } from "../../../../util/date-time-utils";
 import MaintenanceDialog from "./maintenance/maintenance-dialog";
 
-export default function MaintenanceHistory({
-  history,
-  room,
-}: {
-  history?: z.infer<typeof maintenanceEntrySchema>[];
-  room: z.infer<typeof classroomSchema>;
-}) {
+export default function MaintenanceHistory({ roomId }: { roomId: z.infer<typeof classroomSchema>["_id"] | undefined }) {
+  const { data: maintenanceHistory, isLoading } = useQuery(
+    webClientORPC.maintenance.getHistory.queryOptions({
+      // biome-ignore lint/style/noNonNullAssertion: query only runs if roomId is defined
+      input: { classroomId: roomId! },
+      enabled: !!roomId,
+    })
+  );
+
   const [viewportElement, setViewportElement] = useState<HTMLDivElement | null>(null);
 
   const viewportRef = useCallback((node: HTMLDivElement | null) => {
@@ -23,12 +27,14 @@ export default function MaintenanceHistory({
   }, []);
 
   const rowVirtualizer = useVirtualizer({
-    count: history?.length ?? 0,
+    count: maintenanceHistory?.length ?? 0,
     getScrollElement: () => viewportElement,
     estimateSize: () => 140,
     overscan: 3,
-    getItemKey: (index) => history?.[index]?._id ?? index,
+    getItemKey: (index) => maintenanceHistory?.[index]?._id ?? index,
   });
+
+  if (isLoading) return <MaintenanceHistorySkeleton />;
 
   return (
     <div className="flex h-full flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/80 sm:text-2xl">
@@ -48,7 +54,7 @@ export default function MaintenanceHistory({
             }}
           >
             {rowVirtualizer.getVirtualItems().map((virtualItem) => {
-              const entry = history?.[virtualItem.index];
+              const entry = maintenanceHistory?.[virtualItem.index];
               if (!entry) return null;
 
               const date = new Date(entry.date);
@@ -100,7 +106,8 @@ export default function MaintenanceHistory({
                   }}
                 >
                   <Tooltip delayDuration={500}>
-                    <MaintenanceDialog roomId={room._id} maintenanceEntry={entry}>
+                    {/** biome-ignore lint/style/noNonNullAssertion: roomId is guaranteed to be defined at this time */}
+                    <MaintenanceDialog roomId={roomId!} maintenanceEntry={entry}>
                       <TooltipTrigger asChild>
                         <div
                           className={cn(

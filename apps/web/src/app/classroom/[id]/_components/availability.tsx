@@ -25,7 +25,7 @@ function getDayName(dayIndex: number): DayName {
   return DAY_NAMES[dayIndex] ?? "sunday";
 }
 
-export default function Availability({ room }: { room: Room }) {
+export default function Availability({ room }: { room: Room | undefined }) {
   const [omitShortBreaks, setOmitShortBreaks] = useState(() => {
     if (typeof window === "undefined") {
       return false;
@@ -49,12 +49,12 @@ export default function Availability({ room }: { room: Room }) {
     () =>
       DAY_NAMES.reduce(
         (acc, day) => {
-          acc[day] = room.schedule?.[day] ?? [];
+          acc[day] = room?.schedule?.[day] ?? [];
           return acc;
         },
         {} as Record<DayName, Block[]>
       ),
-    [room.schedule]
+    [room?.schedule]
   );
 
   const setOmitShortBreakPreference = (checked: boolean) => {
@@ -82,6 +82,7 @@ export default function Availability({ room }: { room: Room }) {
     return "future";
   };
 
+  if (!room) return <AvailabilitySkeleton />;
   return (
     <AvailabilityFrame>
       <AvailabilityTabs defaultValue={todayName}>

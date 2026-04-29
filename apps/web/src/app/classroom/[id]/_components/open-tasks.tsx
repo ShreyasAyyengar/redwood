@@ -1,14 +1,28 @@
-import type { classroomSchema, taskSchema } from "@redwood/contracts";
+import type { classroomSchema } from "@redwood/contracts";
 import { Button } from "@redwood/shad-ui/components/button";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { cn } from "@redwood/shad-ui/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import { BookAlert, ClipboardList, Plus } from "lucide-react";
 import type { z } from "zod";
+import { webClientORPC } from "../../../../lib/orpc-web-client";
+import { ActiveIssuesSkeleton } from "./active-issues";
 import { TaskCard, TaskCardSkeleton } from "./task/task-card";
 import { TaskDialog } from "./task/task-dialog";
 import TaskHistoryDialog from "./task/task-history-dialog";
 
-export default function OpenTasks({ tasks, room }: { tasks?: z.infer<typeof taskSchema>[]; room: z.infer<typeof classroomSchema> }) {
+export default function OpenTasks({ room }: { room: z.infer<typeof classroomSchema> | undefined }) {
+  const { data: tasks, isLoading } = useQuery(
+    webClientORPC.tasks.getTasks.queryOptions({
+      // biome-ignore lint/suspicious/noNonNullAssertedOptionalChain: query only runs if room is defined
+      // biome-ignore lint/style/noNonNullAssertion: query only runs if room is defined
+      input: { classroomId: room?._id! },
+      enabled: !!room,
+    })
+  );
+
+  if (!room || isLoading || !tasks) return <ActiveIssuesSkeleton />;
+
   const now = Date.now();
   const openTasks = tasks?.filter((task) => !task.completion && (!task.task.visibleAt || new Date(task.task.visibleAt).getTime() <= now));
 

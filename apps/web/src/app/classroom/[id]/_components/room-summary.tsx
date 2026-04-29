@@ -1,4 +1,4 @@
-import type { classroomSchema } from "@redwood/contracts";
+import type { classroomSchemaPayload } from "@redwood/contracts";
 import { Button } from "@redwood/shad-ui/components/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwood/shad-ui/components/tooltip";
 import { cn } from "@redwood/shad-ui/lib/utils";
@@ -13,15 +13,9 @@ type LastServiced = {
   lastServicedDaysAgo: string;
 } | null;
 
-export default function RoomSummary({
-  room,
-  issueCount,
-  taskCount,
-}: {
-  room: z.infer<typeof classroomSchema>;
-  issueCount: number;
-  taskCount: number;
-}) {
+export default function RoomSummary({ room }: { room: z.infer<typeof classroomSchemaPayload> | undefined }) {
+  if (!room) return <RoomSummarySkeleton />;
+
   let lastServiced: LastServiced = null;
 
   if (room.lastMaintenance) {
@@ -102,7 +96,7 @@ export default function RoomSummary({
         <div className="mt-2 flex flex-col">
           <div className="flex items-center font-bold text-neutral-400 text-sm">Active Issues</div>
           <div className="flex items-center font-normal text-sm text-white/80">
-            {issueCount} issue{issueCount !== 1 ? "s" : ""}
+            {room.activeIssuesCount} issue{room.activeIssuesCount !== 1 ? "s" : ""}
           </div>
         </div>
       </div>
@@ -112,7 +106,7 @@ export default function RoomSummary({
         <div className="mt-2 flex flex-col">
           <div className="flex items-center font-bold text-neutral-400 text-sm">Open Tasks</div>
           <div className="flex items-center font-normal text-sm text-white/80">
-            {taskCount} task{taskCount !== 1 ? "s" : ""}
+            {room.openTasksCount} task{room.openTasksCount !== 1 ? "s" : ""}
           </div>
         </div>
       </div>
