@@ -69,8 +69,10 @@ export default function HomePage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="admin">
-            <AdminPanel />
+          <TabsContent value="admin" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
+            <div className="flex w-full flex-1 justify-center overflow-hidden p-5">
+              <AdminPanel />
+            </div>
           </TabsContent>
         </Tabs>
       </div>
