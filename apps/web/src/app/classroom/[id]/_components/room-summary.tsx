@@ -1,4 +1,5 @@
 import type { classroomSchema } from "@redwood/contracts";
+import { Button } from "@redwood/shad-ui/components/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwood/shad-ui/components/tooltip";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { Bug, Building2, Info, SquareCheckBig, Wrench } from "lucide-react";
@@ -118,10 +119,10 @@ export default function RoomSummary({
 
       <div className="flex justify-start lg:justify-center">
         <MaintenanceDialog roomId={room._id}>
-          <div className="mt-4 flex w-fit items-center rounded-md bg-neutral-300 px-2 py-0.5 text-center font-semibold text-base text-black transition-all duration-150 hover:bg-neutral-400 active:scale-95 active:transform">
-            <Wrench className="mr-2 h-5 w-5" />
+          <Button className="mt-4 flex w-fit items-center rounded-md bg-neutral-300 px-2 py-0.5 text-center font-semibold text-base text-black transition-all duration-150 hover:bg-neutral-400 focus:ring-5! focus:ring-neutral-600! active:scale-95 active:transform">
+            <Wrench className="size-5" />
             Perform Maintenance
-          </div>
+          </Button>
         </MaintenanceDialog>
       </div>
     </div>
