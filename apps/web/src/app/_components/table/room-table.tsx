@@ -103,6 +103,8 @@ export function RoomTable({
   const rows = table.getRowModel();
 
   return (
+    // <ScrollArea className="h-full min-w-0 flex-1 rounded-lg rounded-l-none bg-neutral-900 p-5 shadow-xl/50 ring-1 ring-black/5 [&_[data-slot=scroll-area-viewport]]:rounded-none">
+    //   <Table className="mx-auto w-max border-separate border-spacing-0">
     <ScrollArea className="flex h-full w-fit items-center justify-center rounded-lg rounded-l-none bg-neutral-900 p-5 shadow-xl/50 ring-1 ring-black/5 [&_[data-slot=scroll-area-viewport]]:rounded-none">
       <Table className="border-separate border-spacing-0">
         <TableHeader className="sticky top-0 z-1 border">
