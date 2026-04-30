@@ -19,7 +19,7 @@ export const TaskCard = ({
   const editDateDisplay: DateTimeDisplay | undefined = task.edited && getDateTimeDisplay(task.edited.editDate);
   const visibleDateDisplay: DateTimeDisplay | undefined = task.task.visibleAt && getDateTimeDisplay(task.task.visibleAt);
 
-  const isOverdue = task.task.completeBy && Date.now() > new Date(task.task.completeBy).getTime();
+  const isOverdue = task.task.completeBy && !task.completion && Date.now() > new Date(task.task.completeBy).getTime();
   const isVisible = !task.task.visibleAt || task.task.visibleAt.getTime() <= Date.now();
 
   return (
