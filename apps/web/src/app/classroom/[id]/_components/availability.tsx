@@ -356,8 +356,8 @@ function AvailabilityBlockMeta({
 
   return (
     <div className="flex flex-col items-center gap-2">
-      {isCurrent && <span className="rounded-md bg-emerald-500/20 px-2 py-0.5 font-bold text-emerald-300 text-xs">NOW</span>}
-      {isUpcoming && <span className="rounded-md bg-amber-500/20 px-2 py-0.5 font-bold text-amber-300 text-xs">SOON</span>}
+      {isCurrent && <span className="rounded-md bg-emerald-500/20 px-2 py-0.5 font-bold text-emerald-300 text-xs">OPEN NOW</span>}
+      {isUpcoming && <span className="rounded-md bg-amber-500/20 px-2 py-0.5 font-bold text-amber-300 text-xs">OPEN SOON</span>}
 
       <span
         className={cn(
