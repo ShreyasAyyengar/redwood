@@ -9,7 +9,15 @@ const PAGE_SIZE = 5;
 
 export const issueRouter = {
   getIssues: protectedProcedure.issues.getIssues.handler(async ({ input, errors }) => {
-    const { classroomId, direction, cursor } = input;
+    const { filter, direction, cursor } = input;
+    const scopeQuery: Record<string, unknown> = {};
+
+    if (filter?.classroomId) {
+      scopeQuery.classroomId = filter.classroomId;
+    } else if (filter?.group) {
+      const classroomIds = await ClassroomService.distinct("_id", { groupKey: filter.group });
+      scopeQuery.classroomId = { $in: classroomIds };
+    }
 
     const sortDirection = direction === "NEWEST_FIRST" ? -1 : 1;
     const cursorOperator = direction === "NEWEST_FIRST" ? "$lt" : "$gt";
@@ -24,7 +32,6 @@ export const issueRouter = {
       ],
     });
 
-    const scopeQuery: Record<string, unknown> = classroomId ? { classroomId } : {};
     let query: Record<string, unknown> = { ...scopeQuery };
 
     if (cursor) {

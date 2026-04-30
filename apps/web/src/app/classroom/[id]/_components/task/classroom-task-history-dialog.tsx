@@ -21,9 +21,9 @@ export function ClassroomTaskHistoryDialog({
       getNextPageParam: (lastPage) => lastPage.nextCursor,
       initialPageParam: undefined,
       input: (cursor) => ({
-        classroomId,
         cursor,
         direction: "NEWEST_FIRST",
+        filter: { classroomId },
       }),
     })
   );

@@ -96,7 +96,12 @@ export const taskContract = {
     })
     .input(
       z.object({
-        classroomId: classroomSchema.shape._id.optional(),
+        filter: z
+          .object({
+            classroomId: classroomSchema.shape._id.optional(),
+            group: z.string().optional(),
+          })
+          .optional(),
         direction: z.enum(["OLDEST_FIRST", "NEWEST_FIRST"]),
         cursor: taskSchema.shape._id.optional(),
       })
