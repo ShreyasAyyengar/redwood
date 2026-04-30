@@ -36,7 +36,7 @@ export function TaskFeedList({ openOnly }: { openOnly?: boolean }) {
 
   const renderTask = (task: (typeof tasks)[number]) => (
     <TaskDialog roomId={task.classroomId} existingTask={task}>
-      <TaskFeedCard task={task} className="w-1/2" />
+      <TaskFeedCard task={task} className="w-full" />
     </TaskDialog>
   );
 

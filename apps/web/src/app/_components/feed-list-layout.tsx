@@ -1,8 +1,14 @@
 "use client";
 
+import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Loader2 } from "lucide-react";
 import { Fragment, type ReactNode, useRef } from "react";
+
+const FEED_LIST_SHELL_CLASS = "flex h-full w-full min-w-0 justify-center overflow-hidden";
+const FEED_SCROLL_AREA_CLASS = "h-full w-1/2 min-w-0 p-4";
+const STACKED_FEED_LIST_CLASS = "flex min-w-0 flex-col gap-2";
+const VIRTUAL_FEED_ROW_CLASS = "absolute top-0 left-0 w-full min-w-0 pb-2";
 
 type FeedItem = {
   _id: string;
@@ -29,19 +35,20 @@ export function FeedEmptyState({ children }: { children: ReactNode }) {
   return <div className="flex h-full items-center justify-center text-zinc-500">{children}</div>;
 }
 
-const STACKED_FEED_LIST_CLASS = "flex h-full w-full min-w-0 flex-col items-center gap-2 overflow-y-auto p-4";
 export function StackedFeedList<TItem extends FeedItem>({ items, renderItem }: FeedListProps<TItem>) {
   return (
-    <div className={STACKED_FEED_LIST_CLASS}>
-      {items.map((item) => (
-        <Fragment key={item._id}>{renderItem(item)}</Fragment>
-      ))}
+    <div className={FEED_LIST_SHELL_CLASS}>
+      <ScrollArea className={FEED_SCROLL_AREA_CLASS} type="always">
+        <div className={STACKED_FEED_LIST_CLASS}>
+          {items.map((item) => (
+            <Fragment key={item._id}>{renderItem(item)}</Fragment>
+          ))}
+        </div>
+      </ScrollArea>
     </div>
   );
 }
 
-const FEED_SCROLL_AREA_CLASS = "h-full w-full min-w-0 overflow-y-auto p-4";
-const VIRTUAL_FEED_ROW_CLASS = "absolute top-0 left-0 flex w-full min-w-0 justify-center pb-2";
 export function VirtualizedFeedList<TItem extends FeedItem>({ items, estimateSize, renderItem }: VirtualizedFeedListProps<TItem>) {
   const parentRef = useRef<HTMLDivElement>(null);
 
@@ -54,27 +61,29 @@ export function VirtualizedFeedList<TItem extends FeedItem>({ items, estimateSiz
   });
 
   return (
-    <div ref={parentRef} className={FEED_SCROLL_AREA_CLASS}>
-      <div className="relative w-full min-w-0" style={{ height: rowVirtualizer.getTotalSize() }}>
-        {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-          const item = items[virtualRow.index];
-          if (!item) {
-            return null;
-          }
+    <div className={FEED_LIST_SHELL_CLASS}>
+      <ScrollArea className={FEED_SCROLL_AREA_CLASS} type="always" viewportRef={parentRef}>
+        <div className="relative w-full min-w-0" style={{ height: rowVirtualizer.getTotalSize() }}>
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+            const item = items[virtualRow.index];
+            if (!item) {
+              return null;
+            }
 
-          return (
-            <div
-              key={virtualRow.key}
-              data-index={virtualRow.index}
-              ref={rowVirtualizer.measureElement}
-              className={VIRTUAL_FEED_ROW_CLASS}
-              style={{ transform: `translateY(${virtualRow.start}px)` }}
-            >
-              {renderItem(item)}
-            </div>
-          );
-        })}
-      </div>
+            return (
+              <div
+                key={virtualRow.key}
+                data-index={virtualRow.index}
+                ref={rowVirtualizer.measureElement}
+                className={VIRTUAL_FEED_ROW_CLASS}
+                style={{ transform: `translateY(${virtualRow.start}px)` }}
+              >
+                {renderItem(item)}
+              </div>
+            );
+          })}
+        </div>
+      </ScrollArea>
     </div>
   );
 }

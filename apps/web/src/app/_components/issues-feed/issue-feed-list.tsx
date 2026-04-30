@@ -36,7 +36,7 @@ export function IssueFeedList({ openOnly }: { openOnly?: boolean }) {
 
   const renderIssue = (issue: (typeof issues)[number]) => (
     <IssueDialog roomId={issue.classroomId} existingIssue={issue}>
-      <IssueFeedCard issue={issue} className="w-1/2" />
+      <IssueFeedCard issue={issue} className="w-full" />
     </IssueDialog>
   );
 
