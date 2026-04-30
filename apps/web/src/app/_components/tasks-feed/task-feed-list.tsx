@@ -1,6 +1,7 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
 import { webClientORPC } from "../../../lib/orpc-web-client";
 import { TaskDialog } from "../../classroom/[id]/_components/task/task-dialog";
 import { FeedEmptyState, FeedLoadingState, StackedFeedList, VirtualizedFeedList } from "../feed-list-layout";
@@ -15,16 +16,28 @@ export function TaskFeedList({ openOnly }: { openOnly?: boolean }) {
     })
   );
 
-  const { data: allTasks, isLoading: allTasksLoading } = useQuery(
-    webClientORPC.tasks.getTasks.queryOptions({
-      input: { direction: "NEWEST_FIRST" },
-      select: (data) => data.tasks,
+  const allTasksQuery = useInfiniteQuery(
+    webClientORPC.tasks.getTasks.infiniteOptions({
       enabled: !openOnly,
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+      initialPageParam: undefined,
+      input: (cursor) => ({
+        cursor,
+        direction: "NEWEST_FIRST",
+      }),
+
+      // it is expensive to load all tasks, so keep it fresh until the browser reloads.
+      gcTime: Number.POSITIVE_INFINITY,
+      staleTime: Number.POSITIVE_INFINITY,
     })
   );
 
+  const allTasks = useMemo(() => allTasksQuery.data?.pages.flatMap((page) => page.tasks) ?? [], [allTasksQuery.data]);
   const tasks = openOnly ? openTasks : allTasks;
-  const isLoading = openOnly ? openTasksLoading : allTasksLoading;
+  const isLoading = openOnly ? openTasksLoading : allTasksQuery.isLoading;
+  const loadMoreTasks = useCallback(() => {
+    allTasksQuery.fetchNextPage();
+  }, [allTasksQuery.fetchNextPage]);
 
   if (isLoading) {
     return <FeedLoadingState />;
@@ -44,5 +57,14 @@ export function TaskFeedList({ openOnly }: { openOnly?: boolean }) {
     return <StackedFeedList items={tasks} renderItem={renderTask} />;
   }
 
-  return <VirtualizedFeedList estimateSize={TASK_FEED_ROW_ESTIMATE_PX} items={tasks} renderItem={renderTask} />;
+  return (
+    <VirtualizedFeedList
+      estimateSize={TASK_FEED_ROW_ESTIMATE_PX}
+      hasNextPage={allTasksQuery.hasNextPage}
+      isFetchingNextPage={allTasksQuery.isFetchingNextPage}
+      items={tasks}
+      onLoadMore={loadMoreTasks}
+      renderItem={renderTask}
+    />
+  );
 }
