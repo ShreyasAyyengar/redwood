@@ -36,7 +36,6 @@ export default function CompletionField({ existingValue }: { existingValue?: z.i
 
   const { data: fetchedUsers = [] } = useQuery(
     webClientORPC.users.getUsers.queryOptions({
-      input: {},
       enabled: isAdmin,
     })
   );

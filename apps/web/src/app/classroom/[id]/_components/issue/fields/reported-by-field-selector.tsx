@@ -1,4 +1,4 @@
-import type { redwoodUserSchema, issueSchema } from "@redwood/contracts";
+import type { issueSchema, redwoodUserSchema } from "@redwood/contracts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@redwood/shad-ui/components/select";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -16,7 +16,6 @@ export default function ReportedByFieldSelector({ existingValue }: { existingVal
 
   const { data: fetchedUsers = [] } = useQuery(
     webClientORPC.users.getUsers.queryOptions({
-      input: {},
       enabled: isAdmin,
     })
   );

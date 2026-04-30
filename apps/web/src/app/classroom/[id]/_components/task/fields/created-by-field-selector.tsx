@@ -16,7 +16,6 @@ export default function CreatedByFieldSelector({ existingValue }: { existingValu
 
   const { data: fetchedUsers = [] } = useQuery(
     webClientORPC.users.getUsers.queryOptions({
-      input: {},
       enabled: isAdmin,
     })
   );
