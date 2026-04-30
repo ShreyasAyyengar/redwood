@@ -35,14 +35,14 @@ export function DeleteIssueDialog({
     webClientORPC.issues.deleteIssue.mutationOptions({
       onMutate: async () => setDeleting(true),
       onSuccess: async () => {
+        setOpen(false);
+        setDeleting(false);
         await Promise.all([
           queryClient.invalidateQueries({
             queryKey: webClientORPC.issues.getActiveIssues.queryOptions({ input: { classroomId: roomId } }).queryKey,
           }),
           refreshRoom(),
         ]);
-        setOpen(false);
-        setDeleting(false);
       },
     })
   );
