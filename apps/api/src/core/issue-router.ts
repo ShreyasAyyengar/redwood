@@ -62,7 +62,7 @@ export const issueRouter = {
     };
   }),
 
-  getActiveIssues: protectedProcedure.issues.getActiveTasks.handler(({ input }) => {
+  getActiveIssues: protectedProcedure.issues.getActiveIssues.handler(({ input }) => {
     if (input?.classroomId) {
       return IssueService.find({ resolution: { $exists: false }, classroomId: input.classroomId })
         .lean()

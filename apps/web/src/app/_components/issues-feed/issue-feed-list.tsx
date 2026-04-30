@@ -12,7 +12,7 @@ const ISSUE_FEED_ROW_ESTIMATE_PX = 220;
 
 export function IssueFeedList({ openOnly }: { openOnly?: boolean }) {
   const { data: openIssues, isLoading: openIssuesLoading } = useQuery(
-    webClientORPC.issues.getActiveTasks.queryOptions({
+    webClientORPC.issues.getActiveIssues.queryOptions({
       input: {},
       enabled: !!openOnly,
     })

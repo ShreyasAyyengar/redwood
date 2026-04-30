@@ -96,7 +96,7 @@ export const issueContract = {
       },
     }),
 
-  getActiveTasks: oc
+  getActiveIssues: oc
     .route({
       method: "GET",
     })

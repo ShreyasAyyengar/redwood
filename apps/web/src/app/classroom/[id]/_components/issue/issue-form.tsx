@@ -63,7 +63,7 @@ export function IssueForm({
       onSuccess: async () => {
         onSuccess?.();
         await queryClient.invalidateQueries({
-          queryKey: webClientORPC.issues.getActiveTasks.queryOptions({ input: { classroomId: roomId } }).queryKey,
+          queryKey: webClientORPC.issues.getActiveIssues.queryOptions({ input: { classroomId: roomId } }).queryKey,
         });
         await refreshRoom();
       },
@@ -75,7 +75,7 @@ export function IssueForm({
       onSuccess: async () => {
         onSuccess?.();
         await queryClient.invalidateQueries({
-          queryKey: webClientORPC.issues.getActiveTasks.queryOptions({ input: { classroomId: roomId } }).queryKey,
+          queryKey: webClientORPC.issues.getActiveIssues.queryOptions({ input: { classroomId: roomId } }).queryKey,
         });
         await refreshRoom();
       },

@@ -21,7 +21,7 @@ export function RoomRow({ row }: { row: Row<z.infer<typeof classroomSchemaPayloa
     input: { classroomId },
     staleTime: 60_000,
   });
-  const issuesQuery = webClientORPC.issues.getActiveTasks.queryOptions({
+  const issuesQuery = webClientORPC.issues.getActiveIssues.queryOptions({
     input: { classroomId },
     staleTime: 60_000,
   });

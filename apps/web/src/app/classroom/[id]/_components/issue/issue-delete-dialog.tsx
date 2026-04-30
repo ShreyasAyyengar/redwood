@@ -37,7 +37,7 @@ export function DeleteIssueDialog({
       onSuccess: async () => {
         await Promise.all([
           queryClient.invalidateQueries({
-            queryKey: webClientORPC.issues.getActiveTasks.queryOptions({ input: { classroomId: roomId } }).queryKey,
+            queryKey: webClientORPC.issues.getActiveIssues.queryOptions({ input: { classroomId: roomId } }).queryKey,
           }),
           refreshRoom(),
         ]);
