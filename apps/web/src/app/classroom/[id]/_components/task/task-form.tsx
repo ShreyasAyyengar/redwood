@@ -46,7 +46,7 @@ export function TaskForm({
     webClientORPC.tasks.addTask.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: webClientORPC.tasks.getTasks.queryOptions({ input: { classroomId: roomId } }).queryKey,
+          queryKey: webClientORPC.tasks.getOpenTasks.queryOptions({ input: { classroomId: roomId } }).queryKey,
         });
         onSuccess?.();
       },
@@ -57,7 +57,7 @@ export function TaskForm({
     webClientORPC.tasks.editTask.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: webClientORPC.tasks.getTasks.queryOptions({ input: { classroomId: roomId } }).queryKey,
+          queryKey: webClientORPC.tasks.getOpenTasks.queryOptions({ input: { classroomId: roomId } }).queryKey,
         });
         onSuccess?.();
       },

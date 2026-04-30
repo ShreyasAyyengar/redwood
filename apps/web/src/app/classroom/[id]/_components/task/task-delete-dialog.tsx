@@ -24,10 +24,10 @@ export function DeleteTaskDialog({
     webClientORPC.tasks.deleteTask.mutationOptions({
       onMutate: async () => setDeleting(true),
       onSuccess: async () => {
-        const taskQueryKey = webClientORPC.tasks.getTasks.queryOptions({ input: { classroomId: roomId } }).queryKey;
-        await queryClient.invalidateQueries({ queryKey: taskQueryKey });
         setOpen(false);
         setDeleting(false);
+        const taskQueryKey = webClientORPC.tasks.getOpenTasks.queryOptions({ input: { classroomId: roomId } }).queryKey;
+        await queryClient.invalidateQueries({ queryKey: taskQueryKey });
       },
     })
   );

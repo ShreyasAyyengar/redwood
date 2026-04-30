@@ -52,5 +52,4 @@ export const uiIssueFormSchema = z.object({
       resolvedAt: z.coerce.date(),
     })
     .optional(),
-  adminNotes: z.array(z.string()).optional(),
 });

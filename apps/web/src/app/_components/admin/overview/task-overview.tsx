@@ -1,13 +1,75 @@
+import type { taskSchema } from "@redwood/contracts";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { ClipboardList } from "lucide-react";
 import type React from "react";
+import { useEffect } from "react";
+import type { z } from "zod";
 import { webClientORPC } from "../../../../lib/orpc-web-client";
-import TaskHistoryDialog from "../../../classroom/[id]/_components/task/task-history-dialog";
+import { TaskListDialog } from "../../../classroom/[id]/_components/task/task-list-dialog";
+
+function maybeWrapWithDialog(children: React.ReactNode, filteredTasks: z.infer<typeof taskSchema>[], title: string) {
+  if (filteredTasks.length < 1) return children;
+
+  return (
+    <TaskListDialog title={title} tasks={filteredTasks}>
+      {children}
+    </TaskListDialog>
+  );
+}
+
+type TaskStatCardProps = React.HTMLAttributes<HTMLDivElement> & {
+  activeClassName: string;
+  activeDescription: string;
+  activeMutedTextClassName: string;
+  activeTextClassName: string;
+  count: number;
+  inactiveDescription?: string;
+  isFetching: boolean;
+  ref?: React.Ref<HTMLDivElement>;
+  title: string;
+  valueClassName?: string;
+};
+
+function TaskStatCard({
+  activeClassName,
+  activeDescription,
+  activeMutedTextClassName,
+  activeTextClassName,
+  className,
+  count,
+  inactiveDescription = "All clear",
+  isFetching,
+  ref,
+  title,
+  valueClassName,
+  ...props
+}: TaskStatCardProps) {
+  const hasTasks = count > 0;
+  const textClassName = hasTasks ? activeTextClassName : "text-emerald-100";
+
+  return (
+    <div
+      ref={ref}
+      {...props}
+      className={cn(
+        "mt-3 flex w-max flex-col rounded-lg border-2 p-2 shadow-lg/30 transition-all hover:-translate-y-1 hover:shadow-xl/100",
+        hasTasks ? activeClassName : "border-emerald-800 bg-emerald-950 text-emerald-100",
+        className
+      )}
+    >
+      <span className={cn("font-medium", textClassName)}>{title}</span>
+      <span className={cn("font-bold text-3xl", valueClassName)}>{isFetching ? "Loading..." : count}</span>
+      <span className={cn(hasTasks ? activeMutedTextClassName : "text-emerald-100/70")}>
+        {hasTasks ? activeDescription : inactiveDescription}
+      </span>
+    </div>
+  );
+}
 
 export default function TaskOverview() {
   const { data: tasks = [], isFetching } = useQuery(
-    webClientORPC.tasks.getAllTasks.queryOptions({
+    webClientORPC.tasks.getOpenTasks.queryOptions({
       input: {},
       staleTime: 60_000,
       refetchOnWindowFocus: true,
@@ -20,15 +82,12 @@ export default function TaskOverview() {
   const overdue = tasks.filter((task) => task.task.completeBy && Date.now() > new Date(task.task.completeBy).getTime());
   const scheduled = tasks.filter((task) => task.task.visibleAt && task.task.visibleAt.getTime() > Date.now());
 
-  function maybeWrapWithDialog(children: React.ReactNode, filteredTasks: typeof tasks, title: string) {
-    if (filteredTasks.length < 1) return children;
-
-    return (
-      <TaskHistoryDialog title={title} tasks={filteredTasks}>
-        {children}
-      </TaskHistoryDialog>
-    );
-  }
+  useEffect(() => {
+    console.log("openTasks", openTasks.length);
+    console.log("urgentTasks", urgentTasks.length);
+    console.log("overdue", overdue.length);
+    console.log("scheduled", scheduled.length);
+  }, [openTasks, urgentTasks, overdue, scheduled]);
 
   return (
     <div>
@@ -44,69 +103,59 @@ export default function TaskOverview() {
 
       <div className="flex gap-3">
         {maybeWrapWithDialog(
-          <div
-            className={cn(
-              "mt-3 flex w-max flex-col rounded-lg border-2 p-2 shadow-lg/30 transition-all hover:-translate-y-1 hover:shadow-xl/100",
-              openTasks.length > 0 ? "border-blue-800 bg-blue-950 text-blue-100" : "border-emerald-800 bg-emerald-950 text-emerald-100"
-            )}
-          >
-            <span className={cn("font-medium", openTasks.length > 0 ? "text-blue-100" : "text-emerald-100")}>Active Tasks</span>
-            <span className="font-bold text-3xl">{isFetching ? "Loading..." : openTasks.length}</span>
-            <span className={cn(openTasks.length > 0 ? "text-blue-100/70" : "text-emerald-100/70")}>
-              {openTasks.length > 0 ? "Currently active" : "All clear"}
-            </span>
-          </div>,
+          <TaskStatCard
+            activeClassName="border-blue-800 bg-blue-950 text-blue-100"
+            activeDescription="Currently active"
+            activeMutedTextClassName="text-blue-100/70"
+            activeTextClassName="text-blue-100"
+            count={openTasks.length}
+            isFetching={isFetching}
+            title="Open Tasks"
+          />,
           openTasks,
           "All Open Tasks:"
         )}
 
         {maybeWrapWithDialog(
-          <div
-            className={cn(
-              "mt-3 flex w-max flex-col rounded-lg border-2 p-2 shadow-lg/30 transition-all hover:-translate-y-1 hover:shadow-xl/100",
-              overdue.length > 0 ? "border-red-800 bg-red-950 text-red-100" : "border-emerald-800 bg-emerald-950 text-emerald-100"
-            )}
-          >
-            <span className={cn("font-medium", overdue.length > 0 ? "text-red-100" : "text-emerald-100")}>Overdue Tasks</span>
-            <span className="font-bold text-3xl">{isFetching ? "Loading..." : overdue.length}</span>
-            <span className={cn(overdue.length > 0 ? "text-red-100/70" : "text-emerald-100/70")}>
-              {overdue.length > 0 ? "Need completion" : "All clear"}
-            </span>
-          </div>,
+          <TaskStatCard
+            activeClassName="border-red-800 bg-red-950 text-red-100"
+            activeDescription="Need completion"
+            activeMutedTextClassName="text-red-100/70"
+            activeTextClassName="text-red-100"
+            count={overdue.length}
+            isFetching={isFetching}
+            title="Overdue Tasks"
+          />,
           overdue,
           "All Overdue Tasks:"
         )}
 
         {maybeWrapWithDialog(
-          <div
-            className={cn(
-              "mt-3 flex w-max flex-col rounded-lg border-2 p-2 shadow-lg/30 transition-all hover:-translate-y-1 hover:shadow-xl/100",
-              urgentTasks.length > 0 ? "border-amber-800 bg-amber-950 text-amber-100" : "border-emerald-800 bg-emerald-950 text-emerald-100"
-            )}
-          >
-            <span className={cn("font-medium", urgentTasks.length > 0 ? "text-amber-100" : "text-emerald-100")}>Urgent Tasks</span>
-            <span className="whitespace-nowrap font-bold text-3xl">{isFetching ? "Loading..." : urgentTasks.length}</span>
-            <span className={cn(urgentTasks.length > 0 ? "text-amber-100/70" : "text-emerald-100/70")}>
-              {urgentTasks.length > 0 ? "Need priority" : "All clear"}
-            </span>
-          </div>,
+          <TaskStatCard
+            activeClassName="border-amber-800 bg-amber-950 text-amber-100"
+            activeDescription="Need priority"
+            activeMutedTextClassName="text-amber-100/70"
+            activeTextClassName="text-amber-100"
+            count={urgentTasks.length}
+            isFetching={isFetching}
+            title="Urgent Tasks"
+            valueClassName="whitespace-nowrap"
+          />,
           urgentTasks,
           "All Urgent Tasks:"
         )}
 
         {maybeWrapWithDialog(
-          <div
-            className={cn(
-              "mt-3 flex w-max flex-col rounded-lg border-2 p-2 shadow-lg/30 transition-all hover:-translate-y-1 hover:shadow-xl/100",
-              scheduled.length > 0 ? "border-slate-700 bg-slate-800 text-slate-100" : "border-emerald-800 bg-emerald-950 text-emerald-100"
-            )}
-          >
-            <span className={cn("font-medium", scheduled.length > 0 ? "text-slate-100" : "text-emerald-100")}>Scheduled Tasks</span>
-            <span className="whitespace-nowrap font-bold text-3xl">{isFetching ? "Loading..." : scheduled.length}</span>
-            <span className={cn(scheduled.length > 0 ? "text-slate-100/70" : "text-emerald-100/70")}>
-              {scheduled.length > 0 ? "Scheduled for later" : "All clear"}
-            </span>
-          </div>,
+          <TaskStatCard
+            activeClassName="border-slate-700 bg-slate-800 text-slate-100"
+            activeDescription="Scheduled for later"
+            activeMutedTextClassName="text-slate-100/70"
+            activeTextClassName="text-slate-100"
+            count={scheduled.length}
+            isFetching={isFetching}
+            title="Scheduled Tasks"
+            valueClassName="whitespace-nowrap"
+          />,
           scheduled,
           "All Scheduled Tasks:"
         )}

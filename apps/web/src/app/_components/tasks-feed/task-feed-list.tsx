@@ -9,7 +9,25 @@ import { TaskDialog } from "../../classroom/[id]/_components/task/task-dialog";
 import { TaskFeedCard } from "./task-feed-card";
 
 export function TaskFeedList({ openOnly }: { openOnly?: boolean }) {
-  const { data: tasks, isLoading } = useQuery(webClientORPC.tasks.getAllTasks.queryOptions({ input: { openOnly } }));
+  // TODO replace with inf query
+
+  const { data: openTasks, isLoading: openTasksLoading } = useQuery(
+    webClientORPC.tasks.getOpenTasks.queryOptions({
+      input: {},
+      enabled: !!openOnly,
+    })
+  );
+
+  const { data: allTasks, isLoading: allTasksLoading } = useQuery(
+    webClientORPC.tasks.getTasks.queryOptions({
+      input: { direction: "NEWEST_FIRST" },
+      select: (data) => data.tasks,
+      enabled: !openOnly,
+    })
+  );
+
+  const tasks = openOnly ? openTasks : allTasks;
+  const isLoading = openOnly ? openTasksLoading : allTasksLoading;
 
   const parentRef = useRef<HTMLDivElement>(null);
 

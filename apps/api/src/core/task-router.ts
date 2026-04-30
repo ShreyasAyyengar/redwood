@@ -5,10 +5,72 @@ import { ClassroomService } from "../database/classroom-service";
 import { TaskService } from "../database/task-service";
 import { protectedProcedure } from "../libs/orpc-procedures";
 
+const PAGE_SIZE = 5;
+
 export const taskRouter = {
-  getTasks: protectedProcedure.tasks.getTasks.handler(({ input, errors }) => {
-    const { classroomId } = input;
-    return TaskService.find({ classroomId }).lean().sort({ createdAt: -1 });
+  getTasks: protectedProcedure.tasks.getTasks.handler(async ({ input, errors }) => {
+    const { classroomId, direction, cursor } = input;
+
+    const sortDirection = direction === "NEWEST_FIRST" ? -1 : 1;
+    const cursorOperator = direction === "NEWEST_FIRST" ? "$lt" : "$gt";
+
+    const getAfterCursorQuery = (task: z.infer<typeof taskSchema>) => ({
+      $or: [
+        { createdAt: { [cursorOperator]: task.createdAt } },
+        {
+          createdAt: task.createdAt,
+          _id: { [cursorOperator]: task._id },
+        },
+      ],
+    });
+
+    const scopeQuery: Record<string, unknown> = classroomId ? { classroomId } : {};
+    let query: Record<string, unknown> = { ...scopeQuery };
+
+    if (cursor) {
+      const cursorTask = await TaskService.findOne({
+        _id: cursor,
+        ...scopeQuery,
+      }).lean();
+
+      if (!cursorTask) {
+        throw errors.NOT_FOUND({
+          data: { message: `Task cursor ${cursor} not found` },
+        });
+      }
+
+      query = {
+        ...query,
+        ...getAfterCursorQuery(cursorTask),
+      };
+    }
+
+    const tasks = await TaskService.find(query).lean().sort({ createdAt: sortDirection, _id: sortDirection }).limit(PAGE_SIZE);
+
+    const lastTask = tasks.at(-1);
+
+    const hasMore = lastTask
+      ? await TaskService.exists({
+          ...scopeQuery,
+          ...getAfterCursorQuery(lastTask),
+        })
+      : false;
+
+    return {
+      tasks,
+      nextCursor: hasMore && lastTask ? lastTask._id : undefined,
+    };
+  }),
+
+  getOpenTasks: protectedProcedure.tasks.getOpenTasks.handler(({ input, errors }) => {
+    if (input?.classroomId) {
+      return TaskService.find({ completion: { $exists: false }, classroomId: input.classroomId })
+        .lean()
+        .sort({ createdAt: -1 });
+    }
+    return TaskService.find({ completion: { $exists: false } })
+      .lean()
+      .sort({ createdAt: -1 });
   }),
 
   getAllTasks: protectedProcedure.tasks.getAllTasks.handler(({ input, errors }) => {

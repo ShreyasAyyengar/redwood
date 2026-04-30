@@ -19,11 +19,7 @@ export default function CommandContent({ closeNavigator }: { closeNavigator: () 
       input: {},
     })
   );
-  const { data: tasks, isFetching: tasksFetching } = useQuery(
-    webClientORPC.tasks.getAllTasks.queryOptions({
-      input: { openOnly: true },
-    })
-  );
+  const { data: tasks, isFetching: tasksFetching } = useQuery(webClientORPC.tasks.getOpenTasks.queryOptions({ input: {} }));
 
   return (
     <CommandList>

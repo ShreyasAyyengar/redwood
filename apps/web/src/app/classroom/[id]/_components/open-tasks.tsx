@@ -6,13 +6,13 @@ import { useQuery } from "@tanstack/react-query";
 import { BookAlert, ClipboardList, Plus } from "lucide-react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../lib/orpc-web-client";
+import { ClassroomTaskHistoryDialog } from "./task/classroom-task-history-dialog";
 import { TaskCard, TaskCardSkeleton } from "./task/task-card";
 import { TaskDialog } from "./task/task-dialog";
-import TaskHistoryDialog from "./task/task-history-dialog";
 
 export default function OpenTasks({ room }: { room: z.infer<typeof classroomSchema> | undefined }) {
   const { data: tasks, isLoading } = useQuery(
-    webClientORPC.tasks.getTasks.queryOptions({
+    webClientORPC.tasks.getOpenTasks.queryOptions({
       // biome-ignore lint/suspicious/noNonNullAssertedOptionalChain: query only runs if room is defined
       // biome-ignore lint/style/noNonNullAssertion: query only runs if room is defined
       input: { classroomId: room?._id! },
@@ -38,21 +38,19 @@ export default function OpenTasks({ room }: { room: z.infer<typeof classroomSche
             <div className="flex items-center gap-2">
               <ClipboardList className="size-6 text-blue-500" />
               <div>Open Tasks</div>
-              {openTasks && (
-                <span
-                  className={cn(
-                    "flex h-6 w-6 items-center justify-center rounded-full text-sm transition-all duration-100",
-                    openTasks.length > 0
-                      ? "border-blue-500/30 bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
-                      : "border-zinc-500/30 bg-zinc-500/20 text-zinc-400 hover:bg-zinc-500/30"
-                  )}
-                >
-                  {openTasks.length}
-                </span>
-              )}
+              <span
+                className={cn(
+                  "flex h-6 w-6 items-center justify-center rounded-full text-sm transition-all duration-100",
+                  openTasks.length > 0
+                    ? "border-blue-500/30 bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
+                    : "border-zinc-500/30 bg-zinc-500/20 text-zinc-400 hover:bg-zinc-500/30"
+                )}
+              >
+                {openTasks.length}
+              </span>
             </div>
 
-            <TaskHistoryDialog title={`Task History: ${room.displayName}`} tasks={tasks}>
+            <ClassroomTaskHistoryDialog classroomId={room._id} title={`Task History: ${room.displayName}`}>
               <button
                 type="button"
                 className="flex w-full cursor-pointer items-center gap-3 font-normal transition-colors hover:text-neutral-200 sm:text-lg"
@@ -60,7 +58,7 @@ export default function OpenTasks({ room }: { room: z.infer<typeof classroomSche
                 <BookAlert className="size-5" />
                 <span className="font-normal text-md">See Task History</span>
               </button>
-            </TaskHistoryDialog>
+            </ClassroomTaskHistoryDialog>
           </div>
           <TaskDialog roomId={room._id}>
             <Button className="flex w-fit items-center rounded-md bg-neutral-300 px-2 py-1 text-center font-semibold text-black text-lg transition-all duration-150 hover:bg-neutral-400 focus:ring-5! focus:ring-neutral-600! active:scale-95 active:transform">
@@ -119,8 +117,8 @@ export function OpenTasksSkeleton() {
 
         <ScrollArea className="mt-5 h-full min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
           <div className="space-y-2">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <TaskCardSkeleton key={index} />
+            {Array.from({ length: 3 }).map(() => (
+              <TaskCardSkeleton key={crypto.randomUUID()} />
             ))}
           </div>
         </ScrollArea>

@@ -1,5 +1,6 @@
 import { oc } from "@orpc/contract";
 import z from "zod";
+import { classroomSchema } from "../rooms/classroom-contract";
 import { taskSchema, uiTaskFormSchema } from "./task-schemas";
 
 export const taskContract = {
@@ -93,14 +94,39 @@ export const taskContract = {
     .route({
       method: "GET",
     })
-    .input(taskSchema.pick({ classroomId: true }))
-    .output(z.array(taskSchema))
+    .input(
+      z.object({
+        classroomId: classroomSchema.shape._id.optional(),
+        direction: z.enum(["OLDEST_FIRST", "NEWEST_FIRST"]),
+        cursor: taskSchema.shape._id.optional(),
+      })
+    )
+    .output(
+      z.object({
+        tasks: z.array(taskSchema),
+        nextCursor: taskSchema.shape._id.optional(),
+      })
+    )
     .errors({
       NOT_FOUND: {
         data: z.object({
           message: z.string(),
         }),
       },
+      INTERNAL_SERVER_ERROR: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+    }),
+
+  getOpenTasks: oc
+    .route({
+      method: "GET",
+    })
+    .input(z.object({ classroomId: taskSchema.shape.classroomId.optional() }))
+    .output(z.array(taskSchema))
+    .errors({
       INTERNAL_SERVER_ERROR: {
         data: z.object({
           message: z.string(),
