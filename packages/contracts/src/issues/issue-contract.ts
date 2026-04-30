@@ -70,14 +70,39 @@ export const issueContract = {
     .route({
       method: "GET",
     })
-    .input(z.object({ classroomId: classroomSchema.shape._id }))
-    .output(z.array(issueSchema))
+    .input(
+      z.object({
+        classroomId: classroomSchema.shape._id.optional(),
+        direction: z.enum(["OLDEST_FIRST", "NEWEST_FIRST"]),
+        cursor: issueSchema.shape._id.optional(),
+      })
+    )
+    .output(
+      z.object({
+        issues: z.array(issueSchema),
+        nextCursor: issueSchema.shape._id.optional(),
+      })
+    )
     .errors({
       NOT_FOUND: {
         data: z.object({
           message: z.string(),
         }),
       },
+      INTERNAL_SERVER_ERROR: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+    }),
+
+  getOpenIssues: oc
+    .route({
+      method: "GET",
+    })
+    .input(z.object({ classroomId: issueSchema.shape.classroomId.optional() }))
+    .output(z.array(issueSchema))
+    .errors({
       INTERNAL_SERVER_ERROR: {
         data: z.object({
           message: z.string(),

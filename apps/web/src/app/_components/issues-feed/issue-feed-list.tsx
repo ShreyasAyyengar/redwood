@@ -8,15 +8,33 @@ import { webClientORPC } from "../../../lib/orpc-web-client";
 import { IssueDialog } from "../../classroom/[id]/_components/issue/issue-dialog";
 import { IssueFeedCard } from "./issue-feed-card";
 
+const ISSUE_FEED_ROW_ESTIMATE_PX = 220;
+
 export function IssueFeedList({ openOnly }: { openOnly?: boolean }) {
-  const { data: issues, isLoading } = useQuery(webClientORPC.issues.getAllIssues.queryOptions({ input: { openOnly } }));
+  const { data: openIssues, isLoading: openIssuesLoading } = useQuery(
+    webClientORPC.issues.getOpenIssues.queryOptions({
+      input: {},
+      enabled: !!openOnly,
+    })
+  );
+
+  const { data: allIssues, isLoading: allIssuesLoading } = useQuery(
+    webClientORPC.issues.getIssues.queryOptions({
+      input: { direction: "NEWEST_FIRST" },
+      select: (data) => data.issues,
+      enabled: !openOnly,
+    })
+  );
+
+  const issues = openOnly ? openIssues : allIssues;
+  const isLoading = openOnly ? openIssuesLoading : allIssuesLoading;
 
   const parentRef = useRef<HTMLDivElement>(null);
 
   const rowVirtualizer = useVirtualizer({
     count: openOnly ? 0 : (issues?.length ?? 0),
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 220,
+    estimateSize: () => ISSUE_FEED_ROW_ESTIMATE_PX,
     overscan: 2,
     getItemKey: (index) => issues?.[index]?._id ?? index,
   });

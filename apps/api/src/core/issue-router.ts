@@ -5,15 +5,76 @@ import { ClassroomService } from "../database/classroom-service";
 import { IssueService } from "../database/issue-service";
 import { protectedProcedure } from "../libs/orpc-procedures";
 
+const PAGE_SIZE = 5;
+
 export const issueRouter = {
   getIssues: protectedProcedure.issues.getIssues.handler(async ({ input, errors }) => {
-    const { classroomId } = input;
-    const issues: z.infer<typeof issueSchema>[] = await IssueService.find({ classroomId }).lean().sort({ "issue.reportedAt": -1 });
+    const { classroomId, direction, cursor } = input;
 
-    return issues;
+    const sortDirection = direction === "NEWEST_FIRST" ? -1 : 1;
+    const cursorOperator = direction === "NEWEST_FIRST" ? "$lt" : "$gt";
+
+    const getAfterCursorQuery = (issue: z.infer<typeof issueSchema>) => ({
+      $or: [
+        { "issue.reportedAt": { [cursorOperator]: issue.issue.reportedAt } },
+        {
+          "issue.reportedAt": issue.issue.reportedAt,
+          _id: { [cursorOperator]: issue._id },
+        },
+      ],
+    });
+
+    const scopeQuery: Record<string, unknown> = classroomId ? { classroomId } : {};
+    let query: Record<string, unknown> = { ...scopeQuery };
+
+    if (cursor) {
+      const cursorIssue = await IssueService.findOne({
+        _id: cursor,
+        ...scopeQuery,
+      }).lean();
+
+      if (!cursorIssue) {
+        throw errors.NOT_FOUND({
+          data: { message: `Issue cursor ${cursor} not found` },
+        });
+      }
+
+      query = {
+        ...query,
+        ...getAfterCursorQuery(cursorIssue),
+      };
+    }
+
+    const issues = await IssueService.find(query).lean().sort({ "issue.reportedAt": sortDirection, _id: sortDirection }).limit(PAGE_SIZE);
+
+    const lastIssue = issues.at(-1);
+
+    const hasMore = lastIssue
+      ? await IssueService.exists({
+          ...scopeQuery,
+          ...getAfterCursorQuery(lastIssue),
+        })
+      : false;
+
+    return {
+      issues,
+      nextCursor: hasMore && lastIssue ? lastIssue._id : undefined,
+    };
   }),
 
-  getAllIssues: protectedProcedure.issues.getAllIssues.handler(({ input, errors }) => {
+  getOpenIssues: protectedProcedure.issues.getOpenIssues.handler(({ input }) => {
+    if (input?.classroomId) {
+      return IssueService.find({ resolution: { $exists: false }, classroomId: input.classroomId })
+        .lean()
+        .sort({ "issue.reportedAt": -1 });
+    }
+
+    return IssueService.find({ resolution: { $exists: false } })
+      .lean()
+      .sort({ "issue.reportedAt": -1 });
+  }),
+
+  getAllIssues: protectedProcedure.issues.getAllIssues.handler(({ input }) => {
     const { openOnly } = input;
     const query = openOnly ? { resolution: { $exists: false } } : {};
 
@@ -39,8 +100,6 @@ export const issueRouter = {
         reportedBy: context.user.email,
         reportedAt: new Date(),
       },
-
-      adminNotes: [],
     };
 
     const isValid = issueSchema.safeParse(newIssue);
@@ -49,7 +108,7 @@ export const issueRouter = {
     try {
       await IssueService.insertOne(newIssue);
 
-      void recomputeRoomStatus(newIssue.classroomId);
+      recomputeRoomStatus(newIssue.classroomId);
 
       return true;
     } catch (e) {
@@ -99,7 +158,7 @@ export const issueRouter = {
 
     try {
       await IssueService.replaceOne({ _id: input._id }, updatedIssue).lean();
-      void recomputeRoomStatus(updatedIssue.classroomId);
+      recomputeRoomStatus(updatedIssue.classroomId);
 
       return true;
     } catch (e) {
@@ -114,7 +173,7 @@ export const issueRouter = {
     try {
       await IssueService.findByIdAndDelete(input.issueId).lean();
 
-      void recomputeRoomStatus(issue.classroomId);
+      recomputeRoomStatus(issue.classroomId);
 
       return true;
     } catch (e) {

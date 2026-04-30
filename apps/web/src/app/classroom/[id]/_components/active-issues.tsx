@@ -6,13 +6,13 @@ import { useQuery } from "@tanstack/react-query";
 import { BookAlert, Plus, TriangleAlert } from "lucide-react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../lib/orpc-web-client";
+import { ClassroomIssueHistoryDialog } from "./issue/classroom-issue-history-dialog";
 import { IssueCard, IssueCardSkeleton } from "./issue/issue-card";
 import { IssueDialog } from "./issue/issue-dialog";
-import IssueHistoryDialog from "./issue/issue-history-dialog";
 
 export default function ActiveIssues({ room }: { room: z.infer<typeof classroomSchema> | undefined }) {
   const { data: issues, isLoading } = useQuery(
-    webClientORPC.issues.getIssues.queryOptions({
+    webClientORPC.issues.getOpenIssues.queryOptions({
       // biome-ignore lint/suspicious/noNonNullAssertedOptionalChain: query only runs if room is defined
       // biome-ignore lint/style/noNonNullAssertion: query only runs if room is defined
       input: { classroomId: room?._id! },
@@ -37,21 +37,19 @@ export default function ActiveIssues({ room }: { room: z.infer<typeof classroomS
             <div className="flex items-center gap-2">
               <TriangleAlert className="size-6 text-yellow-500" />
               <div>Active Issues</div>
-              {openIssues && (
-                <span
-                  className={cn(
-                    "flex h-6 w-6 items-center justify-center rounded-full text-sm transition-all duration-100",
-                    openIssues.length > 0
-                      ? "border-yellow-500/30 bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30"
-                      : "border-zinc-500/30 bg-zinc-500/20 text-zinc-400 hover:bg-zinc-500/30"
-                  )}
-                >
-                  {openIssues.length}
-                </span>
-              )}
+              <span
+                className={cn(
+                  "flex h-6 w-6 items-center justify-center rounded-full text-sm transition-all duration-100",
+                  openIssues.length > 0
+                    ? "border-yellow-500/30 bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30"
+                    : "border-zinc-500/30 bg-zinc-500/20 text-zinc-400 hover:bg-zinc-500/30"
+                )}
+              >
+                {openIssues.length}
+              </span>
             </div>
 
-            <IssueHistoryDialog title={`Issue History: ${room.displayName}`} issues={issues}>
+            <ClassroomIssueHistoryDialog classroomId={room._id} title={`Issue History: ${room.displayName}`}>
               <button
                 type="button"
                 className="flex w-full cursor-pointer items-center gap-3 font-normal transition-colors hover:text-neutral-200 sm:text-lg"
@@ -59,7 +57,7 @@ export default function ActiveIssues({ room }: { room: z.infer<typeof classroomS
                 <BookAlert className="size-5" />
                 <span className="font-normal text-md">See Issue History</span>
               </button>
-            </IssueHistoryDialog>
+            </ClassroomIssueHistoryDialog>
           </div>
 
           <IssueDialog roomId={room._id}>
@@ -119,8 +117,8 @@ export function ActiveIssuesSkeleton() {
 
         <ScrollArea className="mt-5 h-full min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
           <div className="space-y-2">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <IssueCardSkeleton key={index} />
+            {Array.from({ length: 3 }).map(() => (
+              <IssueCardSkeleton key={crypto.randomUUID()} />
             ))}
           </div>
         </ScrollArea>

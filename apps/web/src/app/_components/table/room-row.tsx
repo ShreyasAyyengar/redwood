@@ -8,6 +8,8 @@ import { useRef, useState } from "react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../lib/orpc-web-client";
 
+const PREFETCH_DELAY_MS = 250;
+
 export function RoomRow({ row }: { row: Row<z.infer<typeof classroomSchemaPayload>> }) {
   const cells = row.getVisibleCells();
   const [isHovering, setIsHovering] = useState(false);
@@ -19,11 +21,11 @@ export function RoomRow({ row }: { row: Row<z.infer<typeof classroomSchemaPayloa
     input: { classroomId },
     staleTime: 60_000,
   });
-  const issuesQuery = webClientORPC.issues.getIssues.queryOptions({
+  const issuesQuery = webClientORPC.issues.getOpenIssues.queryOptions({
     input: { classroomId },
     staleTime: 60_000,
   });
-  const tasksQuery = webClientORPC.tasks.getTasks.queryOptions({
+  const tasksQuery = webClientORPC.tasks.getOpenTasks.queryOptions({
     input: { classroomId },
     staleTime: 60_000,
   });
@@ -54,7 +56,7 @@ export function RoomRow({ row }: { row: Row<z.infer<typeof classroomSchemaPayloa
           setIsHovering(true);
           hoverTimeoutRef.current = setTimeout(() => {
             prefetchRoomData();
-          }, 250);
+          }, PREFETCH_DELAY_MS);
         }}
         onMouseLeave={() => {
           setIsHovering(false);
