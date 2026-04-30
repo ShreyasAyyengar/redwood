@@ -68,7 +68,7 @@ function IssueStatCard({
 
 export default function IssueOverview() {
   const { data: issues = [], isFetching } = useQuery(
-    webClientORPC.issues.getOpenIssues.queryOptions({
+    webClientORPC.issues.getActiveTasks.queryOptions({
       input: {},
       staleTime: 60_000,
       refetchOnWindowFocus: true,

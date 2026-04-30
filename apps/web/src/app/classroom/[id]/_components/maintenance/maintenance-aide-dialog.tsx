@@ -20,7 +20,7 @@ export function MaintenanceAideDialog({
   onCreateNew: () => void;
 }) {
   const { data: issues } = useQuery(
-    webClientORPC.issues.getOpenIssues.queryOptions({
+    webClientORPC.issues.getActiveTasks.queryOptions({
       input: { classroomId: roomId },
     })
   );

@@ -12,7 +12,7 @@ import { IssueDialog } from "./issue/issue-dialog";
 
 export default function ActiveIssues({ room }: { room: z.infer<typeof classroomSchema> | undefined }) {
   const { data: issues, isLoading } = useQuery(
-    webClientORPC.issues.getOpenIssues.queryOptions({
+    webClientORPC.issues.getActiveTasks.queryOptions({
       // biome-ignore lint/suspicious/noNonNullAssertedOptionalChain: query only runs if room is defined
       // biome-ignore lint/style/noNonNullAssertion: query only runs if room is defined
       input: { classroomId: room?._id! },

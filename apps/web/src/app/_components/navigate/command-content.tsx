@@ -15,7 +15,7 @@ export default function CommandContent({ closeNavigator }: { closeNavigator: () 
   };
 
   const { data: issues, isFetching: issuesFetching } = useQuery(
-    webClientORPC.issues.getOpenIssues.queryOptions({
+    webClientORPC.issues.getActiveTasks.queryOptions({
       input: {},
     })
   );
