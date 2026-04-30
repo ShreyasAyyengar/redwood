@@ -14,12 +14,8 @@ export default function CommandContent({ closeNavigator }: { closeNavigator: () 
     router.push(`/classroom/${roomId}`);
   };
 
-  const { data: issues, isFetching: issuesFetching } = useQuery(
-    webClientORPC.issues.getActiveIssues.queryOptions({
-      input: {},
-    })
-  );
-  const { data: tasks, isFetching: tasksFetching } = useQuery(webClientORPC.tasks.getOpenTasks.queryOptions({ input: {} }));
+  const { data: issues, isFetching: issuesFetching } = useQuery(webClientORPC.issues.getActiveIssues.queryOptions());
+  const { data: tasks, isFetching: tasksFetching } = useQuery(webClientORPC.tasks.getOpenTasks.queryOptions());
 
   return (
     <CommandList>

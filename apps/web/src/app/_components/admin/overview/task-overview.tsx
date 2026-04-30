@@ -3,7 +3,6 @@ import { cn } from "@redwood/shad-ui/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { ClipboardList } from "lucide-react";
 import type React from "react";
-import { useEffect } from "react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../lib/orpc-web-client";
 import { TaskListDialog } from "../../../classroom/[id]/_components/task/task-list-dialog";
@@ -70,7 +69,6 @@ function TaskStatCard({
 export default function TaskOverview() {
   const { data: tasks = [], isFetching } = useQuery(
     webClientORPC.tasks.getOpenTasks.queryOptions({
-      input: {},
       staleTime: 60_000,
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,
@@ -81,13 +79,6 @@ export default function TaskOverview() {
   const urgentTasks = openTasks.filter((task) => task.task.urgent);
   const overdue = tasks.filter((task) => task.task.completeBy && Date.now() > new Date(task.task.completeBy).getTime());
   const scheduled = tasks.filter((task) => task.task.visibleAt && task.task.visibleAt.getTime() > Date.now());
-
-  useEffect(() => {
-    console.log("openTasks", openTasks.length);
-    console.log("urgentTasks", urgentTasks.length);
-    console.log("overdue", overdue.length);
-    console.log("scheduled", scheduled.length);
-  }, [openTasks, urgentTasks, overdue, scheduled]);
 
   return (
     <div>

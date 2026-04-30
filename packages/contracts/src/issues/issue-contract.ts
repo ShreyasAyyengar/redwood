@@ -100,7 +100,7 @@ export const issueContract = {
     .route({
       method: "GET",
     })
-    .input(z.object({ classroomId: issueSchema.shape.classroomId.optional() }))
+    .input(z.object({ classroomId: z.string().optional() }).optional()) // double .optional() is to allow for no input on frontend
     .output(z.array(issueSchema))
     .errors({
       INTERNAL_SERVER_ERROR: {

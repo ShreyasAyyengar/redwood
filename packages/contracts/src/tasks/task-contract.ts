@@ -124,7 +124,7 @@ export const taskContract = {
     .route({
       method: "GET",
     })
-    .input(z.object({ classroomId: taskSchema.shape.classroomId.optional() }))
+    .input(z.object({ classroomId: z.string().optional() }).optional()) // double .optional() is to allow for no input on frontend
     .output(z.array(taskSchema))
     .errors({
       INTERNAL_SERVER_ERROR: {

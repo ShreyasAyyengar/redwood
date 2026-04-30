@@ -13,7 +13,6 @@ export function TaskFeedList({ openOnly }: { openOnly?: boolean }) {
 
   const { data: openTasks, isLoading: openTasksLoading } = useQuery(
     webClientORPC.tasks.getOpenTasks.queryOptions({
-      input: {},
       enabled: !!openOnly,
     })
   );
