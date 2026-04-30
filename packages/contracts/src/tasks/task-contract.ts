@@ -133,28 +133,4 @@ export const taskContract = {
         }),
       },
     }),
-
-  // TODO paginate with inf queries
-  getAllTasks: oc
-    .route({
-      method: "GET",
-    })
-    .input(
-      z.object({
-        openOnly: z.coerce.boolean().default(false),
-      })
-    )
-    .output(z.array(taskSchema))
-    .errors({
-      NOT_FOUND: {
-        data: z.object({
-          message: z.string(),
-        }),
-      },
-      INTERNAL_SERVER_ERROR: {
-        data: z.object({
-          message: z.string(),
-        }),
-      },
-    }),
 };

@@ -74,13 +74,6 @@ export const issueRouter = {
       .sort({ "issue.reportedAt": -1 });
   }),
 
-  getAllIssues: protectedProcedure.issues.getAllIssues.handler(({ input }) => {
-    const { openOnly } = input;
-    const query = openOnly ? { resolution: { $exists: false } } : {};
-
-    return IssueService.find(query).lean().sort({ "issue.reportedAt": -1 });
-  }),
-
   createIssue: protectedProcedure.issues.createIssue.handler(async ({ input, errors, context }) => {
     const classroom = await ClassroomService.findById(input.classroomId).lean();
     if (!classroom) throw errors.NOT_FOUND({ data: { message: `Classroom with id ${input.classroomId} not found` } });

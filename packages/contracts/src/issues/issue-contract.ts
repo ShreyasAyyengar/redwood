@@ -109,23 +109,4 @@ export const issueContract = {
         }),
       },
     }),
-
-  // TODO paginate with inf queries
-  getAllIssues: oc
-    .route({
-      method: "GET",
-    })
-    .input(
-      z.object({
-        openOnly: z.coerce.boolean().default(false),
-      })
-    )
-    .output(z.array(issueSchema))
-    .errors({
-      INTERNAL_SERVER_ERROR: {
-        data: z.object({
-          message: z.string(),
-        }),
-      },
-    }),
 };

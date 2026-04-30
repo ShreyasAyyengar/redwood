@@ -73,12 +73,6 @@ export const taskRouter = {
       .sort({ createdAt: -1 });
   }),
 
-  getAllTasks: protectedProcedure.tasks.getAllTasks.handler(({ input, errors }) => {
-    const { openOnly } = input;
-    const query = openOnly ? { completion: { $exists: false } } : {};
-    return TaskService.find(query).lean().sort({ createdAt: -1 });
-  }),
-
   addTask: protectedProcedure.tasks.addTask.handler(async ({ input, errors, context }) => {
     const classroom = await ClassroomService.findById(input.classroomId).lean();
     if (!classroom) throw errors.NOT_FOUND({ data: { message: `Classroom with id ${input.classroomId} not found` } });
