@@ -2,37 +2,57 @@ import type { classroomSchema } from "@redwood/contracts";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwood/shad-ui/components/tooltip";
 import { cn } from "@redwood/shad-ui/lib/utils";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { CalendarDays, ClipboardClock, UserCog } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useInView } from "react-intersection-observer";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../lib/orpc-web-client";
 import { formatDate, getDateTimeDisplay } from "../../../../util/date-time-utils";
 import MaintenanceDialog from "./maintenance/maintenance-dialog";
 
+const INTERSECTION_ROOT_MARGIN = "160px 0px";
+const MAINTENANCE_ROW_ESTIMATE_PX = 140;
+
 export default function MaintenanceHistory({ roomId }: { roomId: z.infer<typeof classroomSchema>["_id"] | undefined }) {
-  const { data: maintenanceHistory, isLoading } = useQuery(
-    webClientORPC.maintenance.getHistory.queryOptions({
-      // biome-ignore lint/style/noNonNullAssertion: query only runs if roomId is defined
-      input: { classroomId: roomId! },
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery(
+    webClientORPC.maintenance.getHistory.infiniteOptions({
       enabled: !!roomId,
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+      initialPageParam: undefined,
+      input: (cursor) => ({
+        // biome-ignore lint/style/noNonNullAssertion: query only runs if roomId is defined
+        classroomId: roomId!,
+        cursor,
+      }),
     })
   );
 
+  const maintenanceHistory = useMemo(() => data?.pages.flatMap((page) => page.history) ?? [], [data]);
   const [viewportElement, setViewportElement] = useState<HTMLDivElement | null>(null);
+  const { inView, ref: loadMoreRef } = useInView({
+    root: viewportElement,
+    rootMargin: INTERSECTION_ROOT_MARGIN,
+  });
+  const loadMoreIndex = hasNextPage && maintenanceHistory.length > 1 ? maintenanceHistory.length - 2 : undefined;
 
   const viewportRef = useCallback((node: HTMLDivElement | null) => {
     setViewportElement((prev) => (prev === node ? prev : node));
   }, []);
 
   const rowVirtualizer = useVirtualizer({
-    count: maintenanceHistory?.length ?? 0,
+    count: maintenanceHistory.length,
     getScrollElement: () => viewportElement,
-    estimateSize: () => 140,
+    estimateSize: () => MAINTENANCE_ROW_ESTIMATE_PX,
     overscan: 3,
-    getItemKey: (index) => maintenanceHistory?.[index]?._id ?? index,
+    getItemKey: (index) => maintenanceHistory[index]?._id ?? index,
   });
+
+  useEffect(() => {
+    if (!inView || !hasNextPage || isFetchingNextPage) return;
+    fetchNextPage();
+  }, [fetchNextPage, hasNextPage, inView, isFetchingNextPage]);
 
   if (isLoading) return <MaintenanceHistorySkeleton />;
 
@@ -95,7 +115,6 @@ export default function MaintenanceHistory({ roomId }: { roomId: z.infer<typeof 
                 <div
                   key={virtualItem.key}
                   data-index={virtualItem.index}
-                  ref={rowVirtualizer.measureElement}
                   style={{
                     position: "absolute",
                     top: 0,
@@ -103,6 +122,10 @@ export default function MaintenanceHistory({ roomId }: { roomId: z.infer<typeof 
                     width: "100%",
                     transform: `translateY(${virtualItem.start}px)`,
                     paddingBottom: "8px", // replaces old space-y-2
+                  }}
+                  ref={(node) => {
+                    rowVirtualizer.measureElement(node);
+                    if (virtualItem.index === loadMoreIndex) loadMoreRef(node);
                   }}
                 >
                   <Tooltip delayDuration={500}>
@@ -259,9 +282,7 @@ export function MaintenanceHistorySkeleton() {
 
       <ScrollArea className="mt-3 h-full min-h-0 flex-1 rounded-2xl bg-zinc-950/50 p-3">
         <div className="mt-1 space-y-2">
-          {Array.from({ length: 1 }).map((_, index) => (
-            <MaintenanceHistoryCardSkeleton key={index} />
-          ))}
+          <MaintenanceHistoryCardSkeleton />
         </div>
       </ScrollArea>
     </div>

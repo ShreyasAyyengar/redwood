@@ -14,7 +14,7 @@ const MaintenanceEntrySchemaMongoose = toMongooseSchema(
   })
 );
 
-MaintenanceEntrySchemaMongoose.index({ classroomId: 1, date: -1 });
+MaintenanceEntrySchemaMongoose.index({ classroomId: 1, date: -1, _id: -1 });
 
 export interface IMaintenanceEntrySchemaMongoose extends z.infer<typeof MaintenanceEntrySchemaMongooseZod> {}
 

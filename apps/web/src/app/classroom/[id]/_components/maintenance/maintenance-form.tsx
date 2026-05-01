@@ -60,7 +60,7 @@ export default function MaintenanceForm({
     webClientORPC.maintenance.addMaintenanceEntry.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: webClientORPC.maintenance.getHistory.queryOptions({ input: { classroomId: roomId } }).queryKey,
+          queryKey: webClientORPC.maintenance.getHistory.queryKey({ input: { classroomId: roomId } }),
         });
         queryClient.fetchQuery(webClientORPC.classrooms.getRoom.queryOptions({ input: { id: roomId } })).then((data) => {
           if (data) updateRoom(roomId, data);

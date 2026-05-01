@@ -17,8 +17,10 @@ export function RoomRow({ row }: { row: Row<z.infer<typeof classroomSchemaPayloa
   const queryClient = useQueryClient();
 
   const classroomId = row.original._id;
-  const historyQuery = webClientORPC.maintenance.getHistory.queryOptions({
-    input: { classroomId },
+  const historyQuery = webClientORPC.maintenance.getHistory.infiniteOptions({
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    initialPageParam: undefined,
+    input: (cursor) => ({ classroomId, cursor }),
     staleTime: 60_000,
   });
   const issuesQuery = webClientORPC.issues.getActiveIssues.queryOptions({
@@ -32,7 +34,7 @@ export function RoomRow({ row }: { row: Row<z.infer<typeof classroomSchemaPayloa
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const prefetchRoomData = () => {
-    queryClient.prefetchQuery({
+    queryClient.prefetchInfiniteQuery({
       ...historyQuery,
       staleTime: 60_000,
     });

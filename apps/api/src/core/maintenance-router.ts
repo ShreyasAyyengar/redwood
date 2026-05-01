@@ -5,6 +5,8 @@ import { ClassroomService } from "../database/classroom-service";
 import { MaintenanceService } from "../database/maintenance-service";
 import { protectedProcedure } from "../libs/orpc-procedures";
 
+const PAGE_SIZE = 5;
+
 export const maintenanceRouter = {
   addMaintenanceEntry: protectedProcedure.maintenance.addMaintenanceEntry.handler(async ({ input, errors, context }) => {
     const classroom = await ClassroomService.findById(input.classroomId).lean();
@@ -33,8 +35,54 @@ export const maintenanceRouter = {
     }
   }),
 
-  getHistory: protectedProcedure.maintenance.getHistory.handler(({ input, errors }) => {
-    const { classroomId } = input;
-    return MaintenanceService.find({ classroomId }).lean().sort({ date: -1 });
+  getHistory: protectedProcedure.maintenance.getHistory.handler(async ({ input, errors }) => {
+    const { classroomId, cursor } = input;
+    const scopeQuery = { classroomId };
+
+    const getAfterCursorQuery = (entry: z.infer<typeof maintenanceEntrySchema>) => ({
+      $or: [
+        { date: { $lt: entry.date } },
+        {
+          date: entry.date,
+          _id: { $lt: entry._id },
+        },
+      ],
+    });
+
+    let query: Record<string, unknown> = { ...scopeQuery };
+
+    if (cursor) {
+      const cursorEntry = await MaintenanceService.findOne({
+        _id: cursor,
+        ...scopeQuery,
+      }).lean();
+
+      if (!cursorEntry) {
+        throw errors.NOT_FOUND({
+          data: { message: `Maintenance cursor ${cursor} not found` },
+        });
+      }
+
+      query = {
+        ...query,
+        ...getAfterCursorQuery(cursorEntry),
+      };
+    }
+
+    const history = await MaintenanceService.find(query).lean().sort({ date: -1, _id: -1 }).limit(PAGE_SIZE);
+
+    const lastEntry = history.at(-1);
+
+    const hasMore = lastEntry
+      ? await MaintenanceService.exists({
+          ...scopeQuery,
+          ...getAfterCursorQuery(lastEntry),
+        })
+      : false;
+
+    return {
+      history,
+      nextCursor: hasMore && lastEntry ? lastEntry._id : undefined,
+    };
   }),
 };

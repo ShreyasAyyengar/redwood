@@ -1,5 +1,6 @@
 import { oc } from "@orpc/contract";
 import { z } from "zod";
+import { classroomSchema } from "../rooms/classroom-contract";
 import { maintenanceEntrySchema } from "./maintenance-schemas";
 
 export const maintenanceContract = {
@@ -31,8 +32,18 @@ export const maintenanceContract = {
     .route({
       method: "GET",
     })
-    .input(maintenanceEntrySchema.pick({ classroomId: true }))
-    .output(z.array(maintenanceEntrySchema))
+    .input(
+      z.object({
+        classroomId: classroomSchema.shape._id,
+        cursor: maintenanceEntrySchema.shape._id.optional(),
+      })
+    )
+    .output(
+      z.object({
+        history: z.array(maintenanceEntrySchema),
+        nextCursor: maintenanceEntrySchema.shape._id.optional(),
+      })
+    )
     .errors({
       NOT_FOUND: {
         data: z.object({
