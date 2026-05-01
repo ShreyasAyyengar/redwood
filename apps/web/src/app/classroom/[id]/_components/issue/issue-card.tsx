@@ -39,7 +39,7 @@ export const IssueCard = ({
     <Card
       ref={ref}
       key={issue._id}
-      className="my-1 border-zinc-800 bg-zinc-900/50 p-4 shadow-md/100 transition-all duration-100 hover:border-zinc-700 active:scale-95"
+      className="my-1 border-zinc-800 bg-zinc-900/50 p-4 shadow-md/100 transition-all duration-100 hover:border-zinc-700 active:scale-[0.99]"
       {...props}
     >
       {foreignView && (

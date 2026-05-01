@@ -164,7 +164,7 @@ export default function MaintenanceHistory({ roomId }: { roomId: z.infer<typeof 
                           className={cn(
                             "group relative cursor-pointer overflow-hidden rounded-xl border bg-neutral-800/70 px-3 py-3",
                             "shadow-sm transition-all duration-200 hover:bg-neutral-800/90 hover:shadow-md",
-                            "duration-150 active:scale-95 active:transform",
+                            "duration-150 active:scale-[0.99] active:transform",
                             overallTone
                           )}
                         >
