@@ -1,7 +1,7 @@
 import { oc } from "@orpc/contract";
 import z from "zod";
 import { classroomSchema } from "../rooms/classroom-contract";
-import { issueSchema, uiIssueFormSchema } from "./issue-schemas";
+import { FINDINGS_OPTIONS, issueSchema, uiIssueFormSchema } from "./issue-schemas";
 
 export const issueContract = {
   createIssue: oc
@@ -47,6 +47,35 @@ export const issueContract = {
       method: "PUT",
     })
     .input(uiIssueFormSchema.extend({ _id: z.uuidv7() }))
+    .output(z.boolean())
+    .errors({
+      FORBIDDEN: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+      NOT_FOUND: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+      INTERNAL_SERVER_ERROR: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+    }),
+
+  setIssueFindings: oc
+    .route({
+      method: "PUT",
+    })
+    .input(
+      z.object({
+        _id: issueSchema.shape._id,
+        findings: z.array(z.enum(FINDINGS_OPTIONS)),
+      })
+    )
     .output(z.boolean())
     .errors({
       FORBIDDEN: {

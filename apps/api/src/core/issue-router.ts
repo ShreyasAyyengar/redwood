@@ -166,6 +166,26 @@ export const issueRouter = {
     }
   }),
 
+  setIssueFindings: protectedProcedure.issues.setIssueFindings.handler(async ({ input, errors, context }) => {
+    const issue = await IssueService.findById(input._id).lean();
+    if (!issue) throw errors.NOT_FOUND({ data: { message: `Issue with id ${input._id} not found` } });
+
+    const updatedIssue: z.infer<typeof issueSchema> = {
+      ...issue,
+      ...(issue.resolution ? { resolution: { ...issue.resolution, findings: input.findings } } : {}),
+    };
+
+    const isValid = issueSchema.safeParse(updatedIssue);
+    if (!isValid.success) throw errors.INTERNAL_SERVER_ERROR({ data: { message: isValid.error.message } });
+
+    try {
+      await IssueService.replaceOne({ _id: input._id }, updatedIssue).lean();
+      return true;
+    } catch (e) {
+      throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
+    }
+  }),
+
   deleteIssue: protectedProcedure.issues.deleteIssue.handler(async ({ input, errors }) => {
     const issue = await IssueService.findById(input.issueId).lean();
     if (!issue) throw errors.NOT_FOUND({ data: { message: `Issue with id ${input.issueId} not found` } });
