@@ -70,11 +70,13 @@ export default function OpenTasks({ room }: { room: z.infer<typeof classroomSche
 
         {openTasks && openTasks.length > 0 ? (
           <ScrollArea className="mt-5 h-full min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
-            {openTasks?.map((task) => (
-              <TaskDialog key={task._id} roomId={room._id} existingTask={task}>
-                <TaskCard task={task} />
-              </TaskDialog>
-            ))}
+            {openTasks
+              ?.sort((a, b) => Number(b.task.urgent) - Number(a.task.urgent) || a.task.createdAt.getTime() - b.task.createdAt.getTime())
+              .map((task) => (
+                <TaskDialog key={task._id} roomId={room._id} existingTask={task}>
+                  <TaskCard task={task} />
+                </TaskDialog>
+              ))}
           </ScrollArea>
         ) : (
           <div className="flex flex-1 items-center justify-center font-semibold text-3xl text-zinc-300">

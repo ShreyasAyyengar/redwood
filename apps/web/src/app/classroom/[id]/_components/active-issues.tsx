@@ -70,11 +70,13 @@ export default function ActiveIssues({ room }: { room: z.infer<typeof classroomS
 
         {openIssues && openIssues.length > 0 ? (
           <ScrollArea className="mt-5 h-full min-h-0 flex-1 overflow-auto rounded-2xl bg-zinc-950/50 p-3">
-            {openIssues?.map((issue) => (
-              <IssueDialog key={issue._id} roomId={room._id} existingIssue={issue}>
-                <IssueCard issue={issue} />
-              </IssueDialog>
-            ))}
+            {openIssues
+              ?.sort((a, b) => Number(b.issue.urgent) - Number(a.issue.urgent) || a.issue.reportedAt.getTime() - b.issue.reportedAt.getTime())
+              .map((issue) => (
+                <IssueDialog key={issue._id} roomId={room._id} existingIssue={issue}>
+                  <IssueCard issue={issue} />
+                </IssueDialog>
+              ))}
           </ScrollArea>
         ) : (
           <div className="flex flex-1 items-center justify-center font-semibold text-3xl text-zinc-300">
