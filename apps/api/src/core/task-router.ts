@@ -94,6 +94,7 @@ export const taskRouter = {
       task: {
         description: input.description,
         urgent: input.urgent,
+        supervisorNeeded: input.supervisorNeeded,
         visibleAt: input.visibleAt,
         completeBy: input.completeBy,
         createdBy: input.createdBy || context.user.email,
@@ -123,6 +124,7 @@ export const taskRouter = {
         ...task.task,
         description: input.description,
         urgent: input.urgent,
+        supervisorNeeded: input.supervisorNeeded,
         visibleAt: input.visibleAt,
         completeBy: input.completeBy,
         createdBy: input.createdBy || task.task.createdBy,

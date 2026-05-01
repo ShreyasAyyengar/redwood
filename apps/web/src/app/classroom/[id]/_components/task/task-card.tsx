@@ -42,6 +42,11 @@ export const TaskCard = ({
                   Urgent
                 </Badge>
               )}
+              {task.task.supervisorNeeded && (
+                <Badge variant="outline" className={urgencyStyle("purple")}>
+                  Supervisor Needed
+                </Badge>
+              )}
               {isOverdue && (
                 <Badge variant="outline" className={urgencyStyle("orange")}>
                   Overdue

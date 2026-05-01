@@ -13,6 +13,7 @@ import { useFetchedRoomsStore } from "../../../../_components/room-store";
 import CompletionField from "./fields/completion-field";
 import CreatedByFieldSelector from "./fields/created-by-field-selector";
 import DescriptionField from "./fields/description-field";
+import SupervisorNeededField from "./fields/supervisor-needed-field";
 import TaskDateField from "./fields/task-date-field";
 import UrgentField from "./fields/urgent-field";
 import { DeleteTaskDialog } from "./task-delete-dialog";
@@ -27,6 +28,7 @@ export const { useAppForm } = createFormHook({
     TaskDateField,
     DescriptionField,
     UrgentField,
+    SupervisorNeededField,
     CompletionField,
   },
   formComponents: {},
@@ -80,6 +82,7 @@ export function TaskForm({
     defaultValues: {
       description: existingTask?.task.description ?? "",
       urgent: existingTask?.task.urgent ?? false,
+      supervisorNeeded: existingTask?.task.supervisorNeeded ?? false,
       visibleAt: existingTask?.task.visibleAt ? existingTask.task.visibleAt : undefined,
       completeBy: existingTask?.task.completeBy ? existingTask.task.completeBy : undefined,
       completion: existingTask?.completion ? { comment: existingTask.completion.comment } : undefined,
@@ -130,7 +133,9 @@ export function TaskForm({
           <Separator className="bg-indigo-500" />
 
           <form.AppField name="urgent">{(field) => <field.UrgentField existingValue={existingTask?.task.urgent} />}</form.AppField>
-
+          <form.AppField name="supervisorNeeded">
+            {(field) => <field.SupervisorNeededField existingValue={existingTask?.task.supervisorNeeded} />}
+          </form.AppField>
           <Separator className="bg-indigo-500" />
 
           <div className="mx-auto flex w-full flex-col justify-between space-y-5 sm:flex-row sm:space-y-0">

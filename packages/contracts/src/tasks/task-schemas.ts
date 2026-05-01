@@ -6,6 +6,7 @@ export const taskDetailsSchema = z.object({
   description: z.string("Task description is required.").min(1, "Task description is required."),
   urgent: z.boolean(),
   visibleAt: z.coerce.date().optional(),
+  supervisorNeeded: z.boolean(),
   completeBy: z.coerce.date().optional(),
 });
 
@@ -33,6 +34,7 @@ export const taskSchema = z.object({
 export const uiTaskFormSchema = z.object({
   description: z.string().min(1, "Task description is required."),
   urgent: z.boolean(),
+  supervisorNeeded: z.boolean(),
   visibleAt: z.coerce.date().optional(),
   completeBy: z.coerce.date().optional(),
   createdBy: z.email().optional(),
