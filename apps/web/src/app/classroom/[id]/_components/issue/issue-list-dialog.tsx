@@ -17,6 +17,7 @@ const INTERSECTION_ROOT_MARGIN = "160px 0px";
 export function IssueListDialog({
   title,
   issues,
+  foreignView = false,
   children,
   emptyMessage = "No issues found",
   hasMore,
@@ -28,6 +29,7 @@ export function IssueListDialog({
 }: {
   title: string;
   issues: z.infer<typeof issueSchema>[];
+  foreignView?: boolean;
   children?: React.ReactNode;
   emptyMessage?: string;
   hasMore?: boolean;
@@ -136,7 +138,7 @@ export function IssueListDialog({
                     }}
                   >
                     <IssueDialog roomId={issue.classroomId} existingIssue={issue}>
-                      <IssueCard issue={issue} />
+                      <IssueCard issue={issue} foreignView={foreignView} />
                     </IssueDialog>
                   </div>
                 );

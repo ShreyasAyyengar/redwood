@@ -8,6 +8,7 @@ import type { RefObject } from "react";
 import type { z } from "zod";
 import { type DateTimeDisplay, getDateTimeDisplay } from "../../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../../util/style-util";
+import { useFetchedRoomsStore } from "../../../../_components/room-store";
 
 export const getStatusSymbol = (issue: z.infer<typeof issueSchema>, size: number) => {
   if (issue.resolution) return <Check className={`size-${size} text-emerald-400`} />;
@@ -19,9 +20,17 @@ export const getStatusSymbol = (issue: z.infer<typeof issueSchema>, size: number
 
 export const IssueCard = ({
   issue,
+  foreignView = false,
   ref,
   ...props
-}: { issue: z.infer<typeof issueSchema> } & React.HTMLAttributes<HTMLDivElement> & { ref?: RefObject<HTMLDivElement | null> }) => {
+}: {
+  issue: z.infer<typeof issueSchema>;
+  foreignView: boolean;
+} & React.HTMLAttributes<HTMLDivElement> & {
+    ref?: RefObject<HTMLDivElement | null>;
+  }) => {
+  const { fetchedRooms } = useFetchedRoomsStore();
+  const thisRoom = fetchedRooms.find((room) => room._id === issue.classroomId);
   const reportedDateDisplay: DateTimeDisplay = getDateTimeDisplay(issue.issue.reportedAt);
   const resolutionDateDisplay: DateTimeDisplay | undefined = issue.resolution && getDateTimeDisplay(issue.resolution.resolvedAt);
   const editedDateDisplay: DateTimeDisplay | undefined = issue.edited && getDateTimeDisplay(issue.edited.editDate);
@@ -33,6 +42,9 @@ export const IssueCard = ({
       className="my-1 border-zinc-800 bg-zinc-900/50 p-4 shadow-md/100 transition-all duration-100 hover:border-zinc-700 active:scale-95"
       {...props}
     >
+      {foreignView && (
+        <span className="mb-2 text-center text-[14px] text-neutral-400 text-sm uppercase tracking-widest">{thisRoom?.displayName}</span>
+      )}
       <div className="flex items-start gap-3">
         <div className="mt-0.5">{getStatusSymbol(issue, 5)}</div>
 

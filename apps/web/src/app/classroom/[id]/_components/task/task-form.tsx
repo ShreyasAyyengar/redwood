@@ -44,7 +44,8 @@ export function TaskForm({
   onSuccess?: () => void;
 }) {
   const queryClient = useQueryClient();
-  const { updateRoom } = useFetchedRoomsStore();
+  const { updateRoom, fetchedRooms } = useFetchedRoomsStore();
+  const thisRoom = fetchedRooms.find((room) => room._id === roomId);
 
   const refreshRoom = async () => {
     const roomQuery = webClientORPC.classrooms.getRoom.queryOptions({ input: { id: roomId } });
@@ -118,6 +119,7 @@ export function TaskForm({
           ) : (
             <p>Create New Task</p>
           )}
+          <p className="mt-2 text-[14px] text-sm uppercase tracking-widest">{thisRoom?.displayName}</p>
         </DialogTitle>
       </DialogHeader>
 

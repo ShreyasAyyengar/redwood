@@ -11,7 +11,7 @@ function maybeWrapWithDialog(children: React.ReactNode, filteredTasks: z.infer<t
   if (filteredTasks.length < 1) return children;
 
   return (
-    <TaskListDialog title={title} tasks={filteredTasks}>
+    <TaskListDialog title={title} tasks={filteredTasks} foreignView={true}>
       {children}
     </TaskListDialog>
   );

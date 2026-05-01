@@ -48,7 +48,8 @@ export function IssueForm({
   existingIssue?: z.infer<typeof issueSchema>;
 }) {
   const queryClient = useQueryClient();
-  const { updateRoom } = useFetchedRoomsStore();
+  const { updateRoom, fetchedRooms } = useFetchedRoomsStore();
+  const thisRoom = fetchedRooms.find((room) => room._id === roomId);
 
   const refreshRoom = async () => {
     const roomQuery = webClientORPC.classrooms.getRoom.queryOptions({ input: { id: roomId } });
@@ -127,6 +128,7 @@ export function IssueForm({
           ) : (
             <p>Report New Issue</p>
           )}
+          <p className="mt-2 text-[14px] text-sm uppercase tracking-widest">{thisRoom?.displayName}</p>
         </DialogTitle>
       </DialogHeader>
 

@@ -8,12 +8,21 @@ import type React from "react";
 import type { z } from "zod";
 import { type DateTimeDisplay, getDateTimeDisplay } from "../../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../../util/style-util";
+import { useFetchedRoomsStore } from "../../../../_components/room-store";
 
 export const TaskCard = ({
   task,
+  foreignView = false,
   ref,
   ...props
-}: { task: z.infer<typeof taskSchema> } & React.HTMLAttributes<HTMLDivElement> & { ref?: React.RefObject<HTMLDivElement | null> }) => {
+}: {
+  task: z.infer<typeof taskSchema>;
+  foreignView?: boolean;
+} & React.HTMLAttributes<HTMLDivElement> & {
+    ref?: React.RefObject<HTMLDivElement | null>;
+  }) => {
+  const { fetchedRooms } = useFetchedRoomsStore();
+  const thisRoom = fetchedRooms.find((room) => room._id === task.classroomId);
   const reportedDateDisplay: DateTimeDisplay = getDateTimeDisplay(task.task.createdAt);
   const completionDateDisplay: DateTimeDisplay | undefined = task.completion && getDateTimeDisplay(task.completion.completedAt);
   const editDateDisplay: DateTimeDisplay | undefined = task.edited && getDateTimeDisplay(task.edited.editDate);
@@ -29,6 +38,9 @@ export const TaskCard = ({
       className="my-1 border-zinc-800 bg-zinc-900/50 p-4 shadow-md/100 transition-all duration-100 hover:border-zinc-700 active:scale-95"
       {...props}
     >
+      {foreignView && (
+        <span className="mb-2 text-center text-[14px] text-neutral-400 text-sm uppercase tracking-widest">{thisRoom?.displayName}</span>
+      )}
       <div className="flex items-start gap-3">
         <div className="mt-0.5">
           <ClipboardList className={cn("size-5", task.task.urgent ? "text-red-400" : "text-amber-400")} />

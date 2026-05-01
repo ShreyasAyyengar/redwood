@@ -17,6 +17,7 @@ const INTERSECTION_ROOT_MARGIN = "160px 0px";
 export function TaskListDialog({
   title,
   tasks,
+  foreignView = false,
   children,
   emptyMessage = "No tasks found",
   hasMore,
@@ -28,6 +29,7 @@ export function TaskListDialog({
 }: {
   title: string;
   tasks: z.infer<typeof taskSchema>[];
+  foreignView?: boolean;
   children?: React.ReactNode;
   emptyMessage?: string;
   hasMore?: boolean;
@@ -136,7 +138,7 @@ export function TaskListDialog({
                     }}
                   >
                     <TaskDialog roomId={task.classroomId} existingTask={task}>
-                      <TaskCard task={task} />
+                      <TaskCard task={task} foreignView={foreignView} />
                     </TaskDialog>
                   </div>
                 );
