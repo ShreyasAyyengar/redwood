@@ -2,13 +2,154 @@ import type { taskSchema } from "@redwood/contracts";
 import { Badge } from "@redwood/shad-ui/components/badge";
 import { Card } from "@redwood/shad-ui/components/card";
 import { cn } from "@redwood/shad-ui/lib/utils";
-import { Calendar, CheckCircle2, ClipboardList, Clock3, Eye, MessageSquare, User, UserCheck } from "lucide-react";
+import { Calendar, CheckCircle2, ClipboardList, Clock3, Eye, type LucideIcon, MessageSquare, User, UserCheck } from "lucide-react";
 import type { RefObject } from "react";
 import type { z } from "zod";
 import { getDateTimeDisplay } from "../../../util/date-time-utils";
 import { urgencyStyle } from "../../../util/style-util";
-import { FeedMetaPill } from "../feed-meta-pill";
 import { useFetchedRoomsStore } from "../room-store";
+
+// TODO modularise the issue-feed-card.tsx in a similar way to this file.
+type TaskFeedCardTask = z.infer<typeof taskSchema>;
+type DateDisplay = ReturnType<typeof getDateTimeDisplay>;
+
+function TaskMetaBox({
+  icon: Icon,
+  label,
+  value,
+  title,
+  className,
+  iconClassName,
+  valueClassName,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  title?: string;
+  className?: string;
+  iconClassName?: string;
+  valueClassName?: string;
+}) {
+  return (
+    <div className={cn("flex flex-1 items-center gap-3 rounded-2xl border p-3 text-xs text-zinc-400", className)} title={title}>
+      <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-full", iconClassName)}>
+        <Icon className="size-4" />
+      </div>
+      <div className="flex min-w-0 flex-col">
+        <span className="font-semibold text-[10px] text-zinc-500 uppercase tracking-[0.18em]">{label}</span>
+        <span className={cn("truncate text-sm text-zinc-300", valueClassName)}>{value}</span>
+      </div>
+    </div>
+  );
+}
+
+function TaskCompletionSection({
+  completion,
+  completionDateDisplay,
+}: {
+  completion: NonNullable<TaskFeedCardTask["completion"]>;
+  completionDateDisplay: DateDisplay | undefined;
+}) {
+  return (
+    <div className="flex flex-col gap-4 rounded-2xl border border-emerald-500/10 bg-emerald-500/5 p-4">
+      {completion.comment && (
+        <div className="flex items-start gap-3">
+          <MessageSquare className="mt-0.5 size-4 shrink-0 text-emerald-500/50" />
+          <div className="flex flex-col">
+            <span className="font-bold text-[10px] text-emerald-500/70 uppercase tracking-[0.18em]">Completion Note</span>
+            <p className="text-emerald-200/90 text-sm leading-relaxed">{completion.comment}</p>
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-col gap-3 md:flex-row">
+        <TaskMetaBox
+          className="border-emerald-500/10 bg-emerald-500/5"
+          icon={UserCheck}
+          iconClassName="bg-emerald-500/10 text-emerald-400"
+          label="Completed By"
+          value={completion.completedBy}
+        />
+
+        {completionDateDisplay && (
+          <TaskMetaBox
+            className="border-emerald-500/10 bg-emerald-500/5"
+            icon={Clock3}
+            iconClassName="bg-emerald-500/10 text-emerald-400"
+            label="Completed"
+            title={`Completed: ${completionDateDisplay.dateAbsolute}`}
+            value={completionDateDisplay.dateDaysAgo}
+            valueClassName="text-emerald-200"
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function getTaskDisplayState(task: TaskFeedCardTask) {
+  const isCompleted = Boolean(task.completion);
+  const isOverdue = Boolean(!task.completion && task.task.completeBy && Date.now() > new Date(task.task.completeBy).getTime());
+  const isVisible = !task.task.visibleAt || new Date(task.task.visibleAt).getTime() <= Date.now();
+
+  if (isCompleted) {
+    return {
+      HeaderIcon: CheckCircle2,
+      StateIcon: CheckCircle2,
+      headerIconClassName: "border-emerald-500/20 bg-emerald-500/10",
+      headerIconTextClassName: "text-emerald-400",
+      isCompleted,
+      isOverdue,
+      isVisible,
+      stateIconClassName: "bg-emerald-500/10 text-emerald-400",
+      stateText: "Closed out",
+      stateTextClassName: "text-emerald-300",
+    };
+  }
+
+  if (isOverdue) {
+    return {
+      HeaderIcon: ClipboardList,
+      StateIcon: Calendar,
+      headerIconClassName: task.task.urgent ? "border-red-500/20 bg-red-500/10" : "border-amber-500/20 bg-amber-500/10",
+      headerIconTextClassName: task.task.urgent ? "text-red-400" : "text-amber-400",
+      isCompleted,
+      isOverdue,
+      isVisible,
+      stateIconClassName: "bg-red-500/10 text-red-400",
+      stateText: "Past due",
+      stateTextClassName: "text-amber-300",
+    };
+  }
+
+  if (!isVisible) {
+    return {
+      HeaderIcon: ClipboardList,
+      StateIcon: Eye,
+      headerIconClassName: task.task.urgent ? "border-red-500/20 bg-red-500/10" : "border-amber-500/20 bg-amber-500/10",
+      headerIconTextClassName: task.task.urgent ? "text-red-400" : "text-amber-400",
+      isCompleted,
+      isOverdue,
+      isVisible,
+      stateIconClassName: "bg-zinc-800/80 text-zinc-400",
+      stateText: "Queued",
+      stateTextClassName: "text-zinc-200",
+    };
+  }
+
+  return {
+    HeaderIcon: ClipboardList,
+    StateIcon: task.task.completeBy ? Calendar : ClipboardList,
+    headerIconClassName: task.task.urgent ? "border-red-500/20 bg-red-500/10" : "border-amber-500/20 bg-amber-500/10",
+    headerIconTextClassName: task.task.urgent ? "text-red-400" : "text-amber-400",
+    isCompleted,
+    isOverdue,
+    isVisible,
+    stateIconClassName: task.task.urgent ? "bg-red-500/10 text-red-400" : "bg-amber-500/10 text-amber-400",
+    stateText: task.task.urgent ? "Needs Urgent Attention" : "In progress",
+    stateTextClassName: task.task.urgent ? "text-amber-300" : "text-zinc-200",
+  };
+}
 
 export const TaskFeedCard = ({
   task,
@@ -23,9 +164,18 @@ export const TaskFeedCard = ({
   const completionDateDisplay = task.completion && getDateTimeDisplay(task.completion.completedAt);
   const visibleDateDisplay = task.task.visibleAt && getDateTimeDisplay(task.task.visibleAt);
   const completeByDateDisplay = task.task.completeBy && getDateTimeDisplay(task.task.completeBy);
-
-  const isOverdue = !task.completion && task.task.completeBy && Date.now() > new Date(task.task.completeBy).getTime();
-  const isVisible = !task.task.visibleAt || new Date(task.task.visibleAt).getTime() <= Date.now();
+  const {
+    HeaderIcon,
+    StateIcon,
+    headerIconClassName,
+    headerIconTextClassName,
+    isOverdue,
+    isVisible,
+    stateIconClassName,
+    stateText,
+    stateTextClassName,
+  } = getTaskDisplayState(task);
+  const shouldShowSchedulingRow = Boolean(completeByDateDisplay || (!isVisible && !task.completion && visibleDateDisplay));
 
   return (
     <Card
@@ -41,126 +191,87 @@ export const TaskFeedCard = ({
           <div
             className={cn(
               "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
-              task.task.urgent ? "border-red-500/20 bg-red-500/10" : "border-amber-500/20 bg-amber-500/10"
+              headerIconClassName
             )}
           >
-            <ClipboardList className={cn("size-6", task.task.urgent ? "text-red-400" : "text-amber-400")} />
+            <HeaderIcon className={cn("size-6", headerIconTextClassName)} />
           </div>
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 pt-0.5">
             <div className="flex flex-col gap-2">
               <span className="font-bold text-lg text-zinc-100 leading-tight">{room ? room.displayName : "Unknown Room"}</span>
-              <div className="flex flex-wrap gap-1.5">
-                <Badge variant="outline" className="h-6 border-zinc-800 bg-zinc-950/70 px-2 text-[10px] text-zinc-300">
-                  {task.completion ? "Completed task" : !isVisible ? "Scheduled task" : "Active task"}
-                </Badge>
-                {task.task.urgent && (
-                  <Badge variant="outline" className={cn("h-6 px-2 text-[10px]", urgencyStyle("red"))}>
-                    Urgent
+              {task.task.supervisorNeeded && (
+                <div className="flex flex-wrap gap-1.5">
+                  <Badge variant="outline" className={cn("h-6 px-2 text-[10px]", urgencyStyle("purple"))}>
+                    Supervisor needed
                   </Badge>
-                )}
-                {isOverdue && (
-                  <Badge variant="outline" className={cn("h-6 px-2 text-[10px]", urgencyStyle("orange"))}>
-                    Overdue
-                  </Badge>
-                )}
-                {!isVisible && !task.completion && (
-                  <Badge variant="outline" className="h-6 border-zinc-700 bg-zinc-800/80 px-2 text-[10px] text-zinc-400">
-                    Hidden until visible
-                  </Badge>
-                )}
-              </div>
-            </div>
-
-            <div className="mt-3 flex flex-wrap gap-2">
-              <FeedMetaPill
-                icon={Clock3}
-                label="Created"
-                value={reportedDateDisplay.dateDaysAgo}
-                tooltip={`Created: ${reportedDateDisplay.dateAbsolute}`}
-                tone="accent"
-              />
-              {completeByDateDisplay && (
-                <FeedMetaPill
-                  icon={Calendar}
-                  label="Due"
-                  value={completeByDateDisplay.dateDaysAgo}
-                  tooltip={`Due: ${completeByDateDisplay.dateAbsolute}`}
-                  tone={isOverdue ? "danger" : "default"}
-                />
-              )}
-              {task.completion && completionDateDisplay && (
-                <FeedMetaPill
-                  icon={CheckCircle2}
-                  label="Completed"
-                  value={completionDateDisplay.dateDaysAgo}
-                  tooltip={`Completed: ${completionDateDisplay.dateAbsolute}`}
-                  tone="success"
-                />
-              )}
-              {!isVisible && !task.completion && visibleDateDisplay && (
-                <FeedMetaPill
-                  icon={Eye}
-                  label="Visible"
-                  value={visibleDateDisplay.dateDaysAgo.replace("-", "")}
-                  tooltip={`Visible: ${visibleDateDisplay.dateAbsolute}`}
-                />
+                </div>
               )}
             </div>
-          </div>
-        </div>
-
-        <div className="grid w-full min-w-0 grid-cols-1 gap-2 text-xs sm:grid-cols-2">
-          <div className="rounded-2xl border border-zinc-800/80 bg-zinc-950/40 p-3">
-            <span className="text-[10px] text-zinc-500 uppercase tracking-[0.18em]">Created By</span>
-            <p className="mt-1 truncate font-medium text-sm text-zinc-200">{task.task.createdBy}</p>
-          </div>
-          <div className="rounded-2xl border border-zinc-800/80 bg-zinc-950/40 p-3">
-            <span className="text-[10px] text-zinc-500 uppercase tracking-[0.18em]">State</span>
-            <p className={cn("mt-1 font-medium text-sm", task.completion ? "text-emerald-300" : isOverdue ? "text-amber-300" : "text-zinc-200")}>
-              {task.completion ? "Closed out" : isOverdue ? "Past due" : !isVisible ? "Queued" : "In progress"}
-            </p>
           </div>
         </div>
       </div>
 
-      <div className="relative overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-950/40 p-4">
+      <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-950/40 p-4">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-zinc-700/70 to-transparent" />
         <p className="whitespace-pre-wrap text-sm text-zinc-300 leading-relaxed">{task.task.description}</p>
-      </div>
 
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <div className="flex items-center gap-3 rounded-2xl border border-zinc-800/80 bg-zinc-950/30 p-3 text-xs text-zinc-400">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-800/80">
-            <User className="size-4" />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-semibold text-[10px] text-zinc-500 uppercase tracking-[0.18em]">Owner</span>
-            <span className="text-sm text-zinc-300">{task.task.createdBy}</span>
-          </div>
+        <div className="flex flex-col gap-3 md:flex-row">
+          <TaskMetaBox
+            className="border-zinc-800/80 bg-zinc-950/30"
+            icon={Clock3}
+            iconClassName="bg-zinc-800/80 text-indigo-200"
+            label="Created"
+            title={`Created: ${reportedDateDisplay.dateAbsolute}`}
+            value={reportedDateDisplay.dateDaysAgo}
+            valueClassName="text-indigo-100"
+          />
+
+          <TaskMetaBox
+            className="border-zinc-800/80 bg-zinc-950/30"
+            icon={User}
+            iconClassName="bg-zinc-800/80"
+            label="Owner"
+            value={task.task.createdBy}
+          />
+
+          <TaskMetaBox
+            className="border-zinc-800/80 bg-zinc-950/30"
+            icon={StateIcon}
+            iconClassName={stateIconClassName}
+            label="State"
+            value={stateText}
+            valueClassName={cn("font-medium", stateTextClassName)}
+          />
         </div>
 
-        {task.completion && (
-          <div className="flex items-center gap-3 rounded-2xl border border-emerald-500/10 bg-emerald-500/5 p-3 text-xs text-zinc-400">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400">
-              <UserCheck className="size-4" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold text-[10px] text-emerald-500/70 uppercase tracking-[0.18em]">Completed By</span>
-              <span className="text-sm text-zinc-300">{task.completion.completedBy}</span>
-            </div>
+        {shouldShowSchedulingRow && (
+          <div className="flex flex-col gap-3 md:flex-row">
+            {completeByDateDisplay && (
+              <TaskMetaBox
+                className="border-zinc-800/80 bg-zinc-950/30"
+                icon={Calendar}
+                iconClassName={isOverdue ? "bg-red-500/10 text-red-400" : "bg-zinc-800/80"}
+                label="Due"
+                title={`Due: ${completeByDateDisplay.dateAbsolute}`}
+                value={completeByDateDisplay.dateDaysAgo}
+                valueClassName={isOverdue ? "text-red-300" : "text-zinc-300"}
+              />
+            )}
+
+            {!isVisible && !task.completion && visibleDateDisplay && (
+              <TaskMetaBox
+                className="border-zinc-800/80 bg-zinc-950/30"
+                icon={Eye}
+                iconClassName="bg-zinc-800/80"
+                label="Visible"
+                value={visibleDateDisplay.dateDaysAgo.replace("-", "")}
+              />
+            )}
           </div>
         )}
       </div>
 
-      {task.completion?.comment && (
-        <div className="mt-1 flex items-start gap-3 rounded-2xl border border-emerald-500/10 bg-emerald-500/5 p-3">
-          <MessageSquare className="mt-0.5 size-4 text-emerald-500/50" />
-          <div className="flex flex-col">
-            <span className="font-bold text-[10px] text-emerald-500/70 uppercase tracking-[0.18em]">Completion Note</span>
-            <p className="text-emerald-200/90 text-sm">{task.completion.comment}</p>
-          </div>
-        </div>
-      )}
+      {task.completion && <TaskCompletionSection completion={task.completion} completionDateDisplay={completionDateDisplay || undefined} />}
     </Card>
   );
 };

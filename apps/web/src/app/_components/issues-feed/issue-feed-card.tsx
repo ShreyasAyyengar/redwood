@@ -1,21 +1,113 @@
-import type { issueSchema } from "@redwood/contracts";
+import { FINDINGS_OPTIONS, type issueSchema } from "@redwood/contracts";
 import { Badge } from "@redwood/shad-ui/components/badge";
 import { Card } from "@redwood/shad-ui/components/card";
+import { MultiSelect, MultiSelectContent, MultiSelectItem, MultiSelectTrigger } from "@redwood/shad-ui/components/multi-select";
 import { cn } from "@redwood/shad-ui/lib/utils";
-import { Clock3, MessageSquare, ThumbsUp, TriangleAlert, User, UserCheck } from "lucide-react";
-import type { RefObject } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { CheckCircle2, ClipboardCheck, Clock3, MessageSquare, TriangleAlert, User, UserCheck } from "lucide-react";
+import { type RefObject, useEffect, useRef, useState } from "react";
 import type { z } from "zod";
+import { webClientORPC } from "../../../lib/orpc-web-client";
 import { getDateTimeDisplay } from "../../../util/date-time-utils";
 import { urgencyStyle } from "../../../util/style-util";
 import { getStatusSymbol } from "../../classroom/[id]/_components/issue/issue-card";
 import { useFetchedRoomsStore } from "../room-store";
+
+type IssueFeedCardIssue = z.infer<typeof issueSchema>;
+type FindingOption = (typeof FINDINGS_OPTIONS)[number];
+const STATUS_SYMBOL_SIZE = 4;
+
+function areFindingsEqual(a: string[], b: string[]) {
+  if (a.length !== b.length) return false;
+  const sortedA = [...a].sort();
+  const sortedB = [...b].sort();
+  return sortedA.every((value, index) => value === sortedB[index]);
+}
+
+function FindingsBox({ issue }: { issue: IssueFeedCardIssue }) {
+  const savedFindings = issue.resolution?.findings ?? [];
+  const [selectedFindings, setSelectedFindings] = useState<string[]>(savedFindings);
+  const savedFindingsRef = useRef<string[]>(savedFindings);
+  const firstFinding = selectedFindings[0];
+  const hiddenFindingsCount = Math.max(selectedFindings.length - 1, 0);
+
+  const setIssueFindingsMutation = useMutation(webClientORPC.issues.setIssueFindings.mutationOptions());
+
+  useEffect(() => {
+    const nextFindings = issue.resolution?.findings ?? [];
+    savedFindingsRef.current = nextFindings;
+    setSelectedFindings(nextFindings);
+  }, [issue.resolution?.findings]);
+
+  const commitFindings = () => {
+    if (areFindingsEqual(selectedFindings, savedFindingsRef.current)) return;
+
+    setIssueFindingsMutation.mutate(
+      {
+        _id: issue._id,
+        findings: selectedFindings as FindingOption[],
+      },
+      {
+        onSuccess: () => {
+          savedFindingsRef.current = selectedFindings;
+        },
+      }
+    );
+  };
+
+  return (
+    <div className="flex flex-1 items-center gap-3 rounded-2xl border border-emerald-500/10 bg-emerald-500/5 p-3 text-xs text-zinc-400">
+      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400">
+        <ClipboardCheck className="size-4" />
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <span className="font-semibold text-[10px] text-emerald-500/70 uppercase tracking-[0.18em]">Findings</span>
+        <MultiSelect
+          modal={false}
+          values={selectedFindings}
+          onValuesChange={setSelectedFindings}
+          onOpenChange={(open) => !open && commitFindings()}
+        >
+          <MultiSelectTrigger
+            className="min-h-8 w-full border-emerald-500/10 bg-emerald-500/5 px-2 py-1 text-emerald-100 hover:bg-emerald-500/10"
+            disabled={setIssueFindingsMutation.isPending}
+            onClick={(event) => event.stopPropagation()}
+            onKeyDown={(event) => event.stopPropagation()}
+            onPointerDown={(event) => event.stopPropagation()}
+          >
+            {firstFinding ? (
+              <span className="flex min-w-0 flex-1 items-center gap-1.5">
+                <span className="truncate">{firstFinding}</span>
+                {hiddenFindingsCount > 0 && <span className="shrink-0 text-emerald-300/80">+{hiddenFindingsCount}</span>}
+              </span>
+            ) : (
+              <span className="min-w-0 flex-1 truncate text-muted-foreground">Select findings</span>
+            )}
+          </MultiSelectTrigger>
+          <MultiSelectContent
+            search={false}
+            onClick={(event) => event.stopPropagation()}
+            onKeyDown={(event) => event.stopPropagation()}
+            onPointerDown={(event) => event.stopPropagation()}
+          >
+            {FINDINGS_OPTIONS.map((finding) => (
+              <MultiSelectItem key={finding} value={finding}>
+                {finding}
+              </MultiSelectItem>
+            ))}
+          </MultiSelectContent>
+        </MultiSelect>
+      </div>
+    </div>
+  );
+}
 
 export const IssueFeedCard = ({
   issue,
   className,
   ref,
   ...props
-}: { issue: z.infer<typeof issueSchema> } & React.HTMLAttributes<HTMLDivElement> & { ref?: RefObject<HTMLDivElement | null> }) => {
+}: { issue: IssueFeedCardIssue } & React.HTMLAttributes<HTMLDivElement> & { ref?: RefObject<HTMLDivElement | null> }) => {
   const { fetchedRooms } = useFetchedRoomsStore();
   const room = fetchedRooms.find((r) => r._id === issue.classroomId);
 
@@ -52,7 +144,7 @@ export const IssueFeedCard = ({
             )}
           >
             {isResolved ? (
-              <ThumbsUp className="size-6 text-emerald-400" />
+              <CheckCircle2 className="size-6 text-emerald-400" />
             ) : (
               <TriangleAlert className={cn("size-6", issue.issue.urgent ? "text-red-400" : "text-amber-400")} />
             )}
@@ -81,7 +173,7 @@ export const IssueFeedCard = ({
             className="flex flex-1 items-center gap-3 rounded-2xl border border-zinc-800/80 bg-zinc-950/30 p-3 text-xs text-zinc-400"
             title={`Reported: ${reportedDateDisplay.dateAbsolute}`}
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-800/80 text-indigo-200">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-800/80 text-zinc-400">
               <Clock3 className="size-4" />
             </div>
             <div className="flex flex-col">
@@ -111,8 +203,7 @@ export const IssueFeedCard = ({
                     : "bg-amber-500/10 text-amber-400"
               )}
             >
-              {getStatusSymbol(issue, 4)}
-              {/*{isResolved ? <ThumbsUp className="size-4" /> : <TriangleAlert className="size-4" />}*/}
+              {getStatusSymbol(issue, STATUS_SYMBOL_SIZE)}
             </div>
             <div className="flex min-w-0 flex-col">
               <span className="font-semibold text-[10px] text-zinc-500 uppercase tracking-[0.18em]">Status</span>
@@ -166,6 +257,8 @@ export const IssueFeedCard = ({
                 </div>
               </div>
             )}
+
+            <FindingsBox issue={issue} />
           </div>
         </div>
       )}
