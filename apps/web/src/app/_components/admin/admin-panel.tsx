@@ -6,10 +6,11 @@ import Overview from "./overview/overview";
 import UserEditor from "./users/user-editor";
 
 export default function AdminPanel() {
-  // Tabs: Overview, CSV Upload, Room Attributes, Room Groups, Statistics
+  const storeLastTab = (tab: string) => localStorage.setItem("adminLastTab", tab);
+  const lastTab = localStorage.getItem("adminLastTab") ?? "overview";
   return (
     <div className="flex justify-center">
-      <Tabs defaultValue="overview" orientation="vertical">
+      <Tabs defaultValue={lastTab} orientation="vertical" onValueChange={storeLastTab}>
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="csv">CSV Upload</TabsTrigger>

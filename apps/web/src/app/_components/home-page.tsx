@@ -17,6 +17,8 @@ export default function HomePage() {
   // biome-ignore lint/style/noNonNullAssertion: user must be logged in to see this page
   const session = data!;
 
+  const storeLastTab = (tab: string) => localStorage.setItem("lastTab", tab);
+  const lastTab = localStorage.getItem("lastTab") ?? "classrooms";
   return (
     <>
       {/* Mobile Layout - Hidden on lg and above */}
@@ -33,7 +35,7 @@ export default function HomePage() {
           <p className="my-5 text-center font-bold text-3xl">Redwood</p>
         </div>
 
-        <Tabs defaultValue="classrooms" className="flex h-full w-full flex-1 flex-col overflow-hidden">
+        <Tabs defaultValue={lastTab} className="flex h-full w-full flex-1 flex-col overflow-hidden" onValueChange={storeLastTab}>
           <TabsList className="mx-auto shrink-0">
             <TabsTrigger value="classrooms">Classrooms</TabsTrigger>
             <TabsTrigger value="issues">Issues</TabsTrigger>
