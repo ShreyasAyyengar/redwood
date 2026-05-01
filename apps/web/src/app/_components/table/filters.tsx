@@ -94,7 +94,7 @@ export default function Filters() {
                 </SelectTrigger>
                 <SelectContent className="border-white/10 bg-neutral-900 text-neutral-200">
                   <SelectItem value="ALL">All</SelectItem>
-                  {groups?.map((g) => (
+                  {groups?.sort((a, b) => a.label.localeCompare(b.label)).map((g) => (
                     <SelectItem key={g._id} value={g.label}>
                       {g.label}
                     </SelectItem>

@@ -28,7 +28,7 @@ export function FeedRoomFilter({ onChange, value }: FeedRoomFilterProps) {
 
   const groupOptions = useMemo(() => {
     const labels = groups?.map((group) => group.label) ?? [];
-    return Array.from(new Set([...labels, UNGROUPED_GROUP]));
+    return Array.from(new Set([...labels, UNGROUPED_GROUP])).sort();
   }, [groups]);
 
   const roomsForGroup = useMemo(() => {
