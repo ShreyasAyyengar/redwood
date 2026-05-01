@@ -1,3 +1,5 @@
+import { oc } from "@orpc/contract";
+import { z } from "zod";
 import { attributesContract } from "./attributes/attributes-contract";
 import { feedbackContract } from "./feedback/feedback-contract";
 import { groupsContract } from "./groups/groups-contract";
@@ -16,4 +18,5 @@ export const httpContract = {
   attributes: attributesContract,
   groups: groupsContract,
   feedback: feedbackContract,
+  sync: oc.route({ method: "GET" }).output(z.boolean()),
 };

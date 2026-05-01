@@ -202,7 +202,7 @@ export const issueRouter = {
   }),
 };
 
-async function recomputeRoomStatus(classroomId: string) {
+export async function recomputeRoomStatus(classroomId: string) {
   try {
     const issues: z.infer<typeof issueSchema>[] = await IssueService.find({
       classroomId,
