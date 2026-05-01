@@ -31,9 +31,8 @@ export const IssueCard = ({
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
-            <p className="flex-1 font-normal text-sm text-zinc-200">{issue.issue.description}</p>
-            <div className="flex shrink-0 gap-1.5">
+          <div className="mb-2 flow-root font-normal text-sm text-zinc-200">
+            <div className="float-right ml-2 flex flex-wrap justify-end gap-1.5">
               {issue.issue.urgent && (
                 <Badge variant="outline" className={urgencyStyle("red")}>
                   Urgent
@@ -45,6 +44,7 @@ export const IssueCard = ({
                 </Badge>
               )}
             </div>
+            {issue.issue.description}
           </div>
 
           <div className="flex flex-col items-start gap-1 font-normal text-xs text-zinc-500">
@@ -115,17 +115,12 @@ export function IssueCardSkeleton() {
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
-            {/* description */}
-            <div className="flex flex-1 flex-col">
-              <div className="h-5 w-full max-w-[420px] animate-pulse rounded bg-zinc-700/50" />
-            </div>
-
-            {/* badges */}
-            <div className="flex shrink-0 gap-1.5">
+          <div className="mb-2 flow-root">
+            <div className="float-right ml-2 flex gap-1.5">
               <div className="h-5 w-16 animate-pulse rounded-md bg-zinc-700/50" />
               <div className="h-5 w-16 animate-pulse rounded-md bg-zinc-700/40" />
             </div>
+            <div className="h-5 w-full max-w-[420px] animate-pulse rounded bg-zinc-700/50" />
           </div>
 
           <div className="flex flex-col items-start gap-1 font-normal text-xs text-zinc-500">
