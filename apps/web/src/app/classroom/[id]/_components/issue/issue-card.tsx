@@ -2,15 +2,16 @@ import type { issueSchema } from "@redwood/contracts";
 import { Badge } from "@redwood/shad-ui/components/badge";
 import { Card } from "@redwood/shad-ui/components/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwood/shad-ui/components/tooltip";
-import { Check, Drill, Flag, TriangleAlert, UserPen } from "lucide-react";
+import { Check, Drill, Flag, Icon, TriangleAlert, UserPen } from "lucide-react";
 import type { RefObject } from "react";
 import type { z } from "zod";
 import { type DateTimeDisplay, getDateTimeDisplay } from "../../../../../util/date-time-utils";
 import { urgencyStyle } from "../../../../../util/style-util";
+import { toolbox } from "@lucide/lab";
 
 export const getStatusSymbol = (issue: z.infer<typeof issueSchema>, size: number) => {
   if (issue.resolution) return <Check className={`size-${size} text-emerald-400`} />;
-  // if (issue.issue.sodId) return <Icon iconNode={toolbox} className={`size-${size} text-amber-400`} />;
+  if (issue.issue.sodId) return <Icon iconNode={toolbox} className={`size-${size} text-amber-400`} />;
   if (issue.issue.cruzfixId) return <Drill className={`size-${size} text-amber-400`} />;
   if (issue.issue.urgent) return <TriangleAlert className={`size-${size} text-red-400`} />;
   return <TriangleAlert className={`size-${size} text-amber-400`} />;

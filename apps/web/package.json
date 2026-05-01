@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@better-auth/electron": "1.6.6",
+    "@lucide/lab": "^0.1.2",
     "@orpc/client": "^1.13.14",
     "@orpc/openapi": "^1.13.14",
     "@orpc/server": "^1.13.14",
