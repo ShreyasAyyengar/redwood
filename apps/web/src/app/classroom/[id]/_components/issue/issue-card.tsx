@@ -25,7 +25,7 @@ export const IssueCard = ({
   ...props
 }: {
   issue: z.infer<typeof issueSchema>;
-  foreignView: boolean;
+  foreignView?: boolean;
 } & React.HTMLAttributes<HTMLDivElement> & {
     ref?: RefObject<HTMLDivElement | null>;
   }) => {
