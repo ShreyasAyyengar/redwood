@@ -8,7 +8,7 @@ import { type FormValues, useFieldContext } from "../issue-form";
 export default function SupervisorNeededField({ existingValue }: { existingValue?: boolean }) {
   const field = useFieldContext<FormValues["supervisorNeeded"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-  const [value, setValue] = useState<boolean>(existingValue ?? field.state.value ?? false);
+  const [value, setValue] = useState<boolean>(existingValue ?? false);
 
   useEffect(() => {
     field.handleChange(value);
