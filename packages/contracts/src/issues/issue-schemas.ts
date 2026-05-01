@@ -15,10 +15,12 @@ const issueEditSchema = z.object({
   editDate: z.coerce.date("Issue edited.editDate must be provided"),
 });
 
+export const FINDINGS_OPTIONS = ["NO SYSTEM FAULT"] as const;
 const issueResolutionSchema = z.object({
   resolvedBy: z.email("Issue resolution.resolvedBy must be provided"),
   resolvedAt: z.coerce.date("Issue resolution.resolvedAt must be provided"),
   comment: z.string("Issue resolution.comment must be provided"),
+  findings: z.array(z.enum(FINDINGS_OPTIONS)).optional(), // TOOD migrate and then enable
 });
 
 // DB Schema - The complete object as stored in the database
