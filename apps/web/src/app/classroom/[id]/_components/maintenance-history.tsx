@@ -1,5 +1,6 @@
 import type { classroomSchema } from "@redwood/contracts";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
+import { Separator } from "@redwood/shad-ui/components/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwood/shad-ui/components/tooltip";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -14,6 +15,7 @@ import MaintenanceDialog from "./maintenance/maintenance-dialog";
 
 const INTERSECTION_ROOT_MARGIN = "160px 0px";
 const MAINTENANCE_ROW_ESTIMATE_PX = 140;
+const END_SEPARATOR_ROW_ESTIMATE_PX = 40;
 
 export default function MaintenanceHistory({ roomId }: { roomId: z.infer<typeof classroomSchema>["_id"] | undefined }) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery(
@@ -36,17 +38,20 @@ export default function MaintenanceHistory({ roomId }: { roomId: z.infer<typeof 
     rootMargin: INTERSECTION_ROOT_MARGIN,
   });
   const loadMoreIndex = hasNextPage && maintenanceHistory.length > 1 ? maintenanceHistory.length - 2 : undefined;
+  const showEndSeparator = !hasNextPage && !isFetchingNextPage && maintenanceHistory.length > 0;
+  const rowCount = maintenanceHistory.length + (showEndSeparator ? 1 : 0);
 
   const viewportRef = useCallback((node: HTMLDivElement | null) => {
     setViewportElement((prev) => (prev === node ? prev : node));
   }, []);
 
   const rowVirtualizer = useVirtualizer({
-    count: maintenanceHistory.length,
+    count: rowCount,
     getScrollElement: () => viewportElement,
-    estimateSize: () => MAINTENANCE_ROW_ESTIMATE_PX,
+    estimateSize: (index) =>
+      showEndSeparator && index === maintenanceHistory.length ? END_SEPARATOR_ROW_ESTIMATE_PX : MAINTENANCE_ROW_ESTIMATE_PX,
     overscan: 3,
-    getItemKey: (index) => maintenanceHistory[index]?._id ?? index,
+    getItemKey: (index) => maintenanceHistory[index]?._id ?? "end-of-maintenance-history",
   });
 
   useEffect(() => {
@@ -74,7 +79,30 @@ export default function MaintenanceHistory({ roomId }: { roomId: z.infer<typeof 
             }}
           >
             {rowVirtualizer.getVirtualItems().map((virtualItem) => {
-              const entry = maintenanceHistory?.[virtualItem.index];
+              const isEndSeparator = showEndSeparator && virtualItem.index === maintenanceHistory.length;
+
+              if (isEndSeparator) {
+                return (
+                  <div
+                    key={virtualItem.key}
+                    data-index={virtualItem.index}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      transform: `translateY(${virtualItem.start}px)`,
+                    }}
+                    ref={rowVirtualizer.measureElement}
+                  >
+                    <div className="flex items-center py-5">
+                      <Separator className="bg-zinc-700" />
+                    </div>
+                  </div>
+                );
+              }
+
+              const entry = maintenanceHistory[virtualItem.index];
               if (!entry) return null;
 
               const date = new Date(entry.date);
