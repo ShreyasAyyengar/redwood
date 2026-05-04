@@ -1,3 +1,5 @@
+import { readFileSync, unlinkSync } from "node:fs";
+import { writeHeapSnapshot } from "node:v8";
 import cors from "@elysiajs/cors";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import Elysia, { type Context as ElysiaContext } from "elysia";
@@ -27,6 +29,20 @@ new Elysia()
       allowedHeaders: ["Content-Type", "Authorization"],
     })
   )
+  .get("/heap", ({ request }: { request: Request }) => {
+    const file = `${Date.now()}.heapsnapshot`;
+
+    writeHeapSnapshot(file);
+    const data = readFileSync(file);
+    unlinkSync(file);
+
+    return new Response(data, {
+      headers: {
+        "Content-Type": "application/octet-stream",
+        "Content-Disposition": `attachment; filename="${file}"`,
+      },
+    });
+  })
   .all(authRoute, async ({ request }: { request: Request }) => authServer.handler(request), {
     parse: "none",
   })
