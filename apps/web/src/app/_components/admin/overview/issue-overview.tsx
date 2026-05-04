@@ -67,6 +67,14 @@ function IssueStatCard({
 }
 
 export default function IssueOverview() {
+  //   const query = webClientORPC.issues.getActiveIssues.queryOptions({
+  //     staleTime: 60_000,
+  //     refetchOnWindowFocus: true,
+  //     refetchOnReconnect: true,
+  //   });
+  //
+  //   const { data: issues = [], isFetching } = useQuery(query);
+
   const { data: issues = [], isFetching } = useQuery(
     webClientORPC.issues.getActiveIssues.queryOptions({
       staleTime: 60_000,
@@ -102,7 +110,9 @@ export default function IssueOverview() {
             isFetching={isFetching}
             title="Active Issues"
           />,
-          activeIssues,
+          activeIssues.sort(
+            (a, b) => Number(b.issue.urgent) - Number(a.issue.urgent) || a.issue.reportedAt.getTime() - b.issue.reportedAt.getTime()
+          ),
           "All Active Issues:"
         )}
 
