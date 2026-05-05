@@ -77,3 +77,7 @@ new Elysia()
       logger.info(`API server started | ${protocol}://${server.hostname}:${server.port}`);
     }
   );
+
+setInterval(() => {
+  Bun.gc(true);
+}, 600_000); // 10 minutes
