@@ -1,7 +1,7 @@
 import { oc } from "@orpc/contract";
 import z from "zod";
 import { classroomSchema } from "../rooms/classroom-contract";
-import { FINDINGS_OPTIONS, issueSchema, uiIssueFormSchema } from "./issue-schemas";
+import { FINDINGS_OPTIONS, issueMutationResult, issueSchema, uiIssueFormSchema } from "./issue-schemas";
 
 export const issueContract = {
   createIssue: oc
@@ -9,7 +9,7 @@ export const issueContract = {
       method: "POST",
     })
     .input(uiIssueFormSchema.extend({ classroomId: z.uuidv7() }))
-    .output(z.boolean())
+    .output(issueMutationResult)
     .errors({
       NOT_FOUND: {
         data: z.object({
@@ -28,7 +28,7 @@ export const issueContract = {
       method: "DELETE",
     })
     .input(z.object({ issueId: issueSchema.shape._id }))
-    .output(z.boolean())
+    .output(issueMutationResult)
     .errors({
       NOT_FOUND: {
         data: z.object({
@@ -47,7 +47,7 @@ export const issueContract = {
       method: "PUT",
     })
     .input(uiIssueFormSchema.extend({ _id: z.uuidv7() }))
-    .output(z.boolean())
+    .output(issueMutationResult)
     .errors({
       FORBIDDEN: {
         data: z.object({

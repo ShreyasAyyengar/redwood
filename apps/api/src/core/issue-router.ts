@@ -1,4 +1,4 @@
-import { type classroomSchema, issueSchema } from "@redwood/contracts";
+import { type classroomSchema, classroomSchemaPayload, issueSchema } from "@redwood/contracts";
 import { v7 as uuidv7 } from "uuid";
 import type { z } from "zod";
 import { ClassroomService } from "../database/classroom-service";
@@ -110,7 +110,10 @@ export const issueRouter = {
 
       recomputeRoomStatus(newIssue.classroomId);
 
-      return true;
+      return {
+        mutatedIssue: newIssue,
+        roomSnapshot: await getRoomSnapshot(newIssue.classroomId),
+      };
     } catch (e) {
       throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
     }
@@ -158,9 +161,12 @@ export const issueRouter = {
 
     try {
       await IssueService.replaceOne({ _id: input._id }, updatedIssue).lean();
-      recomputeRoomStatus(updatedIssue.classroomId);
+      await recomputeRoomStatus(updatedIssue.classroomId);
 
-      return true;
+      return {
+        mutatedIssue: updatedIssue,
+        roomSnapshot: await getRoomSnapshot(updatedIssue.classroomId),
+      };
     } catch (e) {
       throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
     }
@@ -193,14 +199,70 @@ export const issueRouter = {
     try {
       await IssueService.findByIdAndDelete(input.issueId).lean();
 
-      recomputeRoomStatus(issue.classroomId);
+      await recomputeRoomStatus(issue.classroomId);
 
-      return true;
+      return {
+        mutatedIssue: issue,
+        roomSnapshot: await getRoomSnapshot(issue.classroomId),
+      };
     } catch (e) {
       throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
     }
   }),
 };
+
+// todo classroom-router also uses this method, pls reuse.
+async function getRoomSnapshot(classroomId: string): Promise<z.infer<typeof classroomSchemaPayload>> {
+  const room = await ClassroomService.aggregate([
+    { $match: { _id: classroomId } },
+    {
+      $lookup: {
+        from: "issues",
+        let: { roomId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$classroomId", "$$roomId"] },
+              resolution: { $exists: false },
+            },
+          },
+          { $count: "count" },
+        ],
+        as: "activeIssueCountResult",
+      },
+    },
+    {
+      $lookup: {
+        from: "tasks",
+        let: { roomId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$classroomId", "$$roomId"] },
+              completion: { $exists: false },
+              $or: [{ visibleAt: { $exists: false } }, { visibleAt: { $lte: new Date() } }],
+            },
+          },
+          { $count: "count" },
+        ],
+        as: "taskCountResult",
+      },
+    },
+    {
+      $addFields: {
+        activeIssuesCount: {
+          $ifNull: [{ $arrayElemAt: ["$activeIssueCountResult.count", 0] }, 0],
+        },
+        openTasksCount: {
+          $ifNull: [{ $arrayElemAt: ["$taskCountResult.count", 0] }, 0],
+        },
+      },
+    },
+    { $project: { activeIssueCountResult: 0, taskCountResult: 0 } },
+  ]).then((results) => results[0]);
+
+  return classroomSchemaPayload.parse(room);
+}
 
 export async function recomputeRoomStatus(classroomId: string) {
   try {

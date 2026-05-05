@@ -1,7 +1,7 @@
 import { oc } from "@orpc/contract";
 import z from "zod";
 import { classroomSchema } from "../rooms/classroom-contract";
-import { taskSchema, uiTaskFormSchema } from "./task-schemas";
+import { taskMutationResult, taskSchema, uiTaskFormSchema } from "./task-schemas";
 
 export const taskContract = {
   addTask: oc
@@ -9,7 +9,7 @@ export const taskContract = {
       method: "POST",
     })
     .input(uiTaskFormSchema.extend({ classroomId: z.uuidv7() }))
-    .output(z.boolean())
+    .output(taskMutationResult)
     .errors({
       NOT_FOUND: {
         data: z.object({
@@ -33,7 +33,7 @@ export const taskContract = {
       method: "DELETE",
     })
     .input(z.object({ taskId: taskSchema.shape._id }))
-    .output(z.boolean())
+    .output(taskMutationResult)
     .errors({
       NOT_FOUND: {
         data: z.object({
@@ -52,7 +52,7 @@ export const taskContract = {
       method: "PUT",
     })
     .input(uiTaskFormSchema.extend({ _id: z.uuidv7() }))
-    .output(z.boolean())
+    .output(taskMutationResult)
     .errors({
       NOT_FOUND: {
         data: z.object({

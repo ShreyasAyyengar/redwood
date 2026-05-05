@@ -1,4 +1,4 @@
-import { taskSchema } from "@redwood/contracts";
+import { classroomSchemaPayload, taskSchema } from "@redwood/contracts";
 import { v7 as uuidv7 } from "uuid";
 import type { z } from "zod";
 import { ClassroomService } from "../database/classroom-service";
@@ -107,7 +107,10 @@ export const taskRouter = {
 
     try {
       await TaskService.insertOne(newTask);
-      return true;
+      return {
+        mutatedTask: newTask,
+        roomSnapshot: await getRoomSnapshot(newTask.classroomId),
+      };
     } catch (e) {
       throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
     }
@@ -145,14 +148,15 @@ export const taskRouter = {
         : undefined),
     };
 
-    if (updatedTask.completion) updatedTask.task.visibleAt = undefined;
-
     const isValid = taskSchema.safeParse(updatedTask);
     if (!isValid.success) throw errors.INTERNAL_SERVER_ERROR({ data: { message: isValid.error.message } });
 
     try {
       await TaskService.replaceOne({ _id: input._id }, updatedTask).lean();
-      return true;
+      return {
+        mutatedTask: updatedTask,
+        roomSnapshot: await getRoomSnapshot(updatedTask.classroomId),
+      };
     } catch (e) {
       throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
     }
@@ -164,9 +168,64 @@ export const taskRouter = {
 
     try {
       await TaskService.findByIdAndDelete(input.taskId).lean();
-      return true;
+      return {
+        mutatedTask: task,
+        roomSnapshot: await getRoomSnapshot(task.classroomId),
+      };
     } catch (e) {
       throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
     }
   }),
 };
+
+async function getRoomSnapshot(classroomId: string): Promise<z.infer<typeof classroomSchemaPayload>> {
+  const room = await ClassroomService.aggregate([
+    { $match: { _id: classroomId } },
+    {
+      $lookup: {
+        from: "issues",
+        let: { roomId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$classroomId", "$$roomId"] },
+              resolution: { $exists: false },
+            },
+          },
+          { $count: "count" },
+        ],
+        as: "activeIssueCountResult",
+      },
+    },
+    {
+      $lookup: {
+        from: "tasks",
+        let: { roomId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$classroomId", "$$roomId"] },
+              completion: { $exists: false },
+              $or: [{ visibleAt: { $exists: false } }, { visibleAt: { $lte: new Date() } }],
+            },
+          },
+          { $count: "count" },
+        ],
+        as: "taskCountResult",
+      },
+    },
+    {
+      $addFields: {
+        activeIssuesCount: {
+          $ifNull: [{ $arrayElemAt: ["$activeIssueCountResult.count", 0] }, 0],
+        },
+        openTasksCount: {
+          $ifNull: [{ $arrayElemAt: ["$taskCountResult.count", 0] }, 0],
+        },
+      },
+    },
+    { $project: { activeIssueCountResult: 0, taskCountResult: 0 } },
+  ]).then((results) => results[0]);
+
+  return classroomSchemaPayload.parse(room);
+}
