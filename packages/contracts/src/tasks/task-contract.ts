@@ -66,30 +66,6 @@ export const taskContract = {
       },
     }),
 
-  resolveTask: oc
-    .route({
-      method: "PUT",
-    })
-    .input(taskSchema.pick({ _id: true, completion: true }))
-    .output(z.boolean())
-    .errors({
-      FORBIDDEN: {
-        data: z.object({
-          message: z.string(),
-        }),
-      },
-      NOT_FOUND: {
-        data: z.object({
-          message: z.string(),
-        }),
-      },
-      INTERNAL_SERVER_ERROR: {
-        data: z.object({
-          message: z.string(),
-        }),
-      },
-    }),
-
   getTasks: oc
     .route({
       method: "GET",
