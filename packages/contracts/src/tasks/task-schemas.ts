@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { classroomSchemaPayload } from "../rooms/classroom-contract";
 
 export const taskDetailsSchema = z.object({
   createdBy: z.email(),
@@ -47,4 +48,9 @@ export const uiTaskFormSchema = z.object({
       completedAt: z.coerce.date(),
     })
     .optional(),
+});
+
+export const taskMutationResult = z.object({
+  mutatedTask: taskSchema,
+  roomSnapshot: classroomSchemaPayload,
 });

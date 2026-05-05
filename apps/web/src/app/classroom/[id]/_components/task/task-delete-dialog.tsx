@@ -1,4 +1,4 @@
-import type { classroomSchema, taskSchema } from "@redwood/contracts";
+import type { taskSchema } from "@redwood/contracts";
 import { Button } from "@redwood/shad-ui/components/button";
 import { Dialog, DialogContent, DialogFooter, DialogTitle, DialogTrigger } from "@redwood/shad-ui/components/dialog";
 import { cn } from "@redwood/shad-ui/lib/utils";
@@ -7,42 +7,20 @@ import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../../lib/orpc-web-client";
-import { useFetchedRoomsStore } from "../../../../_components/room-store";
+import { applyTaskMutationResult } from "../../../../../util/cache-reconciliation";
 
-export function DeleteTaskDialog({
-  roomId,
-  existingTask,
-  children,
-}: {
-  roomId: z.infer<typeof classroomSchema>["_id"];
-  existingTask: z.infer<typeof taskSchema>;
-  children?: React.ReactNode;
-}) {
+export function DeleteTaskDialog({ existingTask, children }: { existingTask: z.infer<typeof taskSchema>; children?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const queryClient = useQueryClient();
-  const { updateRoom } = useFetchedRoomsStore();
-
-  const refreshRoom = async () => {
-    const roomQuery = webClientORPC.classrooms.getRoom.queryOptions({ input: { id: roomId } });
-
-    await queryClient.invalidateQueries({ queryKey: roomQuery.queryKey });
-    const data = await queryClient.fetchQuery({ ...roomQuery, staleTime: 0 });
-    if (data) updateRoom(roomId, data);
-  };
 
   const deleteTaskMutation = useMutation(
     webClientORPC.tasks.deleteTask.mutationOptions({
       onMutate: async () => setDeleting(true),
-      onSuccess: async () => {
+      onSuccess: (mutationResult) => {
         setOpen(false);
         setDeleting(false);
-        await Promise.all([
-          queryClient.invalidateQueries({
-            queryKey: webClientORPC.tasks.getOpenTasks.queryOptions({ input: { classroomId: roomId } }).queryKey,
-          }),
-          refreshRoom(),
-        ]);
+        applyTaskMutationResult(queryClient, mutationResult, "delete");
       },
     })
   );

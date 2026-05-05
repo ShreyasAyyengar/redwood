@@ -1,4 +1,5 @@
 import z from "zod";
+import { classroomSchemaPayload } from "../rooms/classroom-contract";
 
 const issueDetailsSchema = z.object({
   reportedBy: z.email("Issue reportedBy must be provided."),
@@ -54,4 +55,9 @@ export const uiIssueFormSchema = z.object({
       resolvedAt: z.coerce.date(),
     })
     .optional(),
+});
+
+export const issueMutationResult = z.object({
+  mutatedIssue: issueSchema,
+  roomSnapshot: classroomSchemaPayload,
 });

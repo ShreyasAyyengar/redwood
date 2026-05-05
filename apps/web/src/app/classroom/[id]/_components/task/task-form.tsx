@@ -9,6 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../../lib/orpc-web-client";
+import { applyTaskMutationResult } from "../../../../../util/cache-reconciliation";
 import { useFetchedRoomsStore } from "../../../../_components/room-store";
 import CompletionField from "./fields/completion-field";
 import CreatedByFieldSelector from "./fields/created-by-field-selector";
@@ -44,37 +45,23 @@ export function TaskForm({
   onSuccess?: () => void;
 }) {
   const queryClient = useQueryClient();
-  const { updateRoom, fetchedRooms } = useFetchedRoomsStore();
+  const { fetchedRooms } = useFetchedRoomsStore();
   const thisRoom = fetchedRooms.find((room) => room._id === roomId);
-
-  const refreshRoom = async () => {
-    const roomQuery = webClientORPC.classrooms.getRoom.queryOptions({ input: { id: roomId } });
-
-    await queryClient.invalidateQueries({ queryKey: roomQuery.queryKey });
-    const data = await queryClient.fetchQuery({ ...roomQuery, staleTime: 0 });
-    if (data) updateRoom(roomId, data);
-  };
 
   const createTask = useMutation(
     webClientORPC.tasks.addTask.mutationOptions({
-      onSuccess: async () => {
+      onSuccess: (mutationResult) => {
         onSuccess?.();
-        await queryClient.invalidateQueries({
-          queryKey: webClientORPC.tasks.getOpenTasks.queryOptions({ input: { classroomId: roomId } }).queryKey,
-        });
-        await refreshRoom();
+        applyTaskMutationResult(queryClient, mutationResult, "upsert");
       },
     })
   );
 
   const editTask = useMutation(
     webClientORPC.tasks.editTask.mutationOptions({
-      onSuccess: async () => {
+      onSuccess: (result) => {
         onSuccess?.();
-        await queryClient.invalidateQueries({
-          queryKey: webClientORPC.tasks.getOpenTasks.queryOptions({ input: { classroomId: roomId } }).queryKey,
-        });
-        await refreshRoom();
+        applyTaskMutationResult(queryClient, result, "upsert");
       },
     })
   );
@@ -179,7 +166,7 @@ export function TaskForm({
         <div className="flex w-full items-center justify-between">
           <div>
             {existingTask && (
-              <DeleteTaskDialog roomId={roomId} existingTask={existingTask}>
+              <DeleteTaskDialog existingTask={existingTask}>
                 <Button variant="ghost" className="bg-red-500/10 text-red-500 hover:bg-red-600/10 hover:text-red-600">
                   <Trash2 className="size-4" />
                   Delete Task

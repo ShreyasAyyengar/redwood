@@ -9,6 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../../lib/orpc-web-client";
+import { applyIssueMutationResult } from "../../../../../util/cache-reconciliation";
 import { useFetchedRoomsStore } from "../../../../_components/room-store";
 import CruzfixField from "./fields/cruzfix-field";
 import DescriptionField from "./fields/description-field";
@@ -48,37 +49,23 @@ export function IssueForm({
   existingIssue?: z.infer<typeof issueSchema>;
 }) {
   const queryClient = useQueryClient();
-  const { updateRoom, fetchedRooms } = useFetchedRoomsStore();
+  const { fetchedRooms } = useFetchedRoomsStore();
   const thisRoom = fetchedRooms.find((room) => room._id === roomId);
-
-  const refreshRoom = async () => {
-    const roomQuery = webClientORPC.classrooms.getRoom.queryOptions({ input: { id: roomId } });
-
-    await queryClient.invalidateQueries({ queryKey: roomQuery.queryKey });
-    const data = await queryClient.fetchQuery({ ...roomQuery, staleTime: 0 });
-    if (data) updateRoom(roomId, data);
-  };
 
   const createIssue = useMutation(
     webClientORPC.issues.createIssue.mutationOptions({
-      onSuccess: async () => {
+      onSuccess: (mutationResult) => {
         onSuccess?.();
-        await queryClient.invalidateQueries({
-          queryKey: webClientORPC.issues.getActiveIssues.queryOptions({ input: { classroomId: roomId } }).queryKey,
-        });
-        await refreshRoom();
+        applyIssueMutationResult(queryClient, mutationResult, "upsert");
       },
     })
   );
 
   const editIssue = useMutation(
     webClientORPC.issues.editIssue.mutationOptions({
-      onSuccess: async () => {
+      onSuccess: (mutationResult) => {
         onSuccess?.();
-        await queryClient.invalidateQueries({
-          queryKey: webClientORPC.issues.getActiveIssues.queryOptions({ input: { classroomId: roomId } }).queryKey,
-        });
-        await refreshRoom();
+        applyIssueMutationResult(queryClient, mutationResult, "upsert");
       },
     })
   );
@@ -167,7 +154,7 @@ export function IssueForm({
       <DialogFooter className="my-3">
         <div className="flex w-full justify-between gap-2">
           {existingIssue && (
-            <DeleteIssueDialog roomId={roomId} existingIssue={existingIssue}>
+            <DeleteIssueDialog existingIssue={existingIssue}>
               <Button variant="ghost" className="bg-red-500/10 text-red-500 hover:bg-red-600/10 hover:text-red-600">
                 <Trash2 className="size-4" />
                 Delete Issue
