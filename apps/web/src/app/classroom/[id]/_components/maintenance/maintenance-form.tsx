@@ -59,13 +59,13 @@ export default function MaintenanceForm({
   const createMaintenanceLog = useMutation(
     webClientORPC.maintenance.addMaintenanceEntry.mutationOptions({
       onSuccess: () => {
+        onSuccess?.();
         queryClient.invalidateQueries({
           queryKey: webClientORPC.maintenance.getHistory.queryKey({ input: { classroomId: roomId } }),
         });
         queryClient.fetchQuery(webClientORPC.classrooms.getRoom.queryOptions({ input: { id: roomId } })).then((data) => {
           if (data) updateRoom(roomId, data);
         });
-        onSuccess?.();
       },
     })
   );
