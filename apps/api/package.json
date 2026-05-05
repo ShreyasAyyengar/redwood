@@ -13,14 +13,14 @@
     "check-types": "tsgo --noEmit"
   },
   "dependencies": {
-    "@better-auth/electron": "^1.6.6",
-    "@better-auth/expo": "^1.6.6",
-    "@elysiajs/cors": "^1.4.1",
-    "@orpc/experimental-publisher": "^1.13.14",
-    "@orpc/openapi": "^1.13.14",
-    "@orpc/server": "^1.13.14",
+    "@better-auth/electron": "^1.6.9",
+    "@better-auth/expo": "^1.6.9",
+    "@elysiajs/cors": "^1.4.2",
+    "@orpc/experimental-publisher": "^1.14.1",
+    "@orpc/openapi": "^1.14.1",
+    "@orpc/server": "^1.14.1",
     "@redwood/contracts": "workspace:*",
-    "better-auth": "^1.6.6",
+    "better-auth": "^1.6.9",
     "csv-parse": "^6.2.1",
     "dotenv": "^17.4.2",
     "elysia": "^1.4.28",
@@ -35,6 +35,6 @@
     "./auth-server": "./src/libs/auth-server.ts"
   },
   "devDependencies": {
-    "@types/node": "^24.12.2"
+    "@types/node": "^25.6.0"
   }
 }
