@@ -7,7 +7,7 @@ import CommandContent from "./command-content";
 
 export default function NavigatorCommand() {
   const [navigateOpen, setNavigateOpen] = useState(false);
-  useHotkey("Mod+F", () => setNavigateOpen(true));
+  useHotkey("Mod+K", () => setNavigateOpen(true));
 
   return (
     <div className="flex flex-col gap-4">
