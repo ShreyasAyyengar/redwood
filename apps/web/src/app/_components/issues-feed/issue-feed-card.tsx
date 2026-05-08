@@ -15,7 +15,6 @@ import { useFetchedRoomsStore } from "../room-store";
 
 type IssueFeedCardIssue = z.infer<typeof issueSchema>;
 type FindingOption = (typeof FINDINGS_OPTIONS)[number];
-const STATUS_SYMBOL_SIZE = 4;
 
 function areFindingsEqual(a: string[], b: string[]) {
   if (a.length !== b.length) return false;
@@ -203,7 +202,7 @@ export const IssueFeedCard = ({
                     : "bg-amber-500/10 text-amber-400"
               )}
             >
-              {getStatusSymbol(issue, STATUS_SYMBOL_SIZE)}
+              {getStatusSymbol(issue, 4)}
             </div>
             <div className="flex min-w-0 flex-col">
               <span className="font-semibold text-[10px] text-zinc-500 uppercase tracking-[0.18em]">Status</span>
