@@ -51,14 +51,12 @@ export default function HomePage() {
             </div>
           </TabsContent>
 
-          {/* TODO: revamp all of this */}
           <TabsContent value="issues" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
             <div className="flex w-full flex-1 overflow-hidden p-5">
               <IssuesFeed />
             </div>
           </TabsContent>
 
-          {/* TODO: revamp all of this */}
           <TabsContent value="tasks" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
             <div className="flex w-full flex-1 overflow-hidden p-5">
               <TasksFeed />
