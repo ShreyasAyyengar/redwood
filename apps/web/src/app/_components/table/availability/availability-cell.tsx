@@ -58,7 +58,7 @@ function AvailabilityDialog({ room, children }: { room: z.infer<typeof classroom
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogTitle hidden={true}>Full Availability</DialogTitle>
-      <DialogContent className="border-none bg-transparent p-0" aria-describedby="Full classroom availablily for days of week">
+      <DialogContent className="h-3/4 border-none bg-transparent p-0" aria-describedby="Full classroom availablily for days of week">
         <Availability room={room} />
       </DialogContent>
     </Dialog>
