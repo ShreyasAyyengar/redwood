@@ -51,7 +51,6 @@ export default function RoomCard({ room }: { room: z.infer<typeof classroomSchem
 
     const availability = dayAvailability(blocks, nowMin);
 
-    // TODO toolip "click to show full availability" and then shadcn popover to show it.
     if (availability.kind === "none")
       return (
         <div className="flex flex-col items-end">

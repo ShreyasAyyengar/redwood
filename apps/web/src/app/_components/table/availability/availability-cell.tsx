@@ -12,7 +12,6 @@ export default function AvailabilityCell({ row }: { row: Row<z.infer<typeof clas
 
   const availability = dayAvailability(blocks, nowMin);
 
-  // TODO toolip "click to show full availability" and then shadcn popover to show it.
   return (
     <div
       onClick={(e) => {
