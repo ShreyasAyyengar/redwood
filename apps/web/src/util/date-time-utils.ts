@@ -104,22 +104,41 @@ export function daysAgoNumeric(date: Date): number {
 // TODO return more -> 0-60 seconds, 0-60 mins, 0-24 hours, 0-7 days, 0-30 days, 0-12 months, + years
 export function daysAgoRelative(date: Date): string {
   const now = new Date();
+  const diffMs = date.getTime() - now.getTime();
+  const absMs = Math.abs(diffMs);
 
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const isPast = diffMs < 0;
+  const suffix = isPast ? "ago" : "from now";
 
-  const number = Math.round((today.getTime() - target.getTime()) / (1000 * 60 * 60 * 24));
+  const second = 1000;
+  const minute = 60 * second;
+  const hour = 60 * minute;
+  const day = 24 * hour;
+  const month = 30 * day;
+  const year = 365 * day;
 
-  switch (number) {
-    case -1:
-      return "tomorrow";
-    case 0:
-      return "today";
-    case 1:
-      return "yesterday";
-    default:
-      return `${Math.abs(number)} days ${number > 0 ? "ago" : "from now"}`;
+  const format = (value: number, unit: string) => {
+    const rounded = Math.floor(value);
+    return `${rounded} ${unit}${rounded === 1 ? "" : "s"} ${suffix}`;
+  };
+
+  if (absMs < 5 * second) return "just now";
+
+  if (absMs < minute) return format(absMs / second, "second");
+
+  if (absMs < hour) return format(absMs / minute, "minute");
+
+  if (absMs < day) return format(absMs / hour, "hour");
+
+  if (absMs < 7 * day) return format(absMs / day, "day");
+
+  if (absMs < month) {
+    const weeks = Math.floor(absMs / (7 * day));
+    return `${weeks} week${weeks === 1 ? "" : "s"} ${suffix}`;
   }
+
+  if (absMs < year) return format(absMs / month, "month");
+  return format(absMs / year, "year");
 }
 
 export function formatDate(date: Date): string {
