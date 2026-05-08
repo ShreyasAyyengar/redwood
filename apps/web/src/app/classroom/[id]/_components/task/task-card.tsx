@@ -143,6 +143,31 @@ export const TaskCard = ({
   );
 };
 
+export function MiniTaskCard({
+  task,
+  ref,
+  ...props
+}: { task: z.infer<typeof taskSchema> } & React.HTMLAttributes<HTMLDivElement> & { ref?: React.RefObject<HTMLDivElement | null> }) {
+  const priorityAccentClassName = task.task.urgent ? "bg-red-500" : "bg-amber-400";
+  const supervisorAccentClassName = task.task.supervisorNeeded ? "bg-purple-500" : priorityAccentClassName;
+
+  return (
+    <div
+      ref={ref}
+      className="flex w-72 cursor-pointer flex-row overflow-hidden rounded-md border border-zinc-800/80 bg-zinc-950/70 shadow-sm transition-colors hover:border-zinc-700 hover:bg-zinc-950"
+      {...props}
+    >
+      <div className="flex w-1.5 shrink-0 flex-col" aria-hidden="true">
+        <div className={cn("h-1/2", priorityAccentClassName)} />
+        <div className={cn("h-1/2", supervisorAccentClassName)} />
+      </div>
+      <p className="max-h-16 min-h-14 flex-1 overflow-y-auto whitespace-pre-wrap px-3 py-2 text-left text-sm text-zinc-200 leading-snug">
+        {task.task.description}
+      </p>
+    </div>
+  );
+}
+
 export function TaskCardSkeleton() {
   return (
     <div className="my-1 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 shadow-md/100">
