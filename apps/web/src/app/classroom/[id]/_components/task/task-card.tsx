@@ -1,6 +1,7 @@
 import type { taskSchema } from "@redwood/contracts";
 import { Badge } from "@redwood/shad-ui/components/badge";
 import { Card } from "@redwood/shad-ui/components/card";
+import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwood/shad-ui/components/tooltip";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { Check, ClipboardClock, ClipboardList, Flag, UserPen } from "lucide-react";
@@ -161,9 +162,9 @@ export function MiniTaskCard({
         <div className={cn("h-1/2", priorityAccentClassName)} />
         <div className={cn("h-1/2", supervisorAccentClassName)} />
       </div>
-      <p className="max-h-16 min-h-14 flex-1 overflow-y-auto whitespace-pre-wrap px-3 py-2 text-left text-sm text-zinc-200 leading-snug">
-        {task.task.description}
-      </p>
+      <ScrollArea className="max-h-16 min-h-14 flex-1">
+        <p className="whitespace-pre-wrap px-3 py-2 text-left text-sm text-zinc-200 leading-snug">{task.task.description}</p>
+      </ScrollArea>
     </div>
   );
 }
