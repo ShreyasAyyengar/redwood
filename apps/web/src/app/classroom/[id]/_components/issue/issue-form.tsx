@@ -121,14 +121,14 @@ export function IssueForm({
 
       <ScrollArea className="max-h-[calc(100dvh-300px)] rounded-2xl bg-background/40 p-3">
         <div className="my-2 flex flex-col gap-5 px-1">
-          <Separator className="bg-red-500" />
+          <Separator className={cn(existingIssue ? existingIssue.issue.urgent && "bg-red-500" : "bg-neutral-500")} />
 
           {/* Description */}
           <form.AppField name="description">
             {(field) => <field.DescriptionField existingValue={existingIssue?.issue.description} />}
           </form.AppField>
 
-          <Separator className="bg-red-500" />
+          <Separator className={cn(existingIssue ? existingIssue.issue.urgent && "bg-red-500" : "bg-neutral-500")} />
 
           {/* Urgent/Supervisor + SOD/Cruzfix */}
           <div className="flex flex-wrap justify-between gap-5">
@@ -145,7 +145,7 @@ export function IssueForm({
             </div>
           </div>
 
-          <Separator className="bg-red-500" />
+          <Separator className={cn(existingIssue ? existingIssue.issue.urgent && "bg-red-500" : "bg-neutral-500")} />
           {existingIssue && (
             <form.AppField name="resolution">{(field) => <field.ResolutionField existingValue={existingIssue.resolution} />}</form.AppField>
           )}
