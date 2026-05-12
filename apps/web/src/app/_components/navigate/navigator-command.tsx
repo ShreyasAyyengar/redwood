@@ -9,6 +9,8 @@ import CommandContent from "./command-content";
 
 export default function NavigatorCommand() {
   const [navigateOpen, setNavigateOpen] = useState(false);
+  const openNavigator = () => setNavigateOpen(true);
+
   useHotkey("Mod+K", () => setNavigateOpen(true));
 
   return (
@@ -18,7 +20,7 @@ export default function NavigatorCommand() {
         size="icon-lg"
         className="h-12 w-12 rounded-full border border-white/20 bg-zinc-800/95 text-white shadow-[0_8px_24px_rgba(0,0,0,0.45)] ring-1 ring-black/20 hover:bg-zinc-700 active:scale-95 lg:hidden"
         aria-label="Open search"
-        onClick={() => setNavigateOpen(true)}
+        onClick={openNavigator}
       >
         <Search className="size-6! text-zinc-100" />
       </Button>
