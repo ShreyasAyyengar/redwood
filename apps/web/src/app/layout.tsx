@@ -37,10 +37,14 @@ export default function RootLayout({
         </Suspense>
         <head>{reactScanEnabled && <script crossOrigin="anonymous" src="//unpkg.com/react-scan/dist/auto.global.js" />}</head>
         <body className={`${geistSans.variable} ${geistMono.variable} dark`}>
-          <div className="fixed right-4 bottom-4 z-50">
+          <div className="fixed right-4 bottom-4 z-50 flex flex-col items-end gap-3">
             <FeedbackDialog />
           </div>
-          <NavigatorCommand />
+
+          <div className="fixed bottom-4 left-4 z-50 flex flex-col items-end gap-3">
+            <NavigatorCommand />
+          </div>
+
           {children}
         </body>
       </Providers>
