@@ -15,8 +15,7 @@ import {
 import { useEffect, useState } from "react";
 import type { z } from "zod";
 import { useShallow } from "zustand/react/shallow";
-import { dayAvailability, getBlocksForToday, getCaliClock } from "../../../util/date-time-utils";
-import { useActiveFiltersStore } from "./active-filters";
+import { roomMatchesActiveFilters, useActiveFiltersStore } from "./active-filters";
 import { RoomRow } from "./room-row";
 
 const SORTING_STORAGE_KEY = "room-table-sorting";
@@ -61,42 +60,7 @@ export function RoomTable({
       sorting,
       globalFilter: filterState,
     },
-    globalFilterFn: (row) => {
-      const { exclusive, status, hasIssues, incompleteTasks, overdueTasks, availableNow, group } = filterState;
-
-      const room = row.original;
-
-      // hard constraint: if group is selected, room must be in that group
-      if (group && room.groupKey !== group) return false;
-
-      const checks: boolean[] = [];
-
-      if (status) checks.push(room.roomStatus === status);
-
-      if (hasIssues) checks.push(room.roomStatus !== "GOOD");
-
-      if (incompleteTasks) checks.push(room.openTasksCount > 0);
-
-      if (overdueTasks) checks.push(false); // replace with real logic
-
-      if (availableNow) {
-        if (!room.schedule) {
-          checks.push(false);
-        } else {
-          const { weekdayKey, nowMin } = getCaliClock();
-          const blocks = getBlocksForToday(room.schedule, weekdayKey);
-          const availability = dayAvailability(blocks, nowMin);
-          checks.push(availability.kind === "open");
-        }
-      }
-
-      // if no non-group filters are active, and group matched, allow it
-      if (checks.length === 0) return true;
-
-      return exclusive
-        ? checks.every(Boolean) // AND across remaining filters
-        : checks.some(Boolean); // OR across remaining filters
-    },
+    globalFilterFn: (row) => roomMatchesActiveFilters(row.original, filterState),
     onSortingChange: setSorting,
   });
 
