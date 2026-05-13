@@ -19,6 +19,9 @@ export const env = createEnv({
     // Google OAuth credentials
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
+
+    // Discord webhook URL
+    DISCORD_WEBHOOK_URL: z.string(),
   },
 
   // biome-ignore lint/correctness/noUndeclaredVariables: It's there; trust.

@@ -1,7 +1,5 @@
+import { env } from "../env";
 import { protectedProcedure } from "../libs/orpc-procedures";
-
-const discordFeedbackWebhookUrl =
-  "https://discord.com/api/webhooks/1498158705877848075/-nD7Vfp_eI_AvaIz5Fb4GScVF9qYltUcJqnw1hCyEOApWbmsOSo6QypqNC-ts7MImtNK";
 
 // biome-ignore lint/style/noMagicNumbers: Discord upload limits are enforced in binary megabytes.
 const maxAttachmentBytes = 24 * 1024 * 1024;
@@ -43,7 +41,7 @@ export const feedbackRouter = {
       formData.append(`files[${index}]`, attachment, attachment.name);
     }
 
-    const response = await fetch(discordFeedbackWebhookUrl, {
+    const response = await fetch(env.DISCORD_WEBHOOK_URL, {
       method: "POST",
       body: formData,
     });
