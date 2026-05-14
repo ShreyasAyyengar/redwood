@@ -1,6 +1,7 @@
 import { roles } from "@redwood/contracts";
 import { APIError, betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
+import { multiSession } from "better-auth/plugins";
 import { ConfigService } from "../database/config-service";
 import { databaseConnection } from "../database/database";
 import { env } from "../env";
@@ -15,6 +16,8 @@ export const authServer = betterAuth({
   baseURL: env.API_URL,
   basePath,
   trustedOrigins: [env.WEBSITE_URL],
+
+  plugins: [multiSession()],
 
   onAPIError: {
     errorURL: "http://localhost:3000/auth/error",
