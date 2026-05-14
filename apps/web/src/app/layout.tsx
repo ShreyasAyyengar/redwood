@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import "@redwood/shad-ui/globals.css";
 import { Suspense } from "react";
 import { env } from "../env";
-import ActionMenu from "./_components/action-menu";
+import ActionMenu from "./_components/action-menu/action-menu";
 import AuthLayer from "./_components/auth-layer";
 import NavigatorCommand from "./_components/navigate/navigator-command";
 import Providers from "./_components/providers";
