@@ -70,7 +70,7 @@ export const authServer = betterAuth({
     },
   },
   session: {
-    expiresIn: 60 * 60 * 4,
+    expiresIn: 60 * 60 * 8,
     updateAge: 60 * 60 * 2,
   },
 });
