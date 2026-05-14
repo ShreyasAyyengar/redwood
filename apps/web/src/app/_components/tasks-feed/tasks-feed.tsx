@@ -13,24 +13,26 @@ export function TasksFeed() {
   );
 
   return (
-    <Tabs defaultValue="open" className="flex h-full flex-1 flex-col overflow-hidden">
-      <div className="flex shrink-0 flex-col items-center gap-4 pb-4">
-        <TabsList className="mx-auto shrink-0 bg-zinc-900/50">
-          <TabsTrigger value="open">Open Tasks</TabsTrigger>
-          <TabsTrigger value="all">All Tasks</TabsTrigger>
-        </TabsList>
-        <FeedRoomFilter value={roomFilter} onChange={setRoomFilter} />
-      </div>
-      <TabsContent value="open" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
-        <div className="w-3xl flex-1 overflow-hidden">
-          <TaskFeedList filter={taskFilter} openOnly />
+    <div className="flex h-full flex-1 flex-col overflow-hidden">
+      <Tabs defaultValue="open" className="flex h-full flex-1 flex-col overflow-hidden">
+        <div className="flex shrink-0 flex-col items-center gap-4 pb-4">
+          <TabsList className="mx-auto shrink-0 bg-zinc-900/50">
+            <TabsTrigger value="open">Open Tasks</TabsTrigger>
+            <TabsTrigger value="all">All Tasks</TabsTrigger>
+          </TabsList>
+          <FeedRoomFilter value={roomFilter} onChange={setRoomFilter} />
         </div>
-      </TabsContent>
-      <TabsContent value="all" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
-        <div className="w-3xl flex-1 overflow-hidden">
-          <TaskFeedList filter={taskFilter} />
-        </div>
-      </TabsContent>
-    </Tabs>
+        <TabsContent value="open" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
+          <div className="w-3xl flex-1 overflow-hidden">
+            <TaskFeedList filter={taskFilter} openOnly />
+          </div>
+        </TabsContent>
+        <TabsContent value="all" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
+          <div className="w-3xl flex-1 overflow-hidden">
+            <TaskFeedList filter={taskFilter} />
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }

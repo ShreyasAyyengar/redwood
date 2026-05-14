@@ -219,18 +219,16 @@ export const TaskFeedCard = ({
           <TaskMetaBox
             className="border-zinc-800/80 bg-zinc-950/30"
             icon={Clock3}
-            iconClassName="bg-zinc-800/80 text-indigo-200"
-            label="Created"
-            title={`Created: ${reportedDateDisplay.dateAbsolute}`}
+            iconClassName="bg-zinc-800/80"
+            label="Created At"
             value={reportedDateDisplay.dateDaysAgo}
-            valueClassName="text-indigo-100"
           />
 
           <TaskMetaBox
             className="border-zinc-800/80 bg-zinc-950/30"
             icon={User}
             iconClassName="bg-zinc-800/80"
-            label="Owner"
+            label="Created By"
             value={task.task.createdBy}
           />
 
@@ -252,7 +250,6 @@ export const TaskFeedCard = ({
                 icon={Calendar}
                 iconClassName={isOverdue ? "bg-red-500/10 text-red-400" : "bg-zinc-800/80"}
                 label="Due"
-                title={`Due: ${completeByDateDisplay.dateAbsolute}`}
                 value={completeByDateDisplay.dateDaysAgo}
                 valueClassName={isOverdue ? "text-red-300" : "text-zinc-300"}
               />
