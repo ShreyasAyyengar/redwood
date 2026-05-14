@@ -176,7 +176,7 @@ export const IssueFeedCard = ({
               <Clock3 className="size-4" />
             </div>
             <div className="flex flex-col">
-              <span className="font-semibold text-[10px] text-zinc-400 uppercase tracking-[0.18em]">Reported</span>
+              <span className="font-semibold text-[10px] text-zinc-400 uppercase tracking-[0.18em]">Reported At</span>
               <span className="text-indigo-100 text-sm">{reportedDateDisplay.dateDaysAgo}</span>
             </div>
           </div>
@@ -186,7 +186,7 @@ export const IssueFeedCard = ({
               <User className="size-4" />
             </div>
             <div className="flex min-w-0 flex-col">
-              <span className="font-semibold text-[10px] text-zinc-500 uppercase tracking-[0.18em]">Reporter</span>
+              <span className="font-semibold text-[10px] text-zinc-500 uppercase tracking-[0.18em]">Reported By</span>
               <span className="truncate text-sm text-zinc-300">{issue.issue.reportedBy}</span>
             </div>
           </div>
