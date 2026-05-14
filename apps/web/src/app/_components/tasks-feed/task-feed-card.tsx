@@ -9,7 +9,6 @@ import { getDateTimeDisplay } from "../../../util/date-time-utils";
 import { urgencyStyle } from "../../../util/style-util";
 import { useFetchedRoomsStore } from "../room-store";
 
-// TODO modularise the issue-feed-card.tsx in a similar way to this file.
 type TaskFeedCardTask = z.infer<typeof taskSchema>;
 type DateDisplay = ReturnType<typeof getDateTimeDisplay>;
 
