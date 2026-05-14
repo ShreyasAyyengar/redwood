@@ -1,10 +1,12 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@redwood/shad-ui/components/avatar";
 import { Button } from "@redwood/shad-ui/components/button";
 import { cn } from "@redwood/shad-ui/lib/utils";
-import { Menu, MessageSquareText, X } from "lucide-react";
+import { LogOut, MessageSquareText, Repeat2, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
+import { authClientWeb } from "../../lib/auth-client-web";
 import FeedbackDialog from "./feedback/feedback-dialog";
 
 const actionButtonClass =
@@ -16,8 +18,23 @@ type MobileAction = {
   render: () => ReactNode;
 };
 
+const getInitials = (name?: string | null, email?: string | null) => {
+  if (name) {
+    return name
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+  }
+
+  return email?.slice(0, 2).toUpperCase() ?? "RW";
+};
+
 export default function MobileActionMenu() {
   const [open, setOpen] = useState(false);
+  const { data: session } = authClientWeb.useSession();
+  const user = session?.user;
 
   const actions: MobileAction[] = [
     {
@@ -31,15 +48,41 @@ export default function MobileActionMenu() {
         </FeedbackDialog>
       ),
     },
+    {
+      id: "switch-accounts",
+      label: "Switch accounts",
+      render: () => (
+        <Button type="button" size="icon-lg" className={cn(actionButtonClass, "opacity-60")} aria-label="Switch accounts coming soon" disabled>
+          <Repeat2 className="size-6!" />
+        </Button>
+      ),
+    },
+    {
+      id: "logout",
+      label: "Log out",
+      render: () => (
+        <Button
+          type="button"
+          size="icon-lg"
+          className={actionButtonClass}
+          aria-label="Log out"
+          onClick={() => {
+            setOpen(false);
+            authClientWeb.signOut().catch(() => undefined);
+          }}
+        >
+          <LogOut className="size-6!" />
+        </Button>
+      ),
+    },
   ];
 
   return (
-    // TODO extract top div into layout.tsx so it's not confusing and remains consistent with other floating icons
-    <div className="fixed right-4 bottom-4 z-50 lg:hidden">
+    <div className="fixed right-4 bottom-4 z-50">
       {open && (
         <button
           type="button"
-          aria-label="Close navigation menu"
+          aria-label="Close profile menu"
           className="fixed inset-0 z-40 cursor-default bg-transparent p-0"
           onClick={() => setOpen(false)}
         />
@@ -61,12 +104,19 @@ export default function MobileActionMenu() {
         <Button
           type="button"
           size="icon-lg"
-          className="h-12 w-12 rounded-full border border-white/20 bg-zinc-800 text-white shadow-[0_10px_28px_rgba(0,0,0,0.5)] ring-1 ring-black/20 hover:bg-zinc-700 active:scale-95"
-          aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+          className="h-12 w-12 overflow-hidden rounded-full border border-white/20 bg-zinc-800 p-0 text-white shadow-[0_10px_28px_rgba(0,0,0,0.5)] ring-1 ring-black/20 hover:bg-zinc-700 active:scale-95"
+          aria-label={open ? "Close profile menu" : "Open profile menu"}
           aria-expanded={open}
           onClick={() => setOpen((current) => !current)}
         >
-          {open ? <X className="size-6!" /> : <Menu className="size-6!" />}
+          {open ? (
+            <X className="size-6!" />
+          ) : (
+            <Avatar className="size-full">
+              {user?.image && <AvatarImage src={user.image} alt={user.name ?? "Signed in user"} />}
+              <AvatarFallback className="bg-zinc-700 font-bold text-white text-xs">{getInitials(user?.name, user?.email)}</AvatarFallback>
+            </Avatar>
+          )}
         </Button>
       </div>
     </div>
