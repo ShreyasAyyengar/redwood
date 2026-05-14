@@ -31,7 +31,7 @@ const getInitials = (name?: string | null, email?: string | null) => {
   return email?.slice(0, 2).toUpperCase() ?? "RW";
 };
 
-export default function MobileActionMenu() {
+export default function ActionMenu() {
   const [open, setOpen] = useState(false);
   const { data: session } = authClientWeb.useSession();
   const user = session?.user;

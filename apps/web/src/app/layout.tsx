@@ -3,9 +3,8 @@ import localFont from "next/font/local";
 import "@redwood/shad-ui/globals.css";
 import { Suspense } from "react";
 import { env } from "../env";
+import ActionMenu from "./_components/action-menu";
 import AuthLayer from "./_components/auth-layer";
-import FeedbackDialog from "./_components/feedback/feedback-dialog";
-import MobileActionMenu from "./_components/mobile-action-menu";
 import NavigatorCommand from "./_components/navigate/navigator-command";
 import Providers from "./_components/providers";
 
@@ -38,14 +37,11 @@ export default function RootLayout({
         </Suspense>
         <head>{reactScanEnabled && <script crossOrigin="anonymous" src="//unpkg.com/react-scan/dist/auto.global.js" />}</head>
         <body className={`${geistSans.variable} ${geistMono.variable} dark`}>
-          <div className="fixed right-4 bottom-4 z-50 hidden lg:block">
-            <FeedbackDialog />
-          </div>
           <div className="fixed bottom-4 left-4 z-50 lg:hidden">
             <NavigatorCommand />
           </div>
-          <MobileActionMenu />
 
+          <ActionMenu />
           {children}
         </body>
       </Providers>
