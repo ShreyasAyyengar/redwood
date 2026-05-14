@@ -17,11 +17,14 @@ databaseConnection.on("error", (_error) => {
 });
 
 await mongoose.connect(env.DATABASE_URL, {
-  maxPoolSize: 10,
-  minPoolSize: 0,
-  maxIdleTimeMS: 30_000,
+  retryReads: true,
+  retryWrites: true,
+  maxPoolSize: 5,
+  minPoolSize: 1,
   serverSelectionTimeoutMS: 5000,
-  socketTimeoutMS: 45_000,
+  socketTimeoutMS: 30_000,
+  connectTimeoutMS: 10_000,
+  maxIdleTimeMS: 60_000,
 });
 
 logger.info("[MongoDB] Initial connection established!");
