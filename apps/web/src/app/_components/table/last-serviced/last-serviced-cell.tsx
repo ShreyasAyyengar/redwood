@@ -29,7 +29,7 @@ export default function LastServicedCell({ row }: { row: Row<z.infer<typeof clas
           )}
         >
           <span className="capitalize">{dateDaysAgo}</span>
-          {` • ${daysAgo <= 14 ? "Up to Date" : daysAgo <= 21 ? "Pending" : "Overdue"}`}
+          {` • ${daysAgo < 14 ? "Up to Date" : daysAgo <= 30 ? "Pending" : "Overdue"}`}
         </span>
       </div>
 

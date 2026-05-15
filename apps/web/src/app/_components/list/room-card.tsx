@@ -33,7 +33,7 @@ export default function RoomCard({ room }: { room: z.infer<typeof classroomSchem
         )}
       >
         <span className="capitalize">{dateDaysAgo}</span>
-        {` • ${daysAgo <= 14 ? "Up to Date" : daysAgo <= 21 ? "Pending" : "Overdue"}`}
+        {` • ${daysAgo < 14 ? "Up to Date" : daysAgo <= 30 ? "Pending" : "Overdue"}`}
       </span>
     );
   };
