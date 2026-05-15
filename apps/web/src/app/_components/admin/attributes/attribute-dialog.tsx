@@ -60,7 +60,7 @@ export function AttributeForm({
   const form = useAppForm({
     defaultValues: existingAttribute ?? {
       label: "",
-      color: "#000000",
+      color: "#FFFFFF",
     },
     validators: {
       onChange: attributeFormSchema,
