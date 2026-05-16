@@ -42,8 +42,6 @@ export const attributesRouter = {
   }),
 
   bulkUpdateClassrooms: adminProcedure.attributes.bulkUpdateClassrooms.handler(async ({ input: { updates }, errors }) => {
-    console.log(updates);
-
     try {
       const bulkOps = updates.map((update) => ({
         updateOne: {
