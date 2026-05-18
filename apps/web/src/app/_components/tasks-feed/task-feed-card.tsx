@@ -7,6 +7,7 @@ import type { RefObject } from "react";
 import type { z } from "zod";
 import { getDateTimeDisplay } from "../../../util/date-time-utils";
 import { urgencyStyle } from "../../../util/style-util";
+import { ClassroomAvailabilityPill } from "../classroom-availability-pill";
 import { useFetchedRoomsStore } from "../room-store";
 
 type TaskFeedCardTask = z.infer<typeof taskSchema>;
@@ -186,7 +187,7 @@ export const TaskFeedCard = ({
       {...props}
     >
       <div className="flex min-w-0 flex-col gap-4">
-        <div className="flex min-w-0 flex-1 items-start gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           <div
             className={cn(
               "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
@@ -197,7 +198,10 @@ export const TaskFeedCard = ({
           </div>
           <div className="min-w-0 flex-1 pt-0.5">
             <div className="flex flex-col gap-2">
-              <span className="font-bold text-lg text-zinc-100 leading-tight">{room ? room.displayName : "Unknown Room"}</span>
+              <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-2 gap-y-1">
+                <span className="font-bold text-lg text-zinc-100 leading-tight">{room ? room.displayName : "Unknown Room"}</span>
+                {room && <ClassroomAvailabilityPill room={room} />}
+              </div>
               {task.task.supervisorNeeded && (
                 <div className="flex flex-wrap gap-1.5">
                   <Badge variant="outline" className={cn("h-6 px-2 text-[10px]", urgencyStyle("purple"))}>

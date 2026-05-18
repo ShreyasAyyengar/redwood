@@ -11,6 +11,7 @@ import { webClientORPC } from "../../../lib/orpc-web-client";
 import { getDateTimeDisplay } from "../../../util/date-time-utils";
 import { urgencyStyle } from "../../../util/style-util";
 import { getStatusSymbol } from "../../classroom/[id]/_components/issue/issue-card";
+import { ClassroomAvailabilityPill } from "../classroom-availability-pill";
 import { useFetchedRoomsStore } from "../room-store";
 
 type IssueFeedCardIssue = z.infer<typeof issueSchema>;
@@ -240,7 +241,7 @@ export const IssueFeedCard = ({
       {...props}
     >
       <div className="flex w-full min-w-0 flex-col gap-4">
-        <div className="flex min-w-0 flex-1 items-start gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           <div
             className={cn(
               "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
@@ -251,7 +252,10 @@ export const IssueFeedCard = ({
           </div>
           <div className="min-w-0 flex-1 pt-0.5">
             <div className="flex flex-col gap-2">
-              <span className="font-bold text-lg text-zinc-100 leading-tight">{room ? room.displayName : "Unknown Room"}</span>
+              <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-2 gap-y-1">
+                <span className="font-bold text-lg text-zinc-100 leading-tight">{room ? room.displayName : "Unknown Room"}</span>
+                {room && <ClassroomAvailabilityPill room={room} />}
+              </div>
               {issue.issue.supervisorNeeded && (
                 <div className="flex flex-wrap gap-1.5">
                   <Badge variant="outline" className={cn("h-6 px-2 text-[10px]", urgencyStyle("purple"))}>
