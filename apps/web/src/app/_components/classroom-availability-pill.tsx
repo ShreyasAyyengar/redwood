@@ -99,8 +99,8 @@ function getAvailabilityDisplay(room: Classroom): AvailabilityDisplay | undefine
   };
 }
 
-export function ClassroomAvailabilityPill({ room, className }: { room: Classroom | undefined; className?: string }) {
-  const availability = room ? getAvailabilityDisplay(room) : undefined;
+export function ClassroomAvailabilityPill({ room, className }: { room: Classroom; className?: string }) {
+  const availability = getAvailabilityDisplay(room);
 
   if (!availability) return null;
 

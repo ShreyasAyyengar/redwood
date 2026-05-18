@@ -231,6 +231,8 @@ export const IssueFeedCard = ({
   const { HeaderIcon, headerIconClassName, headerIconTextClassName, stateIconClassName, stateIconNode, stateText, stateTextClassName } =
     getIssueDisplayState(issue);
 
+  if (!room) return null;
+
   return (
     <Card
       ref={ref}
@@ -253,7 +255,7 @@ export const IssueFeedCard = ({
           <div className="min-w-0 flex-1 pt-0.5">
             <div className="flex flex-col gap-2">
               <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-2 gap-y-1">
-                <span className="font-bold text-lg text-zinc-100 leading-tight">{room ? room.displayName : "Unknown Room"}</span>
+                <span className="font-bold text-lg text-zinc-100 leading-tight">{room.displayName}</span>
                 {room && <ClassroomAvailabilityPill room={room} />}
               </div>
               {issue.issue.supervisorNeeded && (
