@@ -6,7 +6,7 @@ import { Separator } from "@redwood/shad-ui/components/separator";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Trash2 } from "lucide-react";
+import { GlobeOff, Trash2 } from "lucide-react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../../lib/orpc-web-client";
 import { applyIssueMutationResult } from "../../../../../util/cache-reconciliation";
@@ -98,6 +98,13 @@ export function IssueForm({
     },
   });
 
+  const autoFillDTEN = () => {
+    form.setFieldValue(
+      "description",
+      "DTEN showing offline (Orbit/Zoom) — Please report whether DTEN was actually offline (unplugged/turned off)."
+    );
+  };
+
   return (
     <>
       <DialogHeader>
@@ -127,6 +134,10 @@ export function IssueForm({
           <form.AppField name="description">
             {(field) => <field.DescriptionField existingValue={existingIssue?.issue.description} />}
           </form.AppField>
+          <Button className="w-fit active:scale-95 active:transform" onClick={autoFillDTEN}>
+            <GlobeOff className="size-4" />
+            DTEN
+          </Button>
 
           <Separator className={cn(existingIssue ? existingIssue.issue.urgent && "bg-red-500" : "bg-neutral-500")} />
 
