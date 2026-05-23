@@ -142,12 +142,12 @@ function TaskTemplateControls({
   const [templateAttributeIds, setTemplateAttributeIds] = useState<string[]>(selectedAttributeIds);
   const [templateClassroomIds, setTemplateClassroomIds] = useState<string[]>(selectedClassroomIds);
 
-  const { data: templates = [] } = useQuery(webClientORPC.attributes.getAttributeTaskTemplates.queryOptions());
+  const { data: templates = [] } = useQuery(webClientORPC.tasks.getTaskTemplates.queryOptions());
 
   const addTemplate = useMutation(
-    webClientORPC.attributes.addAttributeTaskTemplate.mutationOptions({
+    webClientORPC.tasks.addTaskTemplate.mutationOptions({
       onSuccess: async (template) => {
-        await queryClient.invalidateQueries({ queryKey: webClientORPC.attributes.getAttributeTaskTemplates.queryKey() });
+        await queryClient.invalidateQueries({ queryKey: webClientORPC.tasks.getTaskTemplates.queryKey() });
         applyTemplate(template);
         setTemplateDialogOpen(false);
         setTemplateName("");

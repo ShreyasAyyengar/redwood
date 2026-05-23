@@ -12,7 +12,6 @@ import { useState } from "react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../lib/orpc-web-client";
 
-export type AttributeFormValues = z.infer<typeof attributeFormSchema>;
 export const { fieldContext, formContext, useFieldContext } = createFormHookContexts();
 export const { useAppForm } = createFormHook({
   fieldContext,

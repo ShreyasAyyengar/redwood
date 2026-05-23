@@ -1,8 +1,9 @@
-import { classroomSchemaPayload, taskSchema } from "@redwood/contracts";
+import { classroomSchemaPayload, taskSchema, taskTemplateSchema } from "@redwood/contracts";
 import { v7 as uuidv7 } from "uuid";
 import type { z } from "zod";
 import { ClassroomService } from "../database/classroom-service";
 import { TaskService } from "../database/task-service";
+import { TaskTemplateService } from "../database/task-template-service";
 import { adminProcedure, protectedProcedure } from "../libs/orpc-procedures";
 
 const PAGE_SIZE = 5;
@@ -215,6 +216,36 @@ export const taskRouter = {
         mutatedTask: task,
         roomSnapshot: await getRoomSnapshot(task.classroomId),
       };
+    } catch (e) {
+      throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
+    }
+  }),
+
+  addTaskTemplate: adminProcedure.tasks.addTaskTemplate.handler(async ({ input, errors, context }) => {
+    const existingTemplate = await TaskTemplateService.findOne({ name: input.name }).lean();
+    if (existingTemplate) {
+      throw errors.UNPROCESSABLE_CONTENT({ data: { message: "Task template with this name already exists." } });
+    }
+
+    const newTemplate: z.infer<typeof taskTemplateSchema> = {
+      ...input,
+      _id: uuidv7(),
+    };
+
+    const isValid = taskTemplateSchema.safeParse(newTemplate);
+    if (!isValid.success) throw errors.INTERNAL_SERVER_ERROR({ data: { message: isValid.error.message } });
+
+    try {
+      await TaskTemplateService.create(newTemplate);
+      return newTemplate;
+    } catch (e) {
+      throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
+    }
+  }),
+
+  getTaskTemplates: adminProcedure.tasks.getTaskTemplates.handler(async ({ errors }) => {
+    try {
+      return await TaskTemplateService.find().lean().sort({ createdAt: -1 });
     } catch (e) {
       throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
     }
