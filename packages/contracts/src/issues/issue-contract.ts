@@ -1,7 +1,14 @@
 import { oc } from "@orpc/contract";
 import z from "zod";
 import { classroomSchema } from "../rooms/classroom-contract";
-import { FINDINGS_OPTIONS, issueMutationResult, issueSchema, uiIssueFormSchema } from "./issue-schemas";
+import {
+  bulkIssueFormSchema,
+  bulkIssueMutationResult,
+  FINDINGS_OPTIONS,
+  issueMutationResult,
+  issueSchema,
+  uiIssueFormSchema,
+} from "./issue-schemas";
 
 export const issueContract = {
   createIssue: oc
@@ -12,6 +19,25 @@ export const issueContract = {
     .output(issueMutationResult)
     .errors({
       NOT_FOUND: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+      INTERNAL_SERVER_ERROR: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+    }),
+
+  bulkCreateIssues: oc
+    .route({
+      method: "POST",
+    })
+    .input(bulkIssueFormSchema)
+    .output(bulkIssueMutationResult)
+    .errors({
+      UNPROCESSABLE_CONTENT: {
         data: z.object({
           message: z.string(),
         }),

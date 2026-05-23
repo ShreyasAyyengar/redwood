@@ -3,7 +3,7 @@ import { v7 as uuidv7 } from "uuid";
 import type { z } from "zod";
 import { ClassroomService } from "../database/classroom-service";
 import { TaskService } from "../database/task-service";
-import { protectedProcedure } from "../libs/orpc-procedures";
+import { adminProcedure, protectedProcedure } from "../libs/orpc-procedures";
 
 const PAGE_SIZE = 5;
 
@@ -116,6 +116,49 @@ export const taskRouter = {
     }
   }),
 
+  bulkAddTasks: adminProcedure.tasks.bulkAddTasks.handler(async ({ input, errors, context }) => {
+    const targetClassrooms = await findBulkTargetClassrooms({
+      attributeIds: input.attributeIds,
+      classroomIds: input.classroomIds,
+      onlyActive: true,
+    });
+
+    if (targetClassrooms.length === 0) {
+      throw errors.UNPROCESSABLE_CONTENT({ data: { message: "Select at least one active classroom for bulk task creation." } });
+    }
+
+    const now = new Date();
+    const createdBy = input.createdBy || context.user.email;
+    const newTasks: z.infer<typeof taskSchema>[] = targetClassrooms.map((classroom) => ({
+      _id: uuidv7(),
+      classroomId: classroom._id,
+      createdBy,
+      createdAt: now,
+      task: {
+        description: input.description,
+        urgent: input.urgent,
+        supervisorNeeded: input.supervisorNeeded,
+        visibleAt: input.visibleAt,
+        completeBy: input.completeBy,
+        createdBy,
+        createdAt: now,
+      },
+    }));
+
+    const isValid = taskSchema.array().safeParse(newTasks);
+    if (!isValid.success) throw errors.INTERNAL_SERVER_ERROR({ data: { message: isValid.error.message } });
+
+    try {
+      await TaskService.insertMany(newTasks);
+      return {
+        mutatedTasks: newTasks,
+        roomSnapshots: await Promise.all(newTasks.map((task) => getRoomSnapshot(task.classroomId))),
+      };
+    } catch (e) {
+      throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
+    }
+  }),
+
   editTask: protectedProcedure.tasks.editTask.handler(async ({ input, errors, context }) => {
     const task = await TaskService.findById(input._id).lean();
     if (!task) throw errors.NOT_FOUND({ data: { message: `Task with id ${input._id} not found` } });
@@ -177,6 +220,27 @@ export const taskRouter = {
     }
   }),
 };
+
+async function findBulkTargetClassrooms({
+  attributeIds,
+  classroomIds,
+  onlyActive,
+}: {
+  attributeIds: string[];
+  classroomIds: string[];
+  onlyActive: boolean;
+}) {
+  const targetFilters: Record<string, unknown>[] = [];
+  if (classroomIds.length > 0) targetFilters.push({ _id: { $in: classroomIds } });
+  if (attributeIds.length > 0) targetFilters.push({ attributes: { $in: attributeIds } });
+
+  if (targetFilters.length === 0) return [];
+
+  return await ClassroomService.find({
+    ...(onlyActive ? { isActive: true } : {}),
+    $or: targetFilters,
+  }).lean();
+}
 
 async function getRoomSnapshot(classroomId: string): Promise<z.infer<typeof classroomSchemaPayload>> {
   const room = await ClassroomService.aggregate([

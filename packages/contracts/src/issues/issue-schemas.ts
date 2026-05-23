@@ -1,5 +1,6 @@
 import z from "zod";
-import { classroomSchemaPayload } from "../rooms/classroom-contract";
+import { attributeSchema } from "../attributes/attributes-schemas";
+import { classroomSchema, classroomSchemaPayload } from "../rooms/classroom-contract";
 
 const issueDetailsSchema = z.object({
   reportedBy: z.email("Issue reportedBy must be provided."),
@@ -60,4 +61,14 @@ export const uiIssueFormSchema = z.object({
 export const issueMutationResult = z.object({
   mutatedIssue: issueSchema,
   roomSnapshot: classroomSchemaPayload,
+});
+
+export const bulkIssueFormSchema = uiIssueFormSchema.extend({
+  attributeIds: z.array(attributeSchema.shape._id).default([]),
+  classroomIds: z.array(classroomSchema.shape._id).default([]),
+});
+
+export const bulkIssueMutationResult = z.object({
+  mutatedIssues: z.array(issueSchema),
+  roomSnapshots: z.array(classroomSchemaPayload),
 });

@@ -3,7 +3,7 @@ import { v7 as uuidv7 } from "uuid";
 import type { z } from "zod";
 import { ClassroomService } from "../database/classroom-service";
 import { IssueService } from "../database/issue-service";
-import { protectedProcedure } from "../libs/orpc-procedures";
+import { adminProcedure, protectedProcedure } from "../libs/orpc-procedures";
 
 const PAGE_SIZE = 5;
 
@@ -119,6 +119,49 @@ export const issueRouter = {
     }
   }),
 
+  bulkCreateIssues: adminProcedure.issues.bulkCreateIssues.handler(async ({ input, errors, context }) => {
+    const targetClassrooms = await findBulkTargetClassrooms({
+      attributeIds: input.attributeIds,
+      classroomIds: input.classroomIds,
+    });
+
+    if (targetClassrooms.length === 0) {
+      throw errors.UNPROCESSABLE_CONTENT({ data: { message: "Select at least one classroom for bulk issue creation." } });
+    }
+
+    const now = new Date();
+    const newIssues: z.infer<typeof issueSchema>[] = targetClassrooms.map((classroom) => ({
+      _id: uuidv7(),
+      createdAt: now,
+      createdBy: context.user.email,
+      classroomId: classroom._id,
+      issue: {
+        description: input.description,
+        urgent: input.urgent,
+        supervisorNeeded: input.supervisorNeeded,
+        cruzfixId: input.cruzfixId,
+        sodId: input.sodId,
+        reportedBy: context.user.email,
+        reportedAt: now,
+      },
+    }));
+
+    const isValid = issueSchema.array().safeParse(newIssues);
+    if (!isValid.success) throw errors.INTERNAL_SERVER_ERROR({ data: { message: isValid.error.message } });
+
+    try {
+      await IssueService.insertMany(newIssues);
+      await Promise.all(newIssues.map((issue) => recomputeRoomStatus(issue.classroomId)));
+
+      return {
+        mutatedIssues: newIssues,
+        roomSnapshots: await Promise.all(newIssues.map((issue) => getRoomSnapshot(issue.classroomId))),
+      };
+    } catch (e) {
+      throw errors.INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
+    }
+  }),
+
   editIssue: protectedProcedure.issues.editIssue.handler(async ({ input, errors, context }) => {
     const issue = await IssueService.findById(input._id).lean();
     if (!issue) throw errors.NOT_FOUND({ data: { message: `Issue with id ${input._id} not found` } });
@@ -210,6 +253,18 @@ export const issueRouter = {
     }
   }),
 };
+
+function findBulkTargetClassrooms({ attributeIds, classroomIds }: { attributeIds: string[]; classroomIds: string[] }) {
+  const targetFilters: Record<string, unknown>[] = [];
+  if (classroomIds.length > 0) targetFilters.push({ _id: { $in: classroomIds } });
+  if (attributeIds.length > 0) targetFilters.push({ attributes: { $in: attributeIds } });
+
+  if (targetFilters.length === 0) return [];
+
+  return ClassroomService.find({
+    $or: targetFilters,
+  }).lean();
+}
 
 // todo classroom-router also uses this method, pls reuse.
 async function getRoomSnapshot(classroomId: string): Promise<z.infer<typeof classroomSchemaPayload>> {
