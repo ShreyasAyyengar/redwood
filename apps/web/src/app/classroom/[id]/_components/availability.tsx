@@ -8,24 +8,23 @@ import { cn } from "@redwood/shad-ui/lib/utils";
 import { CalendarClock } from "lucide-react";
 import { useEffect, useId, useMemo, useState } from "react";
 import type { z } from "zod";
-import { convertMinutesToReadable } from "../../../../util/date-time-utils";
+import {
+  convertMinutesToReadable,
+  getCaliClock,
+  type ScheduleBlock,
+  SHORT_WEEKDAY_LABELS,
+  WEEKDAY_KEYS,
+  type WeekdayKey,
+} from "../../../../util/date-time-utils";
 
 const SHORT_BREAK_MINUTES = 15;
-const DAY_NAMES = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
-const SHORT_DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const satisfies Record<number, string>;
 const OMIT_SHORT_BREAKS_STORAGE_KEY = "omittingShortBreaks";
-const SKELETON_BLOCK_KEYS = ["first", "second", "third", "fourth"] as const;
 
-type Room = z.infer<typeof classroomSchema>;
-type DayName = (typeof DAY_NAMES)[number];
-type Block = NonNullable<Room["schedule"]>[DayName][number];
+type DayName = WeekdayKey;
+type Block = ScheduleBlock;
 type BlockStatus = "current" | "future" | "past" | "upcoming";
 
-function getDayName(dayIndex: number): DayName {
-  return DAY_NAMES[dayIndex] ?? "sunday";
-}
-
-export default function Availability({ room }: { room: Room | undefined }) {
+export default function Availability({ room }: { room: z.infer<typeof classroomSchema> | undefined }) {
   const [omitShortBreaks, setOmitShortBreaks] = useState(() => {
     if (typeof window === "undefined") {
       return false;
@@ -43,11 +42,10 @@ export default function Availability({ room }: { room: Room | undefined }) {
     return () => clearInterval(interval);
   }, []);
 
-  const todayName = getDayName(currentTime.getDay());
-  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+  const { weekdayKey: todayName, nowMin: currentMinutes } = getCaliClock(currentTime);
   const blocksByDay = useMemo(
     () =>
-      DAY_NAMES.reduce(
+      WEEKDAY_KEYS.reduce(
         (acc, day) => {
           acc[day] = room?.schedule?.[day] ?? [];
           return acc;
@@ -63,7 +61,7 @@ export default function Availability({ room }: { room: Room | undefined }) {
   };
 
   const getBlockStatus = (day: DayName, startMin: number, endMin: number): BlockStatus => {
-    if (currentTime.getDay() !== DAY_NAMES.indexOf(day)) {
+    if (day !== todayName) {
       return "future";
     }
 
@@ -129,7 +127,7 @@ function AvailabilityTabs({ children, defaultValue }: { children: React.ReactNod
 function DayTabList() {
   return (
     <TabsList className="grid w-full grid-cols-7 items-stretch gap-1 overflow-hidden rounded-xl border bg-zinc-950/40 p-1">
-      {DAY_NAMES.map((day, index) => (
+      {WEEKDAY_KEYS.map((day, index) => (
         <TabsTrigger
           key={day}
           value={day}
@@ -140,7 +138,7 @@ function DayTabList() {
             "hover:bg-white/5"
           )}
         >
-          {SHORT_DAY_NAMES[index]}
+          {SHORT_WEEKDAY_LABELS[index]}
         </TabsTrigger>
       ))}
     </TabsList>
@@ -160,7 +158,7 @@ function DayTabPanels({
 }) {
   return (
     <div className="min-h-0 flex-1">
-      {DAY_NAMES.map((day) => (
+      {WEEKDAY_KEYS.map((day) => (
         <TabsContent key={day} value={day} className="m-0 h-full">
           <AvailabilityPanel
             blocks={blocksByDay[day]}
@@ -385,7 +383,7 @@ function durationLabel(start: number, end: number) {
 }
 
 export function AvailabilitySkeleton() {
-  const todayName = getDayName(new Date().getDay());
+  const todayName = getCaliClock().weekdayKey;
 
   return (
     <AvailabilityFrame>
@@ -393,7 +391,7 @@ export function AvailabilitySkeleton() {
         <DayTabList />
 
         <div className="min-h-0 flex-1">
-          {DAY_NAMES.map((day) => (
+          {WEEKDAY_KEYS.map((day) => (
             <TabsContent key={day} value={day} className="m-0 h-full">
               <AvailabilitySkeletonPanel day={day} />
             </TabsContent>
@@ -422,8 +420,8 @@ function AvailabilitySkeletonPanel({ day }: { day: string }) {
 
       <ScrollArea className="mb-2 h-full min-h-0 flex-1">
         <div className="space-y-2 p-3">
-          {SKELETON_BLOCK_KEYS.map((key) => (
-            <AvailabilityBlockSkeleton key={key} />
+          {Array.from({ length: 4 }).map(() => (
+            <AvailabilityBlockSkeleton key={crypto.randomUUID()} />
           ))}
         </div>
       </ScrollArea>

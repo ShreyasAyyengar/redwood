@@ -2,29 +2,15 @@ import type { classroomSchemaPayload } from "@redwood/contracts";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { Clock3 } from "lucide-react";
 import type { z } from "zod";
-import { convertMinutesToReadable, dayAvailability, getBlocksForToday, getCaliClock } from "../../util/date-time-utils";
+import { formatMinutesRange, getScheduleAvailability, SHORT_WEEKDAY_LABEL_BY_KEY } from "../../util/date-time-utils";
 
-// TODO centralise this logic a bit more with the logic that's already in availability.tsx; this is too messy
-// TODO remove this pill from tasks/
+// TODO remove this pill from tasks/issues that are already completed.
 type Classroom = z.infer<typeof classroomSchemaPayload>;
-type Schedule = NonNullable<Classroom["schedule"]>;
-type WeekdayKey = keyof Schedule;
 type AvailabilityDisplay = {
   label: string;
   range?: string;
   title: string;
   tone: "available" | "next" | "unavailable";
-};
-
-const WEEKDAY_KEYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const satisfies WeekdayKey[];
-const DAY_LABELS: Record<WeekdayKey, string> = {
-  friday: "Fri",
-  monday: "Mon",
-  saturday: "Sat",
-  sunday: "Sun",
-  thursday: "Thu",
-  tuesday: "Tue",
-  wednesday: "Wed",
 };
 
 const toneStyles: Record<AvailabilityDisplay["tone"], string> = {
@@ -33,23 +19,13 @@ const toneStyles: Record<AvailabilityDisplay["tone"], string> = {
   unavailable: "border-zinc-800/80 bg-zinc-950/50 text-zinc-400",
 };
 
-function formatRange(startMinTime: number, endMinTime: number) {
-  return `${convertMinutesToReadable(startMinTime)} - ${convertMinutesToReadable(endMinTime)}`;
-}
-
-function getSortedBlocks(schedule: Schedule, weekdayKey: WeekdayKey) {
-  return [...getBlocksForToday(schedule, weekdayKey)].sort((a, b) => a.startTimeMin - b.startTimeMin);
-}
-
 function getAvailabilityDisplay(room: Classroom): AvailabilityDisplay | undefined {
   if (!room.schedule) return;
 
-  const { weekdayKey, nowMin } = getCaliClock();
-  const todaysBlocks = getSortedBlocks(room.schedule, weekdayKey);
-  const availability = dayAvailability(todaysBlocks, nowMin);
+  const availability = getScheduleAvailability(room.schedule);
 
   if (availability.kind === "open") {
-    const range = formatRange(availability.startMinTime, availability.endMinTime);
+    const range = formatMinutesRange(availability.startMinTime, availability.endMinTime);
 
     return {
       label: "Available Now!",
@@ -59,37 +35,20 @@ function getAvailabilityDisplay(room: Classroom): AvailabilityDisplay | undefine
     };
   }
 
-  if (availability.kind === "closed") {
-    const range = formatRange(availability.nextStartMinTime, availability.nextEndMinTime);
+  if (availability.kind === "next") {
+    const timeRange = formatMinutesRange(availability.nextStartMinTime, availability.nextEndMinTime);
+    const range =
+      availability.dayOffset === 0
+        ? timeRange
+        : `${availability.dayOffset === 1 ? "Tomorrow" : SHORT_WEEKDAY_LABEL_BY_KEY[availability.weekdayKey]} ${timeRange}`;
+    const titleRange = availability.dayOffset === 0 ? `today, ${range}` : range;
 
     return {
       label: "Next Available",
       range,
-      title: `${room.displayName} is next available today, ${range}.`,
+      title: `${room.displayName} is next available ${titleRange}.`,
       tone: "next",
     };
-  }
-
-  const todayIndex = WEEKDAY_KEYS.indexOf(weekdayKey);
-
-  for (let offset = 1; offset < WEEKDAY_KEYS.length; offset += 1) {
-    const nextWeekdayKey = WEEKDAY_KEYS[(todayIndex + offset) % WEEKDAY_KEYS.length];
-
-    if (!nextWeekdayKey) continue;
-
-    const nextBlock = getSortedBlocks(room.schedule, nextWeekdayKey)[0];
-
-    if (nextBlock) {
-      const dayLabel = offset === 1 ? "Tomorrow" : DAY_LABELS[nextWeekdayKey];
-      const range = `${dayLabel} ${formatRange(nextBlock.startTimeMin, nextBlock.endTimeMin)}`;
-
-      return {
-        label: "Next Available",
-        range,
-        title: `${room.displayName} is next available ${range}.`,
-        tone: "next",
-      };
-    }
   }
 
   return {

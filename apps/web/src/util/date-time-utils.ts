@@ -17,11 +17,24 @@ export const nth = (d: number) => {
   }
 };
 
-const WEEKDAY_KEYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
-type WeekdayKey = (typeof WEEKDAY_KEYS)[number];
+export const WEEKDAY_KEYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
+export const SHORT_WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 
-export function getCaliClock() {
-  const now = new Date();
+export type WeekdayKey = (typeof WEEKDAY_KEYS)[number];
+export type Schedule = z.infer<typeof scheduleSchema>;
+export type ScheduleBlock = Schedule[WeekdayKey][number];
+
+export const SHORT_WEEKDAY_LABEL_BY_KEY: Record<WeekdayKey, string> = {
+  friday: "Fri",
+  monday: "Mon",
+  saturday: "Sat",
+  sunday: "Sun",
+  thursday: "Thu",
+  tuesday: "Tue",
+  wednesday: "Wed",
+};
+
+export function getCaliClock(now = new Date()) {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "America/Los_Angeles",
     weekday: "long",
@@ -51,13 +64,17 @@ export function toSortKey(av: DayAvailability): SortKey {
   return { group: 2, time: Number.POSITIVE_INFINITY }; // last
 }
 
-type Block = { startTimeMin: number; endTimeMin: number };
 type DayAvailability =
   | { kind: "open"; endMinTime: number; startMinTime: number }
   | { kind: "closed"; nextStartMinTime: number; nextEndMinTime: number }
   | { kind: "none" }; // no more windows today
 
-export function dayAvailability(blocks: Block[], nowMinTime: number): DayAvailability {
+export type ScheduleAvailability =
+  | { kind: "open"; endMinTime: number; startMinTime: number; weekdayKey: WeekdayKey }
+  | { dayOffset: number; kind: "next"; nextEndMinTime: number; nextStartMinTime: number; weekdayKey: WeekdayKey }
+  | { kind: "none" };
+
+export function dayAvailability(blocks: ScheduleBlock[], nowMinTime: number): DayAvailability {
   // blocks assumed sorted by startMinTime
   for (const b of blocks) {
     if (b.startTimeMin <= nowMinTime && nowMinTime < b.endTimeMin) {
@@ -72,8 +89,58 @@ export function dayAvailability(blocks: Block[], nowMinTime: number): DayAvailab
   return { kind: "none" };
 }
 
-export function getBlocksForToday(schedule: z.infer<typeof scheduleSchema>, weekdayKey: WeekdayKey): Block[] {
+export function getBlocksForToday(schedule: Schedule, weekdayKey: WeekdayKey): ScheduleBlock[] {
   return schedule?.[weekdayKey] ?? [];
+}
+
+export function getSortedBlocksForDay(schedule: Schedule, weekdayKey: WeekdayKey): ScheduleBlock[] {
+  return [...getBlocksForToday(schedule, weekdayKey)].sort((a, b) => a.startTimeMin - b.startTimeMin);
+}
+
+export function getScheduleAvailability(schedule: Schedule, clock = getCaliClock()): ScheduleAvailability {
+  const todaysBlocks = getSortedBlocksForDay(schedule, clock.weekdayKey);
+  const availability = dayAvailability(todaysBlocks, clock.nowMin);
+
+  if (availability.kind === "open") {
+    return {
+      kind: "open",
+      startMinTime: availability.startMinTime,
+      endMinTime: availability.endMinTime,
+      weekdayKey: clock.weekdayKey,
+    };
+  }
+
+  if (availability.kind === "closed") {
+    return {
+      dayOffset: 0,
+      kind: "next",
+      nextStartMinTime: availability.nextStartMinTime,
+      nextEndMinTime: availability.nextEndMinTime,
+      weekdayKey: clock.weekdayKey,
+    };
+  }
+
+  const todayIndex = WEEKDAY_KEYS.indexOf(clock.weekdayKey);
+
+  for (let offset = 1; offset < WEEKDAY_KEYS.length; offset += 1) {
+    const nextWeekdayKey = WEEKDAY_KEYS[(todayIndex + offset) % WEEKDAY_KEYS.length];
+
+    if (!nextWeekdayKey) continue;
+
+    const nextBlock = getSortedBlocksForDay(schedule, nextWeekdayKey)[0];
+
+    if (nextBlock) {
+      return {
+        dayOffset: offset,
+        kind: "next",
+        nextStartMinTime: nextBlock.startTimeMin,
+        nextEndMinTime: nextBlock.endTimeMin,
+        weekdayKey: nextWeekdayKey,
+      };
+    }
+  }
+
+  return { kind: "none" };
 }
 
 // converts minutes after midnight to a readable time
@@ -83,6 +150,10 @@ export function convertMinutesToReadable(minutes: number): string {
   const period = hours >= 12 ? "PM" : "AM";
   const displayHours = hours % 12 || 12;
   return `${displayHours}:${mins.toString().padStart(2, "0")} ${period}`;
+}
+
+export function formatMinutesRange(startMinTime: number, endMinTime: number) {
+  return `${convertMinutesToReadable(startMinTime)} - ${convertMinutesToReadable(endMinTime)}`;
 }
 
 export type DateTimeDisplay = {
