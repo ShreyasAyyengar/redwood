@@ -27,7 +27,7 @@ export default function ClassroomNameCell({ row }: { row: Row<z.infer<typeof cla
           <div className="w-full text-center font-semibold text-sm text-zinc-400 uppercase tracking-wide">Captioning Device: </div>
 
           <div className="mt-2 flex items-center justify-center gap-2">
-            <div className="font-medium text-sm text-zinc-100">{row.original.captioning.type}</div>
+            <div className="font-medium text-sm text-zinc-100">{row.original.captioning.type}:</div>
 
             <div className="w-fit rounded-md bg-zinc-800 px-2 py-1 font-mono text-xs text-zinc-300">{row.original.captioning.identifier}</div>
           </div>
