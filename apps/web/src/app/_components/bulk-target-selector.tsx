@@ -19,11 +19,6 @@ import { useFetchedRoomsStore } from "./room-store";
 type BulkTargetAttribute = z.infer<typeof attributeSchema>;
 type BulkTargetClassroom = z.infer<typeof classroomSchemaPayload>;
 
-export type BulkTargetSelection = {
-  attributeIds: BulkTargetAttribute["_id"][];
-  classroomIds: BulkTargetClassroom["_id"][];
-};
-
 export type BulkTargetSummary = {
   attributeMatchedClassroomIds: BulkTargetClassroom["_id"][];
   duplicateClassroomIds: BulkTargetClassroom["_id"][];
@@ -72,7 +67,7 @@ export function BulkTargetSelector({
   const { fetchedRooms: classrooms } = useFetchedRoomsStore();
   const { data: attributes } = useQuery(webClientORPC.attributes.getAttributes.queryOptions({ enabled: true }));
 
-  const { attributeMatchedClassroomIds, duplicateClassroomIds, targetClassroomIds } = useMemo(
+  const { attributeMatchedClassroomIds, targetClassroomIds } = useMemo(
     () => resolveBulkTargetClassroomIds({ classrooms, selectedAttributeIds, selectedClassroomIds }),
     [classrooms, selectedAttributeIds, selectedClassroomIds]
   );
@@ -108,6 +103,7 @@ export function BulkTargetSelector({
               </MultiSelectGroup>
             </MultiSelectContent>
           </MultiSelect>
+          <span className="text-muted-foreground text-xs">{attributeMatchedClassroomIds.length} matched by attributes</span>
         </Field>
 
         <Field>
@@ -126,13 +122,8 @@ export function BulkTargetSelector({
               </MultiSelectGroup>
             </MultiSelectContent>
           </MultiSelect>
+          <span className="text-muted-foreground text-xs">{selectedClassroomIds.length} manually selected.</span>
         </Field>
-      </div>
-
-      <div className="mt-3 flex flex-wrap gap-2 text-muted-foreground text-xs">
-        <span>{attributeMatchedClassroomIds.length} matched by attributes</span>
-        <span>{selectedClassroomIds.length} manually selected</span>
-        {duplicateClassroomIds.length > 0 && <span>{duplicateClassroomIds.length} duplicates removed</span>}
       </div>
     </div>
   );
