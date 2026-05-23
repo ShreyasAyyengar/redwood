@@ -53,7 +53,7 @@ export function RoomRow({ row }: { row: Row<z.infer<typeof classroomSchemaPayloa
   return (
     <>
       <TableRow
-        className="transition-all duration-150 hover:-translate-y-0.5 hover:cursor-pointer hover:bg-zinc-800 hover:shadow-xl/70 active:scale-95 active:transform"
+        className="transition-all duration-150 hover:-translate-y-0.5 hover:cursor-pointer hover:bg-[#242424] hover:shadow-xl/70 [&:active:not(:has(button:active,a:active,input:active,textarea:active,select:active,[role=button]:active,[data-row-interactive]:active))]:scale-95"
         onMouseEnter={() => {
           setIsHovering(true);
           hoverTimeoutRef.current = setTimeout(() => {

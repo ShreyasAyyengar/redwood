@@ -14,6 +14,7 @@ export default function AvailabilityCell({ row }: { row: Row<z.infer<typeof clas
 
   return (
     <div
+      data-row-interactive
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -24,7 +25,7 @@ export default function AvailabilityCell({ row }: { row: Row<z.infer<typeof clas
       }}
     >
       <AvailabilityDialog room={row.original}>
-        <div className="flex items-center justify-center rounded-2xl border border-black/0 p-1 transition duration-150 hover:cursor-pointer hover:border hover:border-white/50 hover:bg-background-300/20">
+        <div className="flex items-center justify-center rounded-2xl border border-black/0 p-1 transition duration-150 hover:cursor-pointer hover:border hover:border-white/50 hover:bg-background-300/20 active:scale-95 active:transform">
           {availability.kind === "open" && (
             <div>
               <p className="text-center font-bold text-[#84bd68] text-lg">Available Now!</p>
