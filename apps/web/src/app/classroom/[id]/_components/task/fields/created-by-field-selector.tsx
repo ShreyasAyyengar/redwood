@@ -5,10 +5,10 @@ import { useState } from "react";
 import type { z } from "zod";
 import { authClientWeb } from "../../../../../../lib/auth-client-web";
 import { webClientORPC } from "../../../../../../lib/orpc-web-client";
-import { type FormValues, useFieldContext } from "../task-form";
+import { type TaskFormValues, useFieldContext } from "../task-form-context";
 
 export default function CreatedByFieldSelector({ existingValue }: { existingValue?: z.infer<typeof taskSchema>["createdBy"] }) {
-  const field = useFieldContext<FormValues["createdBy"]>();
+  const field = useFieldContext<TaskFormValues["createdBy"]>();
 
   const { data: session } = authClientWeb.useSession();
   const isAdmin = session?.user.role === "admin";

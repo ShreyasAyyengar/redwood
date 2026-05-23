@@ -2,10 +2,10 @@ import { Checkbox } from "@redwood/shad-ui/components/checkbox";
 import { Input } from "@redwood/shad-ui/components/input";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useEffect, useState } from "react";
-import { type FormValues, useFieldContext } from "../issue-form";
+import { type IssueFormValues, useFieldContext } from "../issue-form-context";
 
 export default function CruzfixField({ existingValue }: { existingValue?: string }) {
-  const field = useFieldContext<FormValues["cruzfixId"]>();
+  const field = useFieldContext<IssueFormValues["cruzfixId"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
   const [checked, setChecked] = useState<boolean>(!!existingValue);
   const [cruzfixId, setCruzfixId] = useState<string | undefined>(existingValue ?? field.state.value ?? undefined);

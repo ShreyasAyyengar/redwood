@@ -3,10 +3,10 @@ import { Field, FieldError, FieldLabel } from "@redwood/shad-ui/components/field
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useEffect, useState } from "react";
 import { urgencyStyle } from "../../../../../../util/style-util";
-import { type FormValues, useFieldContext } from "../issue-form";
+import { type IssueFormValues, useFieldContext } from "../issue-form-context";
 
 export default function SupervisorNeededField({ existingValue }: { existingValue?: boolean }) {
-  const field = useFieldContext<FormValues["supervisorNeeded"]>();
+  const field = useFieldContext<IssueFormValues["supervisorNeeded"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
   const [value, setValue] = useState<boolean>(existingValue ?? false);
 

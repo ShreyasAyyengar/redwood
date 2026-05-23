@@ -6,7 +6,7 @@ import { cn } from "@redwood/shad-ui/lib/utils";
 import { CalendarDays, ChevronDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { authClientWeb } from "../../../../../../lib/auth-client-web";
-import { useFieldContext } from "../issue-form";
+import { useFieldContext } from "../issue-form-context";
 
 export default function IssueDateField({ existingDate }: { existingDate: Date }) {
   const field = useFieldContext<Date>();

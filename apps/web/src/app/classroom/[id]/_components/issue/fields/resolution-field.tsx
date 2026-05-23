@@ -13,10 +13,10 @@ import { useEffect, useState } from "react";
 import type { z } from "zod";
 import { authClientWeb } from "../../../../../../lib/auth-client-web";
 import { webClientORPC } from "../../../../../../lib/orpc-web-client";
-import { type FormValues, useFieldContext } from "../issue-form";
+import { type IssueFormValues, useFieldContext } from "../issue-form-context";
 
 export default function ResolutionField({ existingValue }: { existingValue?: z.infer<typeof issueSchema>["resolution"] }) {
-  const field = useFieldContext<FormValues["resolution"]>();
+  const field = useFieldContext<IssueFormValues["resolution"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 
   const { data } = authClientWeb.useSession();

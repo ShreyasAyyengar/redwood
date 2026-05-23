@@ -2,38 +2,18 @@ import { type classroomSchema, type taskSchema, uiTaskFormSchema } from "@redwoo
 import { Button } from "@redwood/shad-ui/components/button";
 import { DialogClose, DialogFooter, DialogHeader, DialogTitle } from "@redwood/shad-ui/components/dialog";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
-import { Separator } from "@redwood/shad-ui/components/separator";
 import { cn } from "@redwood/shad-ui/lib/utils";
-import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../../../lib/orpc-web-client";
 import { applyTaskMutationResult } from "../../../../../util/cache-reconciliation";
 import { useFetchedRoomsStore } from "../../../../_components/room-store";
-import CompletionField from "./fields/completion-field";
-import CreatedByFieldSelector from "./fields/created-by-field-selector";
-import DescriptionField from "./fields/description-field";
-import SupervisorNeededField from "./fields/supervisor-needed-field";
-import TaskDateField from "./fields/task-date-field";
-import UrgentField from "./fields/urgent-field";
 import { DeleteTaskDialog } from "./task-delete-dialog";
+import { type TaskFormValues, taskAppForm } from "./task-form-context";
+import { TaskFormFields } from "./task-form-fields";
 
-export type FormValues = z.input<typeof uiTaskFormSchema>;
-export const { fieldContext, formContext, useFieldContext } = createFormHookContexts();
-export const { useAppForm } = createFormHook({
-  fieldContext,
-  formContext,
-  fieldComponents: {
-    CreatedByFieldSelector,
-    TaskDateField,
-    DescriptionField,
-    UrgentField,
-    SupervisorNeededField,
-    CompletionField,
-  },
-  formComponents: {},
-});
+export type FormValues = TaskFormValues;
 
 export function TaskForm({
   roomId,
@@ -66,7 +46,7 @@ export function TaskForm({
     })
   );
 
-  const form = useAppForm({
+  const form = taskAppForm({
     defaultValues: {
       description: existingTask?.task.description ?? "",
       urgent: existingTask?.task.urgent ?? false,
@@ -75,7 +55,7 @@ export function TaskForm({
       completeBy: existingTask?.task.completeBy ? existingTask.task.completeBy : undefined,
       completion: existingTask?.completion ? { comment: existingTask.completion.comment } : undefined,
       createdBy: existingTask?.createdBy,
-    } as FormValues,
+    } as TaskFormValues,
     validators: {
       onChange: uiTaskFormSchema,
     },
@@ -112,54 +92,7 @@ export function TaskForm({
 
       {/* SCROLL ONLY WRAPS BODY */}
       <ScrollArea className="max-h-[calc(100dvh-300px)] rounded-2xl bg-background/40 p-3">
-        <div className="my-2 flex flex-col gap-5 px-1">
-          <Separator className="bg-indigo-500" />
-
-          <form.AppField name="description">
-            {(field) => <field.DescriptionField existingValue={existingTask?.task.description} />}
-          </form.AppField>
-
-          <Separator className="bg-indigo-500" />
-
-          <form.AppField name="urgent">{(field) => <field.UrgentField existingValue={existingTask?.task.urgent} />}</form.AppField>
-          <form.AppField name="supervisorNeeded">
-            {(field) => <field.SupervisorNeededField existingValue={existingTask?.task.supervisorNeeded} />}
-          </form.AppField>
-          <Separator className="bg-indigo-500" />
-
-          <div className="mx-auto flex w-full flex-col justify-between space-y-5 sm:flex-row sm:space-y-0">
-            <div>
-              <form.AppField name="visibleAt">
-                {(field) => (
-                  <field.TaskDateField
-                    label="Visible At"
-                    name="visibleAt"
-                    existingDate={existingTask?.task.visibleAt ? new Date(existingTask.task.visibleAt) : undefined}
-                  />
-                )}
-              </form.AppField>
-            </div>
-
-            <div>
-              <form.AppField name="completeBy">
-                {(field) => (
-                  <field.TaskDateField
-                    label="Complete By"
-                    name="completeBy"
-                    existingDate={existingTask?.task.completeBy ? new Date(existingTask.task.completeBy) : undefined}
-                  />
-                )}
-              </form.AppField>
-            </div>
-          </div>
-
-          {existingTask && (
-            <>
-              <Separator className="bg-indigo-500" />
-              <form.AppField name="completion">{(field) => <field.CompletionField existingValue={existingTask?.completion} />}</form.AppField>
-            </>
-          )}
-        </div>
+        <TaskFormFields form={form} existingTask={existingTask} />
       </ScrollArea>
 
       <DialogFooter className="my-3">

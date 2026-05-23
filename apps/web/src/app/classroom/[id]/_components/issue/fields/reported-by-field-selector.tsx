@@ -5,10 +5,10 @@ import { useState } from "react";
 import type { z } from "zod";
 import { authClientWeb } from "../../../../../../lib/auth-client-web";
 import { webClientORPC } from "../../../../../../lib/orpc-web-client";
-import { type FormValues, useFieldContext } from "../issue-form";
+import { type IssueFormValues, useFieldContext } from "../issue-form-context";
 
 export default function ReportedByFieldSelector({ existingValue }: { existingValue?: z.infer<typeof issueSchema>["issue"]["reportedBy"] }) {
-  const field = useFieldContext<FormValues["reportedBy"]>();
+  const field = useFieldContext<IssueFormValues["reportedBy"]>();
 
   const { data: session } = authClientWeb.useSession();
   const isAdmin = session?.user.role === "admin";

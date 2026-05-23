@@ -4,10 +4,10 @@ import { Field, FieldError, FieldLabel } from "@redwood/shad-ui/components/field
 import { Popover, PopoverContent, PopoverTrigger } from "@redwood/shad-ui/components/popover";
 import { CalendarDays, ChevronDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { type FormValues, useFieldContext } from "../task-form";
+import { type TaskFormValues, useFieldContext } from "../task-form-context";
 
 export default function TaskDateField({ label, name, existingDate }: { label: string; name: "visibleAt" | "completeBy"; existingDate?: Date }) {
-  const field = useFieldContext<FormValues["visibleAt" | "completeBy"]>();
+  const field = useFieldContext<TaskFormValues["visibleAt" | "completeBy"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
   const [date, setDate] = useState<Date | undefined>(existingDate ?? undefined);
 

@@ -13,10 +13,10 @@ import { useEffect, useState } from "react";
 import type { z } from "zod";
 import { authClientWeb } from "../../../../../../lib/auth-client-web";
 import { webClientORPC } from "../../../../../../lib/orpc-web-client";
-import { type FormValues, useFieldContext } from "../task-form";
+import { type TaskFormValues, useFieldContext } from "../task-form-context";
 
 export default function CompletionField({ existingValue }: { existingValue?: z.infer<typeof taskSchema>["completion"] }) {
-  const field = useFieldContext<FormValues["completion"]>();
+  const field = useFieldContext<TaskFormValues["completion"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 
   const { data } = authClientWeb.useSession();
