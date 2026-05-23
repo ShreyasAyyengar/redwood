@@ -1,10 +1,10 @@
-import { classroomSchema } from "@redwood/contracts";
+import { classroomSchema, classroomSchemaPayload } from "@redwood/contracts";
 import { parse } from "csv-parse/sync";
 import { v7 as uuidv7 } from "uuid";
 import type { z } from "zod";
 import { ClassroomService } from "../database/classroom-service";
 import { ConfigService } from "../database/config-service";
-import { protectedProcedure } from "../libs/orpc-procedures";
+import { adminProcedure, protectedProcedure } from "../libs/orpc-procedures";
 import { emptySchedule, processTimeRanges, rowSchema } from "../util/csv-util";
 
 export const classroomRouter = {
@@ -24,7 +24,11 @@ export const classroomRouter = {
 
       // Group rows by Room
       const uploadedRooms: Record<string, z.infer<typeof rowSchema>[]> = {};
-      for (const row of typedRows) (uploadedRooms[row.Room] ??= []).push(row);
+      for (const row of typedRows) {
+        const roomRows = uploadedRooms[row.Room] ?? [];
+        roomRows.push(row);
+        uploadedRooms[row.Room] = roomRows;
+      }
 
       const touchedRoomNames = Object.keys(uploadedRooms);
 
@@ -96,7 +100,6 @@ export const classroomRouter = {
 
       return true;
     } catch (e) {
-      console.error(e);
       throw INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
     }
   }),
@@ -107,54 +110,8 @@ export const classroomRouter = {
     return config.csvRecords ?? null;
   }),
 
-  getRoom: protectedProcedure.classrooms.getRoom.handler(async ({ input, errors: { NOT_FOUND, INTERNAL_SERVER_ERROR } }) => {
-    const room = await ClassroomService.aggregate([
-      { $match: { _id: input.id } },
-      {
-        $lookup: {
-          from: "issues",
-          let: { roomId: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                $expr: { $eq: ["$classroomId", "$$roomId"] },
-                resolution: { $exists: false },
-              },
-            },
-            { $count: "count" },
-          ],
-          as: "activeIssueCountResult",
-        },
-      },
-      {
-        $lookup: {
-          from: "tasks",
-          let: { roomId: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                $expr: { $eq: ["$classroomId", "$$roomId"] },
-                completion: { $exists: false },
-                $or: [{ visibleAt: { $exists: false } }, { visibleAt: { $lte: new Date() } }],
-              },
-            },
-            { $count: "count" },
-          ],
-          as: "taskCountResult",
-        },
-      },
-      {
-        $addFields: {
-          activeIssuesCount: {
-            $ifNull: [{ $arrayElemAt: ["$activeIssueCountResult.count", 0] }, 0],
-          },
-          openTasksCount: {
-            $ifNull: [{ $arrayElemAt: ["$taskCountResult.count", 0] }, 0],
-          },
-        },
-      },
-      { $project: { activeIssueCountResult: 0, taskCountResult: 0 } },
-    ]).then((results) => results[0]);
+  getRoom: protectedProcedure.classrooms.getRoom.handler(async ({ input, errors: { NOT_FOUND } }) => {
+    const room = await getRoomPayload(input.id);
     if (!room) throw NOT_FOUND({ data: { message: `Room with id ${input.id} not found` } });
 
     return room;
@@ -221,8 +178,78 @@ export const classroomRouter = {
         { $project: { activeIssueCountResult: 0, taskCountResult: 0 } },
       ]);
     } catch (e) {
-      console.error(e);
       throw INTERNAL_SERVER_ERROR({ data: { message: String(e) } });
     }
   }),
+
+  updateRoom: adminProcedure.classrooms.updateRoom.handler(async ({ input, errors: { NOT_FOUND } }) => {
+    const { _id, ...updates } = input;
+    const $set: Partial<z.infer<typeof classroomSchema>> = {};
+
+    if (updates.groupKey !== undefined) $set.groupKey = updates.groupKey;
+    if (updates.attributes !== undefined) $set.attributes = updates.attributes;
+    if (updates.captioning !== undefined) $set.captioning = updates.captioning;
+
+    if (Object.keys($set).length > 0) {
+      const result = await ClassroomService.updateOne({ _id }, { $set }).lean();
+      if (result.matchedCount === 0) throw NOT_FOUND({ data: { message: `Room with id ${_id} not found` } });
+    }
+
+    const room = await getRoomPayload(_id);
+    if (!room) throw NOT_FOUND({ data: { message: `Room with id ${_id} not found` } });
+
+    return room;
+  }),
 };
+
+async function getRoomPayload(classroomId: string): Promise<z.infer<typeof classroomSchemaPayload> | undefined> {
+  const room = await ClassroomService.aggregate([
+    { $match: { _id: classroomId } },
+    {
+      $lookup: {
+        from: "issues",
+        let: { roomId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$classroomId", "$$roomId"] },
+              resolution: { $exists: false },
+            },
+          },
+          { $count: "count" },
+        ],
+        as: "activeIssueCountResult",
+      },
+    },
+    {
+      $lookup: {
+        from: "tasks",
+        let: { roomId: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$classroomId", "$$roomId"] },
+              completion: { $exists: false },
+              $or: [{ visibleAt: { $exists: false } }, { visibleAt: { $lte: new Date() } }],
+            },
+          },
+          { $count: "count" },
+        ],
+        as: "taskCountResult",
+      },
+    },
+    {
+      $addFields: {
+        activeIssuesCount: {
+          $ifNull: [{ $arrayElemAt: ["$activeIssueCountResult.count", 0] }, 0],
+        },
+        openTasksCount: {
+          $ifNull: [{ $arrayElemAt: ["$taskCountResult.count", 0] }, 0],
+        },
+      },
+    },
+    { $project: { activeIssueCountResult: 0, taskCountResult: 0 } },
+  ]).then((results) => results[0]);
+
+  return room ? classroomSchemaPayload.parse(room) : undefined;
+}

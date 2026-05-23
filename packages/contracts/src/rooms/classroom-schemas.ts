@@ -66,4 +66,23 @@ export const classroomContract = {
         }),
       },
     }),
+
+  updateRoom: oc
+    .route({
+      method: "PATCH",
+    })
+    .input(classroomSchema.pick({ _id: true, groupKey: true, attributes: true, captioning: true }).partial().required({ _id: true }))
+    .output(classroomSchemaPayload)
+    .errors({
+      NOT_FOUND: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+      INTERNAL_SERVER_ERROR: {
+        data: z.object({
+          message: z.string(),
+        }),
+      },
+    }),
 };

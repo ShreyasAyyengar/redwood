@@ -34,6 +34,7 @@ export const classroomSchema = z.object({
   isActive: z.boolean().default(true),
   captioning: z
     .object({
+      isCaptioning: z.boolean(),
       type: z.enum(["DTEN", "MAC"]),
       identifier: z.string(),
     })
