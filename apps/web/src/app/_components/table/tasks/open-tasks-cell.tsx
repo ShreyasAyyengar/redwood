@@ -1,5 +1,6 @@
 import type { classroomSchemaPayload } from "@redwood/contracts";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@redwood/shad-ui/components/hover-card";
+import { Button } from "@redwood/shad-ui/components/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@redwood/shad-ui/components/popover";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import type { Row } from "@tanstack/react-table";
@@ -28,13 +29,27 @@ export default function OpenTasksCell({ row }: { row: Row<z.infer<typeof classro
     .sort((a, b) => Number(b.task.urgent) - Number(a.task.urgent) || a.task.createdAt.getTime() - b.task.createdAt.getTime());
 
   return (
-    <HoverCard open={isHoverOpen} onOpenChange={setIsHoverOpen} openDelay={100} closeDelay={100}>
-      <HoverCardTrigger asChild>
-        <div className={cn("flex items-center justify-center font-bold text-4xl text-foreground", openTasksCount > 0 && "text-amber-400")}>
+    <Popover open={isHoverOpen} onOpenChange={setIsHoverOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="ghost"
+          className={cn(
+            "clear! mx-auto flex h-12 w-12 items-center justify-center rounded-lg font-bold text-4xl transition-all duration-150",
+            "hover:bg-zinc-900! active:scale-90 active:transform",
+            openTasksCount > 0 ? "text-amber-400" : "text-foreground"
+          )}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          onKeyDown={(e) => {
+            e.stopPropagation();
+          }}
+        >
           {openTasksCount}
-        </div>
-      </HoverCardTrigger>
-      <HoverCardContent
+        </Button>
+      </PopoverTrigger>
+
+      <PopoverContent
         side="top"
         className="flex w-80 flex-col items-stretch gap-2 border-zinc-800 bg-zinc-900 p-3"
         onClick={(e) => {
@@ -46,12 +61,14 @@ export default function OpenTasksCell({ row }: { row: Row<z.infer<typeof classro
       >
         <div className="flex items-center justify-center gap-2">
           <span className="text-center font-bold text-sm text-zinc-100">Open Tasks</span>
+
           <TaskDialog roomId={room._id}>
             <div className="rounded-md bg-white px-1 text-black transition-all duration-100 active:scale-95 active:transform">
               <Plus className="size-5" />
             </div>
           </TaskDialog>
         </div>
+
         {isLoading ? (
           <span className="py-2 text-center text-sm text-zinc-500">Loading tasks...</span>
         ) : visibleOpenTasks && visibleOpenTasks.length > 0 ? (
@@ -65,7 +82,7 @@ export default function OpenTasksCell({ row }: { row: Row<z.infer<typeof classro
         ) : (
           <span className="py-2 text-center text-sm text-zinc-500">No open tasks</span>
         )}
-      </HoverCardContent>
-    </HoverCard>
+      </PopoverContent>
+    </Popover>
   );
 }
