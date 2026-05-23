@@ -168,7 +168,7 @@ function TaskTemplateControls({
 
   return (
     <div className="rounded-lg border border-white/10 bg-zinc-950/30 p-4">
-      <div className="mb-3 flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3">
         <div>
           <h3 className="font-semibold text-lg">Task Template</h3>
           <p className="text-muted-foreground text-sm">Use a saved template or create one from reusable targets.</p>
@@ -201,7 +201,7 @@ function TaskTemplateControls({
                 onClassroomIdsChange={setTemplateClassroomIds}
               />
             </div>
-            <DialogFooter className="mt-4">
+            <DialogFooter>
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
@@ -229,9 +229,11 @@ function TaskTemplateControls({
           if (template) applyTemplate(template);
         }}
       >
-        <SelectTrigger className="w-full bg-zinc-950/40">
-          <SelectValue placeholder="Use existing template" />
-        </SelectTrigger>
+        {templates.length > 0 && (
+          <SelectTrigger className="mt-3 w-full bg-zinc-950/40">
+            <SelectValue placeholder="Use existing template" />
+          </SelectTrigger>
+        )}
         <SelectContent>
           {templates.map((template) => (
             <SelectItem key={template._id} value={template._id}>
