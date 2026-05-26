@@ -20,7 +20,7 @@ export default function ClassroomNameCell({ row }: { row: Row<z.infer<typeof cla
             title="Captioning device info"
             className="p-2! text-zinc-400 hover:bg-zinc-900! active:scale-90 active:transform"
           >
-            {row.original.captioning.type === "MAC" ? <TvMinimal className="size-5" /> : <Computer className="size-5" />}
+            {row.original.captioning.type === "MAC" ? <Computer className="size-5" /> : <TvMinimal className="size-5" />}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-fit">
