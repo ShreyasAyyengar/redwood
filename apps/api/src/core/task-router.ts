@@ -221,7 +221,7 @@ export const taskRouter = {
     }
   }),
 
-  addTaskTemplate: adminProcedure.tasks.addTaskTemplate.handler(async ({ input, errors, context }) => {
+  addTaskTemplate: adminProcedure.tasks.addTaskTemplate.handler(async ({ input, errors }) => {
     const existingTemplate = await TaskTemplateService.findOne({ name: input.name }).lean();
     if (existingTemplate) {
       throw errors.UNPROCESSABLE_CONTENT({ data: { message: "Task template with this name already exists." } });
@@ -252,7 +252,7 @@ export const taskRouter = {
   }),
 };
 
-async function findBulkTargetClassrooms({
+function findBulkTargetClassrooms({
   attributeIds,
   classroomIds,
   onlyActive,
@@ -265,11 +265,9 @@ async function findBulkTargetClassrooms({
   if (classroomIds.length > 0) targetFilters.push({ _id: { $in: classroomIds } });
   if (attributeIds.length > 0) targetFilters.push({ attributes: { $in: attributeIds } });
 
-  if (targetFilters.length === 0) return [];
-
-  return await ClassroomService.find({
+  return ClassroomService.find({
     ...(onlyActive ? { isActive: true } : {}),
-    $or: targetFilters,
+    ...(targetFilters.length > 0 ? { $or: targetFilters } : {}),
   }).lean();
 }
 

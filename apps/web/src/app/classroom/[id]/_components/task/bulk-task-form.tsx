@@ -21,6 +21,7 @@ export function BulkTaskForm({ onSuccess }: { onSuccess?: () => void }) {
   const { fetchedRooms } = useFetchedRoomsStore();
   const [selectedAttributeIds, setSelectedAttributeIds] = useState<string[]>([]);
   const [selectedClassroomIds, setSelectedClassroomIds] = useState<string[]>([]);
+  const [allClassroomsSelected, setAllClassroomsSelected] = useState(false);
 
   const bulkAddTasks = useMutation(
     webClientORPC.tasks.bulkAddTasks.mutationOptions({
@@ -41,8 +42,9 @@ export function BulkTaskForm({ onSuccess }: { onSuccess?: () => void }) {
         classrooms: fetchedRooms,
         selectedAttributeIds,
         selectedClassroomIds,
+        allClassroomsSelected,
       }),
-    [fetchedRooms, selectedAttributeIds, selectedClassroomIds]
+    [allClassroomsSelected, fetchedRooms, selectedAttributeIds, selectedClassroomIds]
   );
 
   const form = taskAppForm({
@@ -83,12 +85,15 @@ export function BulkTaskForm({ onSuccess }: { onSuccess?: () => void }) {
             selectedClassroomIds={selectedClassroomIds}
             setSelectedAttributeIds={setSelectedAttributeIds}
             setSelectedClassroomIds={setSelectedClassroomIds}
+            setAllClassroomsSelected={setAllClassroomsSelected}
           />
           <BulkTargetSelector
             selectedAttributeIds={selectedAttributeIds}
             selectedClassroomIds={selectedClassroomIds}
             onAttributeIdsChange={setSelectedAttributeIds}
             onClassroomIdsChange={setSelectedClassroomIds}
+            allClassroomsSelected={allClassroomsSelected}
+            onAllClassroomsSelectedChange={setAllClassroomsSelected}
           />
           <TaskFormFields form={form} />
         </div>
@@ -128,12 +133,14 @@ function TaskTemplateControls({
   selectedClassroomIds,
   setSelectedAttributeIds,
   setSelectedClassroomIds,
+  setAllClassroomsSelected,
 }: {
   setDescription: (description: string) => void;
   selectedAttributeIds: string[];
   selectedClassroomIds: string[];
   setSelectedAttributeIds: (attributeIds: string[]) => void;
   setSelectedClassroomIds: (classroomIds: string[]) => void;
+  setAllClassroomsSelected: (selected: boolean) => void;
 }) {
   const queryClient = useQueryClient();
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
@@ -141,6 +148,7 @@ function TaskTemplateControls({
   const [templateDescription, setTemplateDescription] = useState("");
   const [templateAttributeIds, setTemplateAttributeIds] = useState<string[]>(selectedAttributeIds);
   const [templateClassroomIds, setTemplateClassroomIds] = useState<string[]>(selectedClassroomIds);
+  const [templateAllClassroomsSelected, setTemplateAllClassroomsSelected] = useState(false);
 
   const { data: templates = [] } = useQuery(webClientORPC.tasks.getTaskTemplates.queryOptions());
 
@@ -154,17 +162,24 @@ function TaskTemplateControls({
         setTemplateDescription("");
         setTemplateAttributeIds([]);
         setTemplateClassroomIds([]);
+        setTemplateAllClassroomsSelected(false);
       },
     })
   );
 
   const applyTemplate = (template: (typeof templates)[number]) => {
+    const appliesToAllClassrooms = template.attributeIds.length === 0 && template.classroomIds.length === 0;
+
     setDescription(template.description);
     setSelectedAttributeIds(template.attributeIds);
     setSelectedClassroomIds(template.classroomIds);
+    setAllClassroomsSelected(appliesToAllClassrooms);
   };
 
-  const canCreateTemplate = templateName.trim().length > 0 && templateDescription.trim().length > 0;
+  const canCreateTemplate =
+    templateName.trim().length > 0 &&
+    templateDescription.trim().length > 0 &&
+    (templateAllClassroomsSelected || templateAttributeIds.length > 0 || templateClassroomIds.length > 0);
 
   return (
     <div className="rounded-lg border border-white/10 bg-zinc-950/30 p-4">
@@ -199,6 +214,9 @@ function TaskTemplateControls({
                 selectedClassroomIds={templateClassroomIds}
                 onAttributeIdsChange={setTemplateAttributeIds}
                 onClassroomIdsChange={setTemplateClassroomIds}
+                selectAllBehavior="empty-targets"
+                allClassroomsSelected={templateAllClassroomsSelected}
+                onAllClassroomsSelectedChange={setTemplateAllClassroomsSelected}
               />
             </div>
             <DialogFooter>
