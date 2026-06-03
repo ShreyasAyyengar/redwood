@@ -45,7 +45,9 @@ export function TaskFeedList({ filter, openOnly }: { filter?: FeedRoomFilterValu
     const roomIds = new Set(fetchedRooms.filter((room) => room.groupKey === filter.group).map((room) => room._id));
     return openTasks.filter((task) => roomIds.has(task.classroomId));
   }, [fetchedRooms, filter?.classroomId, filter?.group, openTasks]);
-  const tasks = openOnly ? filteredOpenTasks : allTasks;
+  const tasks = (openOnly ? filteredOpenTasks : allTasks)?.filter(
+    (task) => !task.task.visibleAt || new Date(task.task.visibleAt).getTime() <= Date.now()
+  );
   const isLoading = openOnly ? openTasksLoading : allTasksQuery.isLoading;
   const loadMoreTasks = useCallback(() => {
     allTasksQuery.fetchNextPage();
