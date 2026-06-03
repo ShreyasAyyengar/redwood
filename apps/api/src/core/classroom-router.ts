@@ -153,7 +153,7 @@ export const classroomRouter = {
                 $match: {
                   $expr: { $eq: ["$classroomId", "$$roomId"] },
                   completion: { $exists: false },
-                  $or: [{ visibleAt: { $exists: false } }, { visibleAt: { $lte: new Date() } }],
+                  $or: [{ "task.visibleAt": { $exists: false } }, { "task.visibleAt": { $lte: new Date() } }],
                 },
               },
               { $count: "count" },
@@ -202,7 +202,7 @@ export const classroomRouter = {
   }),
 };
 
-async function getRoomPayload(classroomId: string): Promise<z.infer<typeof classroomSchemaPayload> | undefined> {
+export async function getRoomPayload(classroomId: string): Promise<z.infer<typeof classroomSchemaPayload> | undefined> {
   const room = await ClassroomService.aggregate([
     { $match: { _id: classroomId } },
     {
@@ -230,7 +230,7 @@ async function getRoomPayload(classroomId: string): Promise<z.infer<typeof class
             $match: {
               $expr: { $eq: ["$classroomId", "$$roomId"] },
               completion: { $exists: false },
-              $or: [{ visibleAt: { $exists: false } }, { visibleAt: { $lte: new Date() } }],
+              $or: [{ "task.visibleAt": { $exists: false } }, { "task.visibleAt": { $lte: new Date() } }],
             },
           },
           { $count: "count" },

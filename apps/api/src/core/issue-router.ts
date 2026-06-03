@@ -295,7 +295,7 @@ async function getRoomSnapshot(classroomId: string): Promise<z.infer<typeof clas
             $match: {
               $expr: { $eq: ["$classroomId", "$$roomId"] },
               completion: { $exists: false },
-              $or: [{ visibleAt: { $exists: false } }, { visibleAt: { $lte: new Date() } }],
+              $or: [{ "task.visibleAt": { $exists: false } }, { "task.visibleAt": { $lte: new Date() } }],
             },
           },
           { $count: "count" },
