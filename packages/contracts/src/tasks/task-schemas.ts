@@ -39,7 +39,9 @@ export const uiTaskFormSchema = z.object({
   supervisorNeeded: z.boolean(),
   visibleAt: z.coerce.date().optional(),
   completeBy: z.coerce.date().optional(),
+
   createdBy: z.email().optional(),
+  createdAt: z.coerce.date().optional(),
 
   // completion
   completion: z

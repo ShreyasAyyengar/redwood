@@ -167,24 +167,41 @@ export const issueRouter = {
     if (!issue) throw errors.NOT_FOUND({ data: { message: `Issue with id ${input._id} not found` } });
     const isAdmin = context.user.role === "admin";
 
+    // Conditionally allowed for admins
+    const newReportedBy = isAdmin ? (input.reportedBy ?? issue.issue.reportedBy) : issue.issue.reportedBy;
+    const newReportedAt = isAdmin ? (input.reportedAt ?? issue.issue.reportedAt) : issue.issue.reportedAt;
+
+    // Check if non-resolution fields were changed
+    const nonResolutionChanged =
+      input.description !== issue.issue.description ||
+      input.urgent !== issue.issue.urgent ||
+      input.supervisorNeeded !== issue.issue.supervisorNeeded ||
+      input.cruzfixId !== issue.issue.cruzfixId ||
+      input.sodId !== issue.issue.sodId ||
+      newReportedBy !== issue.issue.reportedBy ||
+      newReportedAt.getTime() !== issue.issue.reportedAt.getTime();
+
     const updatedIssue: z.infer<typeof issueSchema> = {
       ...issue,
       issue: {
         ...issue.issue,
-        // Always allowed for everyone
         description: input.description,
         urgent: input.urgent,
         supervisorNeeded: input.supervisorNeeded,
         cruzfixId: input.cruzfixId,
         sodId: input.sodId,
-        // Conditionally allowed for admins
-        reportedBy: isAdmin ? (input.reportedBy ?? issue.issue.reportedBy) : issue.issue.reportedBy,
-        reportedAt: isAdmin ? (input.reportedAt ?? issue.issue.reportedAt) : issue.issue.reportedAt,
+        reportedBy: newReportedBy,
+        reportedAt: newReportedAt,
       },
-      edited: {
-        editedBy: context.user.email,
-        editDate: new Date(),
-      },
+
+      // if the resolution existed and was changed, mark as edited
+      // if any other field was changed, mark as edited
+      ...((nonResolutionChanged || (issue.resolution && input.resolution !== issue.resolution)) && {
+        edited: {
+          editedBy: context.user.email,
+          editDate: new Date(),
+        },
+      }),
 
       // if input.resolution is provided, update resolution, else make it undefined
       ...(input.resolution

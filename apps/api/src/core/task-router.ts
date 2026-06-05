@@ -165,6 +165,20 @@ export const taskRouter = {
     if (!task) throw errors.NOT_FOUND({ data: { message: `Task with id ${input._id} not found` } });
     const isAdmin = context.user.role === "admin";
 
+    // Conditionally allowed for admins
+    const newCreatedBy = isAdmin ? (input.createdBy ?? task.task.createdBy) : task.task.createdBy;
+    const newCreatedAt = isAdmin ? (input.createdAt ?? task.task.createdAt) : task.task.createdAt;
+
+    // Check if non-completion fields were changed
+    const nonCompletionChanged =
+      input.description !== task.task.description ||
+      input.urgent !== task.task.urgent ||
+      input.supervisorNeeded !== task.task.supervisorNeeded ||
+      input.visibleAt?.getTime() !== task.task.visibleAt?.getTime() ||
+      input.completeBy?.getTime() !== task.task.completeBy?.getTime() ||
+      newCreatedBy !== task.task.createdBy ||
+      newCreatedAt.getTime() !== task.task.createdAt.getTime();
+
     const updatedTask: z.infer<typeof taskSchema> = {
       ...task,
       task: {
@@ -174,12 +188,18 @@ export const taskRouter = {
         supervisorNeeded: input.supervisorNeeded,
         visibleAt: input.visibleAt,
         completeBy: input.completeBy,
-        createdBy: input.createdBy || task.task.createdBy,
+        createdBy: newCreatedBy,
+        createdAt: newCreatedAt,
       },
-      edited: {
-        editedBy: context.user.email,
-        editDate: new Date(),
-      },
+
+      // if the completion existed and was changed, mark as edited
+      // if any other field was changed, mark as edited
+      ...((nonCompletionChanged || (task.completion && input.completion !== task.completion)) && {
+        edited: {
+          editedBy: context.user.email,
+          editDate: new Date(),
+        },
+      }),
       ...(input.completion
         ? {
             completion: {
