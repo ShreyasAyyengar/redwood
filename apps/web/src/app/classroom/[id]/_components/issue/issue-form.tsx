@@ -53,6 +53,9 @@ export function IssueForm({
       supervisorNeeded: existingIssue?.issue.supervisorNeeded ?? false,
       cruzfixId: existingIssue?.issue.cruzfixId ?? undefined,
       sodId: existingIssue?.issue.sodId ?? undefined,
+      reportedBy: existingIssue?.issue.reportedBy ?? undefined,
+      reportedAt: existingIssue?.issue.reportedAt ?? undefined,
+      resolution: existingIssue?.resolution ?? undefined,
     } as IssueFormValues,
     validators: {
       onChange: uiIssueFormSchema,
@@ -113,15 +116,15 @@ export function IssueForm({
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-              {([canSubmit, isSubmitting]) => (
+            <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting, state.isDefaultValue]}>
+              {([canSubmit, isSubmitting, isDefaultValue]) => (
                 <Button
                   className={cn(
                     `${canSubmit ? "bg-foreground hover:cursor-pointer hover:bg-foreground/50" : "cursor-not-allowed hover:bg-accent"}`,
                     `${isSubmitting ? "cursor-wait" : "cursor-default"}`
                   )}
                   onClick={form.handleSubmit}
-                  disabled={!canSubmit || isSubmitting}
+                  disabled={!canSubmit || (existingIssue && isDefaultValue) || isSubmitting}
                 >
                   {isSubmitting ? (existingIssue ? "Saving..." : "Creating...") : existingIssue ? "Save Changes" : "Create Issue"}
                 </Button>

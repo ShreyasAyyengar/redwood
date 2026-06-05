@@ -53,8 +53,8 @@ export function TaskForm({
       supervisorNeeded: existingTask?.task.supervisorNeeded ?? false,
       visibleAt: existingTask?.task.visibleAt ? existingTask.task.visibleAt : undefined,
       completeBy: existingTask?.task.completeBy ? existingTask.task.completeBy : undefined,
-      completion: existingTask?.completion ? { comment: existingTask.completion.comment } : undefined,
-      createdBy: existingTask?.createdBy,
+      completion: existingTask?.completion,
+      createdBy: existingTask?.task.createdBy,
     } as TaskFormValues,
     validators: {
       onChange: uiTaskFormSchema,
@@ -113,15 +113,15 @@ export function TaskForm({
               <Button variant="outline">Cancel</Button>
             </DialogClose>
 
-            <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-              {([canSubmit, isSubmitting]) => (
+            <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting, state.isDefaultValue]}>
+              {([canSubmit, isSubmitting, isDefaultValue]) => (
                 <Button
                   className={cn(
                     `${canSubmit ? "bg-foreground hover:cursor-pointer hover:bg-foreground/50" : "cursor-not-allowed hover:bg-accent"}`,
                     `${isSubmitting ? "cursor-wait" : "cursor-default"}`
                   )}
                   onClick={form.handleSubmit}
-                  disabled={!canSubmit || isSubmitting}
+                  disabled={!canSubmit || (existingTask && isDefaultValue) || isSubmitting}
                 >
                   {isSubmitting ? (existingTask ? "Saving..." : "Creating...") : existingTask ? "Save Changes" : "Create Task"}
                 </Button>
