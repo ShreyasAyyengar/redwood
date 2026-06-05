@@ -9,7 +9,7 @@ import { Textarea } from "@redwood/shad-ui/components/textarea";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { CalendarDays } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { z } from "zod";
 import { authClientWeb } from "../../../../../../lib/auth-client-web";
 import { webClientORPC } from "../../../../../../lib/orpc-web-client";
@@ -40,23 +40,6 @@ export default function CompletionField({ existingValue }: { existingValue?: z.i
     })
   );
 
-  useEffect(() => {
-    if (existingValue) {
-      setLocalValue(existingValue.comment);
-      setSelectedCompletedBy(existingValue.completedBy);
-      field.handleChange({
-        comment: existingValue.comment,
-        completedBy: existingValue.completedBy,
-        completedAt: existingValue.completedAt,
-      });
-    }
-  }, [existingValue]);
-
-  useEffect(() => {
-    if (!completing) field.handleChange(undefined);
-    else field.handleChange({ comment: localValue, completedBy: selectedCompletedBy, completedAt: localCompletedAt });
-  }, [completing, localValue, selectedCompletedBy, localCompletedAt]);
-
   return (
     <>
       <div className={cn("flex items-center gap-2")}>
@@ -66,6 +49,7 @@ export default function CompletionField({ existingValue }: { existingValue?: z.i
           onCheckedChange={(checked) => {
             const next = checked === true;
             setCompleting(next);
+            field.handleChange(next ? { comment: localValue, completedBy: selectedCompletedBy, completedAt: localCompletedAt } : undefined);
           }}
         />
         <span>Mark as Completed</span>

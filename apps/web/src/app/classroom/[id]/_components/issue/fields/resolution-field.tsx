@@ -9,7 +9,7 @@ import { Textarea } from "@redwood/shad-ui/components/textarea";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { CalendarDays } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { z } from "zod";
 import { authClientWeb } from "../../../../../../lib/auth-client-web";
 import { webClientORPC } from "../../../../../../lib/orpc-web-client";
@@ -40,23 +40,6 @@ export default function ResolutionField({ existingValue }: { existingValue?: z.i
     })
   );
 
-  useEffect(() => {
-    if (existingValue) {
-      setLocalValue(existingValue.comment);
-      setSelectedResolvedBy(existingValue.resolvedBy);
-      field.handleChange({
-        comment: existingValue.comment,
-        resolvedBy: existingValue.resolvedBy,
-        resolvedAt: existingValue.resolvedAt,
-      });
-    }
-  }, [existingValue]);
-
-  useEffect(() => {
-    if (!resolving) field.handleChange(undefined);
-    else field.handleChange({ comment: localValue, resolvedBy: selectedResolvedBy, resolvedAt: localResolvedAt });
-  }, [resolving, localValue, selectedResolvedBy, localResolvedAt]);
-
   return (
     <>
       <div className={cn("flex items-center gap-2")}>
@@ -66,6 +49,7 @@ export default function ResolutionField({ existingValue }: { existingValue?: z.i
           onCheckedChange={(checked) => {
             const next = checked === true;
             setResolving(next);
+            field.handleChange(next ? { comment: localValue, resolvedBy: selectedResolvedBy, resolvedAt: localResolvedAt } : undefined);
           }}
         />
         <span>Mark as Resolved</span>

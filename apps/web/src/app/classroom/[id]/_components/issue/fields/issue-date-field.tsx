@@ -4,7 +4,7 @@ import { Field, FieldError, FieldLabel } from "@redwood/shad-ui/components/field
 import { Popover, PopoverContent, PopoverTrigger } from "@redwood/shad-ui/components/popover";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { CalendarDays, ChevronDownIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { authClientWeb } from "../../../../../../lib/auth-client-web";
 import { useFieldContext } from "../issue-form-context";
 
@@ -14,10 +14,6 @@ export default function IssueDateField({ existingDate }: { existingDate: Date })
   const [date, setDate] = useState<Date | undefined>(existingDate);
   const { data: session } = authClientWeb.useSession();
   const isAdmin = session?.user.role === "admin";
-
-  useEffect(() => {
-    if (date) field.handleChange(date);
-  }, [date]);
 
   return (
     <Field data-invalid={isInvalid}>
@@ -41,7 +37,15 @@ export default function IssueDateField({ existingDate }: { existingDate: Date })
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <Calendar mode="single" selected={date} onSelect={setDate} defaultMonth={date} />
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={(nextDate) => {
+                setDate(nextDate);
+                if (nextDate) field.handleChange(nextDate);
+              }}
+              defaultMonth={date}
+            />
           </PopoverContent>
         </Popover>
       </div>

@@ -1,7 +1,7 @@
 import { Checkbox } from "@redwood/shad-ui/components/checkbox";
 import { Input } from "@redwood/shad-ui/components/input";
 import { cn } from "@redwood/shad-ui/lib/utils";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { type IssueFormValues, useFieldContext } from "../issue-form-context";
 
 export default function CruzfixField({ existingValue }: { existingValue?: string }) {
@@ -10,19 +10,18 @@ export default function CruzfixField({ existingValue }: { existingValue?: string
   const [checked, setChecked] = useState<boolean>(!!existingValue);
   const [cruzfixId, setCruzfixId] = useState<string | undefined>(existingValue ?? field.state.value ?? undefined);
 
-  useEffect(() => {
-    field.handleChange(cruzfixId);
-    if (checked && existingValue) setCruzfixId(existingValue);
-  }, [checked, cruzfixId]);
-
   return (
     <div className="flex items-center gap-2">
       <Checkbox
         className="h-5 w-5 border border-neutral-400"
         checked={checked}
         onCheckedChange={(checked) => {
-          setChecked(checked.valueOf() as boolean);
-          if (!checked) setCruzfixId(undefined);
+          const nextChecked = checked === true;
+          setChecked(nextChecked);
+          if (!nextChecked) {
+            setCruzfixId(undefined);
+            field.handleChange(undefined);
+          }
         }}
       />
       <div className="flex flex-col">
@@ -31,7 +30,11 @@ export default function CruzfixField({ existingValue }: { existingValue?: string
           type="text"
           placeholder="Enter CruzFix ID"
           value={cruzfixId ?? ""}
-          onChange={(e) => setCruzfixId(e.target.value)}
+          onChange={(e) => {
+            const next = e.target.value;
+            setCruzfixId(next);
+            field.handleChange(next);
+          }}
           className={`rounded border px-2 py-1 ${isInvalid ? "border-red-500" : ""}`}
           disabled={!checked}
         />

@@ -3,17 +3,13 @@ import { Calendar } from "@redwood/shad-ui/components/calendar";
 import { Field, FieldError, FieldLabel } from "@redwood/shad-ui/components/field";
 import { Popover, PopoverContent, PopoverTrigger } from "@redwood/shad-ui/components/popover";
 import { CalendarDays, ChevronDownIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { type TaskFormValues, useFieldContext } from "../task-form-context";
 
-export default function TaskDateField({ label, name, existingDate }: { label: string; name: "visibleAt" | "completeBy"; existingDate?: Date }) {
+export default function TaskDateField({ label, existingDate }: { label: string; existingDate?: Date }) {
   const field = useFieldContext<TaskFormValues["visibleAt" | "completeBy"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
   const [date, setDate] = useState<Date | undefined>(existingDate ?? undefined);
-
-  useEffect(() => {
-    field.handleChange(date);
-  }, [date]);
 
   return (
     <Field data-invalid={isInvalid}>
@@ -37,7 +33,15 @@ export default function TaskDateField({ label, name, existingDate }: { label: st
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <Calendar mode="single" selected={date} onSelect={setDate} defaultMonth={date} />
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={(nextDate) => {
+                setDate(nextDate);
+                field.handleChange(nextDate);
+              }}
+              defaultMonth={date}
+            />
           </PopoverContent>
         </Popover>
       </div>
