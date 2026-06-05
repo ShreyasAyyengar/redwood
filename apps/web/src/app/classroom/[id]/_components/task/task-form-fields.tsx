@@ -24,7 +24,6 @@ export function TaskFormFields({ form, existingTask }: { form: TaskFormBodyApi; 
             {(field) => (
               <field.TaskDateField
                 label="Visible At"
-                name="visibleAt"
                 existingDate={existingTask?.task.visibleAt ? new Date(existingTask.task.visibleAt) : undefined}
               />
             )}
@@ -36,7 +35,6 @@ export function TaskFormFields({ form, existingTask }: { form: TaskFormBodyApi; 
             {(field) => (
               <field.TaskDateField
                 label="Complete By"
-                name="completeBy"
                 existingDate={existingTask?.task.completeBy ? new Date(existingTask.task.completeBy) : undefined}
               />
             )}
