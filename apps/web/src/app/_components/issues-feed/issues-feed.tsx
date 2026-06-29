@@ -41,6 +41,7 @@ export function IssuesFeed() {
           )}
         </div>
         <FeedRoomFilter value={roomFilter} onChange={setRoomFilter} />
+        <FeedFilterControls kind="issues" value={feedFilter} onChange={setFeedFilter} />
       </div>
       <TabsContent value="open" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
         <div className="w-3xl flex-1 overflow-hidden">
