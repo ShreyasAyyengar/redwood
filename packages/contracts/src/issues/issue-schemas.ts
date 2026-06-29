@@ -38,6 +38,25 @@ export const issueSchema = z.object({
   resolution: issueResolutionSchema.optional(),
 });
 
+export const issueFeedDateRangeFilterSchema = z.object({
+  from: z.coerce.date().optional(),
+  to: z.coerce.date().optional(),
+});
+
+export const issueFeedFilterSchema = z.object({
+  classroomId: classroomSchema.shape._id.optional(),
+  group: z.string().optional(),
+  search: z.string().optional(),
+  created: issueFeedDateRangeFilterSchema.optional(),
+  resolved: issueFeedDateRangeFilterSchema.optional(),
+  status: z.enum(["UNRESOLVED", "RESOLVED"]).optional(),
+  urgent: z.coerce.boolean().optional(),
+  supervisorNeeded: z.coerce.boolean().optional(),
+  hasSodId: z.coerce.boolean().optional(),
+  hasCruzfixId: z.coerce.boolean().optional(),
+  hasFindings: z.coerce.boolean().optional(),
+});
+
 export const uiIssueFormSchema = z.object({
   description: z.string().min(1, "Issue description must be provided"),
   urgent: z.boolean().default(false),

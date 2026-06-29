@@ -33,6 +33,23 @@ export const taskSchema = z.object({
   completion: taskCompletionSchema.optional(),
 });
 
+export const taskFeedDateRangeFilterSchema = z.object({
+  from: z.coerce.date().optional(),
+  to: z.coerce.date().optional(),
+});
+
+export const taskFeedFilterSchema = z.object({
+  classroomId: classroomSchema.shape._id.optional(),
+  group: z.string().optional(),
+  search: z.string().optional(),
+  created: taskFeedDateRangeFilterSchema.optional(),
+  completed: taskFeedDateRangeFilterSchema.optional(),
+  status: z.enum(["OPEN", "COMPLETED"]).optional(),
+  urgent: z.coerce.boolean().optional(),
+  supervisorNeeded: z.coerce.boolean().optional(),
+  hasDueDate: z.coerce.boolean().optional(),
+});
+
 export const uiTaskFormSchema = z.object({
   description: z.string().min(1, "Task description is required."),
   urgent: z.boolean(),

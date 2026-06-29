@@ -1,9 +1,9 @@
 import { oc } from "@orpc/contract";
 import z from "zod";
-import { classroomSchema } from "../rooms/classroom-contract";
 import {
   bulkTaskFormSchema,
   bulkTaskMutationResult,
+  taskFeedFilterSchema,
   taskMutationResult,
   taskSchema,
   taskTemplateSchema,
@@ -98,12 +98,7 @@ export const taskContract = {
     })
     .input(
       z.object({
-        filter: z
-          .object({
-            classroomId: classroomSchema.shape._id.optional(),
-            group: z.string().optional(),
-          })
-          .optional(),
+        filter: taskFeedFilterSchema.optional(),
         direction: z.enum(["OLDEST_FIRST", "NEWEST_FIRST"]),
         cursor: taskSchema.shape._id.optional(),
       })
