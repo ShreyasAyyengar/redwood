@@ -6,16 +6,21 @@ import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { authClientWeb } from "../../../lib/auth-client-web";
 import { BulkIssueDialog } from "../../classroom/[id]/_components/issue/bulk-issue-dialog";
+import { FeedFilterControls, type IssueFeedFilterValue } from "../feed-filter-controls";
 import { FeedRoomFilter, type FeedRoomFilterValue } from "../feed-room-filter";
 import { IssueFeedList } from "./issue-feed-list";
 
 export function IssuesFeed() {
   const [roomFilter, setRoomFilter] = useState<FeedRoomFilterValue | undefined>();
+  const [feedFilter, setFeedFilter] = useState<IssueFeedFilterValue>({});
   const { data: session } = authClientWeb.useSession();
   const isAdmin = session?.user.role === "admin";
   const issueFilter = useMemo(
-    () => (roomFilter?.group ? { group: roomFilter.group, classroomId: roomFilter.classroomId } : undefined),
-    [roomFilter?.classroomId, roomFilter?.group]
+    () => ({
+      ...feedFilter,
+      ...(roomFilter?.group ? { group: roomFilter.group, classroomId: roomFilter.classroomId } : {}),
+    }),
+    [feedFilter, roomFilter?.classroomId, roomFilter?.group]
   );
 
   return (
