@@ -6,16 +6,21 @@ import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { authClientWeb } from "../../../lib/auth-client-web";
 import { BulkTaskDialog } from "../../classroom/[id]/_components/task/bulk-task-dialog";
+import { FeedFilterControls, type TaskFeedFilterValue } from "../feed-filter-controls";
 import { FeedRoomFilter, type FeedRoomFilterValue } from "../feed-room-filter";
 import { TaskFeedList } from "./task-feed-list";
 
 export function TasksFeed() {
   const [roomFilter, setRoomFilter] = useState<FeedRoomFilterValue | undefined>();
+  const [feedFilter, setFeedFilter] = useState<TaskFeedFilterValue>({});
   const { data: session } = authClientWeb.useSession();
   const isAdmin = session?.user.role === "admin";
   const taskFilter = useMemo(
-    () => (roomFilter?.group ? { group: roomFilter.group, classroomId: roomFilter.classroomId } : undefined),
-    [roomFilter?.classroomId, roomFilter?.group]
+    () => ({
+      ...feedFilter,
+      ...(roomFilter?.group ? { group: roomFilter.group, classroomId: roomFilter.classroomId } : {}),
+    }),
+    [feedFilter, roomFilter?.classroomId, roomFilter?.group]
   );
 
   return (
