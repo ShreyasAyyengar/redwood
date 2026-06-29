@@ -1,4 +1,4 @@
-import { classroomSchemaPayload, taskSchema, taskTemplateSchema } from "@redwood/contracts";
+import { classroomSchemaPayload, type taskFeedFilterSchema, taskSchema, taskTemplateSchema } from "@redwood/contracts";
 import { v7 as uuidv7 } from "uuid";
 import type { z } from "zod";
 import { ClassroomService } from "../database/classroom-service";
@@ -7,78 +7,202 @@ import { TaskTemplateService } from "../database/task-template-service";
 import { adminProcedure, protectedProcedure } from "../libs/orpc-procedures";
 
 const PAGE_SIZE = 5;
+const NEWEST_FIRST = -1 as const;
+
+type Task = z.infer<typeof taskSchema>;
+type TaskFeedFilter = z.infer<typeof taskFeedFilterSchema>;
+type TaskFeedQuery = {
+  baseQuery: Record<string, unknown>;
+  onlyCompleted: boolean;
+  onlyOpen: boolean;
+};
+
+const getAfterDateCursorQuery = (datePath: string, date: Date, id: string, cursorOperator: "$lt" | "$gt") => ({
+  $or: [
+    { [datePath]: { [cursorOperator]: date } },
+    {
+      [datePath]: date,
+      _id: { [cursorOperator]: id },
+    },
+  ],
+});
+
+function andQuery(...queries: Record<string, unknown>[]): Record<string, unknown> {
+  const activeQueries = queries.filter((query) => Object.keys(query).length > 0);
+  if (activeQueries.length === 0) return {};
+  if (activeQueries.length === 1) return activeQueries[0] ?? {};
+  return { $and: activeQueries };
+}
+
+function escapeRegex(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function getDateRangeQuery(range: { from?: Date; to?: Date } | undefined) {
+  if (!(range?.from || range?.to)) return;
+
+  const query: Record<string, Date> = {};
+  if (range.from) query.$gte = range.from;
+  if (range.to) {
+    const end = new Date(range.to);
+    end.setDate(end.getDate() + 1);
+    query.$lt = end;
+  }
+
+  return query;
+}
+
+async function getTaskFeedQuery(filter: TaskFeedFilter | undefined): Promise<TaskFeedQuery> {
+  const scopeQuery: Record<string, unknown> = {};
+
+  if (filter?.classroomId) {
+    scopeQuery.classroomId = filter.classroomId;
+  } else if (filter?.group) {
+    const classroomIds = await ClassroomService.distinct("_id", { groupKey: filter.group });
+    scopeQuery.classroomId = { $in: classroomIds };
+  }
+
+  const search = filter?.search?.trim();
+  if (search) {
+    const regex = new RegExp(escapeRegex(search), "i");
+    scopeQuery.$or = [{ "task.description": regex }, { "completion.comment": regex }];
+  }
+
+  const createdRangeQuery = getDateRangeQuery(filter?.created);
+  if (createdRangeQuery) scopeQuery["task.createdAt"] = createdRangeQuery;
+
+  const completedRangeQuery = getDateRangeQuery(filter?.completed);
+  if (completedRangeQuery) scopeQuery["completion.completedAt"] = completedRangeQuery;
+
+  if (filter?.urgent) scopeQuery["task.urgent"] = true;
+  if (filter?.supervisorNeeded) scopeQuery["task.supervisorNeeded"] = true;
+  if (filter?.hasDueDate) scopeQuery["task.completeBy"] = { $exists: true };
+
+  return {
+    baseQuery: scopeQuery,
+    onlyCompleted: filter?.status === "COMPLETED" || Boolean(completedRangeQuery),
+    onlyOpen: filter?.status === "OPEN",
+  };
+}
+
+async function getTaskCursor(cursor: string | undefined, query: TaskFeedQuery) {
+  if (!cursor) return;
+
+  const task = await TaskService.findOne({
+    _id: cursor,
+    ...query.baseQuery,
+  }).lean();
+
+  return (task as Task | null) ?? undefined;
+}
+
+function getTaskStatusQuery(query: TaskFeedQuery) {
+  if (query.onlyCompleted) return { completion: { $exists: true } };
+  if (query.onlyOpen) return { completion: { $exists: false } };
+  return {};
+}
+
+async function getOldestTaskPage(query: TaskFeedQuery, cursorTask: Task | undefined) {
+  const getAfterCursorQuery = (task: Task) => getAfterDateCursorQuery("task.createdAt", task.task.createdAt, task._id, "$gt");
+  const taskQuery = andQuery(query.baseQuery, getTaskStatusQuery(query), cursorTask ? getAfterCursorQuery(cursorTask) : {});
+  const tasks = await TaskService.find(taskQuery).lean().sort({ "task.createdAt": 1, _id: 1 }).limit(PAGE_SIZE);
+  const lastTask = tasks.at(-1);
+  const hasMore = lastTask
+    ? await TaskService.exists(andQuery(query.baseQuery, getTaskStatusQuery(query), getAfterCursorQuery(lastTask)))
+    : false;
+
+  return {
+    tasks,
+    nextCursor: hasMore && lastTask ? lastTask._id : undefined,
+  };
+}
+
+async function getNewestTaskFeedPage(query: TaskFeedQuery, cursorTask: Task | undefined) {
+  const tasks: Task[] = [];
+
+  if (!(query.onlyCompleted || cursorTask?.completion)) {
+    const openCursorQuery = cursorTask ? getAfterDateCursorQuery("task.createdAt", cursorTask.task.createdAt, cursorTask._id, "$lt") : {};
+    const openTasks = (await TaskService.find(andQuery(query.baseQuery, { completion: { $exists: false } }, openCursorQuery))
+      .lean()
+      .sort({ "task.createdAt": NEWEST_FIRST, _id: NEWEST_FIRST })
+      .limit(PAGE_SIZE)) as Task[];
+
+    tasks.push(...openTasks);
+  }
+
+  if (tasks.length < PAGE_SIZE && !query.onlyOpen) {
+    const completedCursorQuery = cursorTask?.completion
+      ? getAfterDateCursorQuery("completion.completedAt", cursorTask.completion.completedAt, cursorTask._id, "$lt")
+      : {};
+    const completedTasks = (await TaskService.find(andQuery(query.baseQuery, { completion: { $exists: true } }, completedCursorQuery))
+      .lean()
+      .sort({ "completion.completedAt": NEWEST_FIRST, _id: NEWEST_FIRST })
+      .limit(PAGE_SIZE - tasks.length)) as Task[];
+
+    tasks.push(...completedTasks);
+  }
+
+  const lastTask = tasks.at(-1);
+  const hasMore = lastTask ? await hasMoreNewestTasksAfter(query, lastTask) : false;
+
+  return {
+    tasks,
+    nextCursor: hasMore && lastTask ? lastTask._id : undefined,
+  };
+}
+
+async function hasMoreNewestTasksAfter(query: TaskFeedQuery, task: Task) {
+  if (task.completion) {
+    return Boolean(
+      await TaskService.exists(
+        andQuery(
+          query.baseQuery,
+          { completion: { $exists: true } },
+          getAfterDateCursorQuery("completion.completedAt", task.completion.completedAt, task._id, "$lt")
+        )
+      )
+    );
+  }
+
+  const hasMoreOpenTasks = await TaskService.exists(
+    andQuery(
+      query.baseQuery,
+      { completion: { $exists: false } },
+      getAfterDateCursorQuery("task.createdAt", task.task.createdAt, task._id, "$lt")
+    )
+  );
+  const hasCompletedTasks = !query.onlyOpen && (await TaskService.exists(andQuery(query.baseQuery, { completion: { $exists: true } })));
+
+  return Boolean(hasMoreOpenTasks || hasCompletedTasks);
+}
 
 export const taskRouter = {
   getTasks: protectedProcedure.tasks.getTasks.handler(async ({ input, errors }) => {
-    const { filter, direction, cursor } = input;
-    const scopeQuery: Record<string, unknown> = {};
+    const query = await getTaskFeedQuery(input.filter);
+    const cursorTask = await getTaskCursor(input.cursor, query);
 
-    if (filter?.classroomId) {
-      scopeQuery.classroomId = filter.classroomId;
-    } else if (filter?.group) {
-      const classroomIds = await ClassroomService.distinct("_id", { groupKey: filter.group });
-      scopeQuery.classroomId = { $in: classroomIds };
+    if (query.onlyOpen && query.onlyCompleted) {
+      return { tasks: [], nextCursor: undefined };
     }
 
-    const sortDirection = direction === "NEWEST_FIRST" ? -1 : 1;
-    const cursorOperator = direction === "NEWEST_FIRST" ? "$lt" : "$gt";
-
-    const getAfterCursorQuery = (task: z.infer<typeof taskSchema>) => ({
-      $or: [
-        { createdAt: { [cursorOperator]: task.createdAt } },
-        {
-          createdAt: task.createdAt,
-          _id: { [cursorOperator]: task._id },
-        },
-      ],
-    });
-
-    let query: Record<string, unknown> = { ...scopeQuery };
-
-    if (cursor) {
-      const cursorTask = await TaskService.findOne({
-        _id: cursor,
-        ...scopeQuery,
-      }).lean();
-
-      if (!cursorTask) {
-        throw errors.NOT_FOUND({
-          data: { message: `Task cursor ${cursor} not found` },
-        });
-      }
-
-      query = {
-        ...query,
-        ...getAfterCursorQuery(cursorTask),
-      };
+    if (input.cursor && !cursorTask) {
+      throw errors.NOT_FOUND({
+        data: { message: `Task cursor ${input.cursor} not found` },
+      });
     }
 
-    const tasks = await TaskService.find(query).lean().sort({ createdAt: sortDirection, _id: sortDirection }).limit(PAGE_SIZE);
-
-    const lastTask = tasks.at(-1);
-
-    const hasMore = lastTask
-      ? await TaskService.exists({
-          ...scopeQuery,
-          ...getAfterCursorQuery(lastTask),
-        })
-      : false;
-
-    return {
-      tasks,
-      nextCursor: hasMore && lastTask ? lastTask._id : undefined,
-    };
+    return input.direction === "OLDEST_FIRST" ? getOldestTaskPage(query, cursorTask) : getNewestTaskFeedPage(query, cursorTask);
   }),
 
-  getOpenTasks: protectedProcedure.tasks.getOpenTasks.handler(({ input, errors }) => {
+  getOpenTasks: protectedProcedure.tasks.getOpenTasks.handler(({ input }) => {
     if (input?.classroomId) {
       return TaskService.find({ completion: { $exists: false }, classroomId: input.classroomId })
         .lean()
-        .sort({ createdAt: -1 });
+        .sort({ "task.createdAt": -1, _id: -1 });
     }
     return TaskService.find({ completion: { $exists: false } })
       .lean()
-      .sort({ createdAt: -1 });
+      .sort({ "task.createdAt": -1, _id: -1 });
   }),
 
   addTask: protectedProcedure.tasks.addTask.handler(async ({ input, errors, context }) => {

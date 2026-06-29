@@ -1,4 +1,4 @@
-import { type classroomSchema, classroomSchemaPayload, issueSchema } from "@redwood/contracts";
+import { type classroomSchema, classroomSchemaPayload, type issueFeedFilterSchema, issueSchema } from "@redwood/contracts";
 import { v7 as uuidv7 } from "uuid";
 import type { z } from "zod";
 import { ClassroomService } from "../database/classroom-service";
@@ -6,79 +6,207 @@ import { IssueService } from "../database/issue-service";
 import { adminProcedure, protectedProcedure } from "../libs/orpc-procedures";
 
 const PAGE_SIZE = 5;
+const NEWEST_FIRST = -1 as const;
+
+type Issue = z.infer<typeof issueSchema>;
+type IssueFeedFilter = z.infer<typeof issueFeedFilterSchema>;
+type IssueFeedQuery = {
+  baseQuery: Record<string, unknown>;
+  onlyResolved: boolean;
+  onlyUnresolved: boolean;
+};
+
+const getAfterDateCursorQuery = (datePath: string, date: Date, id: string, cursorOperator: "$lt" | "$gt") => ({
+  $or: [
+    { [datePath]: { [cursorOperator]: date } },
+    {
+      [datePath]: date,
+      _id: { [cursorOperator]: id },
+    },
+  ],
+});
+
+function andQuery(...queries: Record<string, unknown>[]): Record<string, unknown> {
+  const activeQueries = queries.filter((query) => Object.keys(query).length > 0);
+  if (activeQueries.length === 0) return {};
+  if (activeQueries.length === 1) return activeQueries[0] ?? {};
+  return { $and: activeQueries };
+}
+
+function escapeRegex(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function getDateRangeQuery(range: { from?: Date; to?: Date } | undefined) {
+  if (!(range?.from || range?.to)) return;
+
+  const query: Record<string, Date> = {};
+  if (range.from) query.$gte = range.from;
+  if (range.to) {
+    const end = new Date(range.to);
+    end.setDate(end.getDate() + 1);
+    query.$lt = end;
+  }
+
+  return query;
+}
+
+async function getIssueFeedQuery(filter: IssueFeedFilter | undefined): Promise<IssueFeedQuery> {
+  const scopeQuery: Record<string, unknown> = {};
+
+  if (filter?.classroomId) {
+    scopeQuery.classroomId = filter.classroomId;
+  } else if (filter?.group) {
+    const classroomIds = await ClassroomService.distinct("_id", { groupKey: filter.group });
+    scopeQuery.classroomId = { $in: classroomIds };
+  }
+
+  const search = filter?.search?.trim();
+  if (search) {
+    const regex = new RegExp(escapeRegex(search), "i");
+    scopeQuery.$or = [{ "issue.description": regex }, { "resolution.comment": regex }];
+  }
+
+  const createdRangeQuery = getDateRangeQuery(filter?.created);
+  if (createdRangeQuery) scopeQuery["issue.reportedAt"] = createdRangeQuery;
+
+  const resolvedRangeQuery = getDateRangeQuery(filter?.resolved);
+  if (resolvedRangeQuery) scopeQuery["resolution.resolvedAt"] = resolvedRangeQuery;
+
+  if (filter?.urgent) scopeQuery["issue.urgent"] = true;
+  if (filter?.supervisorNeeded) scopeQuery["issue.supervisorNeeded"] = true;
+  if (filter?.hasSodId) scopeQuery["issue.sodId"] = { $exists: true, $ne: "" };
+  if (filter?.hasCruzfixId) scopeQuery["issue.cruzfixId"] = { $exists: true, $ne: "" };
+  if (filter?.hasFindings) scopeQuery["resolution.findings.0"] = { $exists: true };
+
+  return {
+    baseQuery: scopeQuery,
+    onlyResolved: filter?.status === "RESOLVED" || Boolean(resolvedRangeQuery) || Boolean(filter?.hasFindings),
+    onlyUnresolved: filter?.status === "UNRESOLVED",
+  };
+}
+
+async function getIssueCursor(cursor: string | undefined, query: IssueFeedQuery) {
+  if (!cursor) return;
+
+  const issue = await IssueService.findOne({
+    _id: cursor,
+    ...query.baseQuery,
+  }).lean();
+
+  return (issue as Issue | null) ?? undefined;
+}
+
+function getIssueStatusQuery(query: IssueFeedQuery) {
+  if (query.onlyResolved) return { resolution: { $exists: true } };
+  if (query.onlyUnresolved) return { resolution: { $exists: false } };
+  return {};
+}
+
+async function getOldestIssuePage(query: IssueFeedQuery, cursorIssue: Issue | undefined) {
+  const getAfterCursorQuery = (issue: Issue) => getAfterDateCursorQuery("issue.reportedAt", issue.issue.reportedAt, issue._id, "$gt");
+  const issueQuery = andQuery(query.baseQuery, getIssueStatusQuery(query), cursorIssue ? getAfterCursorQuery(cursorIssue) : {});
+  const issues = await IssueService.find(issueQuery).lean().sort({ "issue.reportedAt": 1, _id: 1 }).limit(PAGE_SIZE);
+  const lastIssue = issues.at(-1);
+  const hasMore = lastIssue
+    ? await IssueService.exists(andQuery(query.baseQuery, getIssueStatusQuery(query), getAfterCursorQuery(lastIssue)))
+    : false;
+
+  return {
+    issues,
+    nextCursor: hasMore && lastIssue ? lastIssue._id : undefined,
+  };
+}
+
+async function getNewestIssueFeedPage(query: IssueFeedQuery, cursorIssue: Issue | undefined) {
+  const issues: Issue[] = [];
+
+  if (!(query.onlyResolved || cursorIssue?.resolution)) {
+    const activeCursorQuery = cursorIssue
+      ? getAfterDateCursorQuery("issue.reportedAt", cursorIssue.issue.reportedAt, cursorIssue._id, "$lt")
+      : {};
+    const activeIssues = (await IssueService.find(andQuery(query.baseQuery, { resolution: { $exists: false } }, activeCursorQuery))
+      .lean()
+      .sort({ "issue.reportedAt": NEWEST_FIRST, _id: NEWEST_FIRST })
+      .limit(PAGE_SIZE)) as Issue[];
+
+    issues.push(...activeIssues);
+  }
+
+  if (issues.length < PAGE_SIZE && !query.onlyUnresolved) {
+    const resolvedCursorQuery = cursorIssue?.resolution
+      ? getAfterDateCursorQuery("resolution.resolvedAt", cursorIssue.resolution.resolvedAt, cursorIssue._id, "$lt")
+      : {};
+    const resolvedIssues = (await IssueService.find(andQuery(query.baseQuery, { resolution: { $exists: true } }, resolvedCursorQuery))
+      .lean()
+      .sort({ "resolution.resolvedAt": NEWEST_FIRST, _id: NEWEST_FIRST })
+      .limit(PAGE_SIZE - issues.length)) as Issue[];
+
+    issues.push(...resolvedIssues);
+  }
+
+  const lastIssue = issues.at(-1);
+  const hasMore = lastIssue ? await hasMoreNewestIssuesAfter(query, lastIssue) : false;
+
+  return {
+    issues,
+    nextCursor: hasMore && lastIssue ? lastIssue._id : undefined,
+  };
+}
+
+async function hasMoreNewestIssuesAfter(query: IssueFeedQuery, issue: Issue) {
+  if (issue.resolution) {
+    return Boolean(
+      await IssueService.exists(
+        andQuery(
+          query.baseQuery,
+          { resolution: { $exists: true } },
+          getAfterDateCursorQuery("resolution.resolvedAt", issue.resolution.resolvedAt, issue._id, "$lt")
+        )
+      )
+    );
+  }
+
+  const hasMoreActiveIssues = await IssueService.exists(
+    andQuery(
+      query.baseQuery,
+      { resolution: { $exists: false } },
+      getAfterDateCursorQuery("issue.reportedAt", issue.issue.reportedAt, issue._id, "$lt")
+    )
+  );
+  const hasResolvedIssues = !query.onlyUnresolved && (await IssueService.exists(andQuery(query.baseQuery, { resolution: { $exists: true } })));
+
+  return Boolean(hasMoreActiveIssues || hasResolvedIssues);
+}
 
 export const issueRouter = {
   getIssues: protectedProcedure.issues.getIssues.handler(async ({ input, errors }) => {
-    const { filter, direction, cursor } = input;
-    const scopeQuery: Record<string, unknown> = {};
+    const query = await getIssueFeedQuery(input.filter);
+    const cursorIssue = await getIssueCursor(input.cursor, query);
 
-    if (filter?.classroomId) {
-      scopeQuery.classroomId = filter.classroomId;
-    } else if (filter?.group) {
-      const classroomIds = await ClassroomService.distinct("_id", { groupKey: filter.group });
-      scopeQuery.classroomId = { $in: classroomIds };
+    if (query.onlyUnresolved && query.onlyResolved) {
+      return { issues: [], nextCursor: undefined };
     }
 
-    const sortDirection = direction === "NEWEST_FIRST" ? -1 : 1;
-    const cursorOperator = direction === "NEWEST_FIRST" ? "$lt" : "$gt";
-
-    const getAfterCursorQuery = (issue: z.infer<typeof issueSchema>) => ({
-      $or: [
-        { "issue.reportedAt": { [cursorOperator]: issue.issue.reportedAt } },
-        {
-          "issue.reportedAt": issue.issue.reportedAt,
-          _id: { [cursorOperator]: issue._id },
-        },
-      ],
-    });
-
-    let query: Record<string, unknown> = { ...scopeQuery };
-
-    if (cursor) {
-      const cursorIssue = await IssueService.findOne({
-        _id: cursor,
-        ...scopeQuery,
-      }).lean();
-
-      if (!cursorIssue) {
-        throw errors.NOT_FOUND({
-          data: { message: `Issue cursor ${cursor} not found` },
-        });
-      }
-
-      query = {
-        ...query,
-        ...getAfterCursorQuery(cursorIssue),
-      };
+    if (input.cursor && !cursorIssue) {
+      throw errors.NOT_FOUND({
+        data: { message: `Issue cursor ${input.cursor} not found` },
+      });
     }
 
-    const issues = await IssueService.find(query).lean().sort({ "issue.reportedAt": sortDirection, _id: sortDirection }).limit(PAGE_SIZE);
-
-    const lastIssue = issues.at(-1);
-
-    const hasMore = lastIssue
-      ? await IssueService.exists({
-          ...scopeQuery,
-          ...getAfterCursorQuery(lastIssue),
-        })
-      : false;
-
-    return {
-      issues,
-      nextCursor: hasMore && lastIssue ? lastIssue._id : undefined,
-    };
+    return input.direction === "OLDEST_FIRST" ? getOldestIssuePage(query, cursorIssue) : getNewestIssueFeedPage(query, cursorIssue);
   }),
 
   getActiveIssues: protectedProcedure.issues.getActiveIssues.handler(({ input }) => {
     if (input?.classroomId) {
       return IssueService.find({ resolution: { $exists: false }, classroomId: input.classroomId })
         .lean()
-        .sort({ "issue.reportedAt": -1 });
+        .sort({ "issue.reportedAt": -1, _id: -1 });
     }
 
     return IssueService.find({ resolution: { $exists: false } })
       .lean()
-      .sort({ "issue.reportedAt": -1 });
+      .sort({ "issue.reportedAt": -1, _id: -1 });
   }),
 
   createIssue: protectedProcedure.issues.createIssue.handler(async ({ input, errors, context }) => {

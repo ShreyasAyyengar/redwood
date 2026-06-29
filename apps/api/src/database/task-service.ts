@@ -14,9 +14,11 @@ const TaskSchemaMongoose = toMongooseSchema(
   })
 );
 
-TaskSchemaMongoose.index({ classroomId: 1, createdAt: 1 });
+TaskSchemaMongoose.index({ classroomId: 1, "task.createdAt": -1, _id: -1 });
+TaskSchemaMongoose.index({ classroomId: 1, "completion.completedAt": -1, _id: -1 });
 TaskSchemaMongoose.index({ completion: 1, visibleAt: 1, classroomId: 1 });
-TaskSchemaMongoose.index({ createdAt: 1 });
+TaskSchemaMongoose.index({ "task.createdAt": -1, _id: -1 });
+TaskSchemaMongoose.index({ "completion.completedAt": -1, _id: -1 });
 
 export interface ITaskSchemaMongoose extends z.infer<typeof TaskSchemaMongooseZod> {}
 
