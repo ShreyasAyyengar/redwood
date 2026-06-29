@@ -65,12 +65,11 @@ function applyIssueHistoryMutation(queryClient: QueryClient, issue: Issue, opera
       })),
     };
   });
+  queryClient.invalidateQueries({ queryKey: ISSUE_HISTORY_QUERY_KEY });
 }
 
 function upsertSortedByReportedAt(issues: Issue[], issue: Issue) {
-  return upsertById(issues, issue).sort(
-    (a, b) => Number(b.issue.urgent) - Number(a.issue.urgent) || b.issue.reportedAt.getTime() - a.issue.reportedAt.getTime()
-  );
+  return upsertById(issues, issue).sort((a, b) => b.issue.reportedAt.getTime() - a.issue.reportedAt.getTime());
 }
 
 export function applyTaskMutationResult(queryClient: QueryClient, mutationResult: TaskMutationResult, operation: CacheMutationOperation) {
@@ -112,10 +111,11 @@ function applyTaskHistoryMutation(queryClient: QueryClient, task: Task, operatio
       })),
     };
   });
+  queryClient.invalidateQueries({ queryKey: TASK_HISTORY_QUERY_KEY });
 }
 
 function upsertSortedByCreatedAt(tasks: Task[], task: Task) {
-  return upsertById(tasks, task).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  return upsertById(tasks, task).sort((a, b) => b.task.createdAt.getTime() - a.task.createdAt.getTime());
 }
 
 function isFutureVisibleTask(task: Task) {
