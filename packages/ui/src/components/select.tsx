@@ -45,9 +45,11 @@ function SelectTrigger({
       {...props}
     >
       {children}
-      <SelectPrimitive.Icon asChild>
-        {hasArrow && <ChevronDownIcon className="size-4 opacity-50" />}
-      </SelectPrimitive.Icon>
+      {hasArrow && (
+        <SelectPrimitive.Icon asChild>
+          <ChevronDownIcon className="size-4 opacity-50" />
+        </SelectPrimitive.Icon>
+      )}
     </SelectPrimitive.Trigger>
   )
 }
