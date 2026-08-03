@@ -41,9 +41,18 @@ export function IssueFormFields({ form, existingIssue }: { form: IssueFormBodyAp
       </div>
 
       <Separator className={cn(existingIssue ? existingIssue.issue.urgent && "bg-red-500" : "bg-neutral-500")} />
-      {existingIssue && (
-        <form.AppField name="resolution">{(field) => <field.ResolutionField existingValue={existingIssue.resolution} />}</form.AppField>
-      )}
+      <div className="flex flex-col gap-4">
+        {existingIssue && (
+          <form.AppField name="resolution">
+            {(field) => (
+              <field.ResolutionField existingValue={existingIssue.resolution} onMarkResolved={() => form.setFieldValue("onHold", false)} />
+            )}
+          </form.AppField>
+        )}
+        <form.AppField name="onHold">
+          {(field) => <field.OnHoldField onPlaceOnHold={() => form.setFieldValue("resolution", undefined)} />}
+        </form.AppField>
+      </div>
     </div>
   );
 }

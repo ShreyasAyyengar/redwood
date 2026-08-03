@@ -48,6 +48,7 @@ export function BulkIssueForm({ onSuccess }: { onSuccess?: () => void }) {
       supervisorNeeded: false,
       cruzfixId: undefined,
       sodId: undefined,
+      onHold: false,
     } as IssueFormValues,
     validators: {
       onChange: uiIssueFormSchema,

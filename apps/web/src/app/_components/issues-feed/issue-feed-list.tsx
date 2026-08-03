@@ -23,7 +23,7 @@ export function IssueFeedList({ filter, openOnly }: { filter?: IssueFeedListFilt
       input: (cursor) => ({
         cursor,
         direction: "NEWEST_FIRST",
-        filter: openOnly ? { ...filter, status: "UNRESOLVED" } : filter,
+        filter: openOnly ? { ...filter, status: "UNRESOLVED", onHold: false } : filter,
       }),
 
       // it is expensive to load all issues, so keep it fresh until the browser reloads.

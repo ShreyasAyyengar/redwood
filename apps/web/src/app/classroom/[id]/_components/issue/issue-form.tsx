@@ -53,6 +53,7 @@ export function IssueForm({
       supervisorNeeded: existingIssue?.issue.supervisorNeeded ?? false,
       cruzfixId: existingIssue?.issue.cruzfixId ?? undefined,
       sodId: existingIssue?.issue.sodId ?? undefined,
+      onHold: existingIssue?.issue.onHold ?? false,
       reportedBy: existingIssue?.issue.reportedBy ?? undefined,
       reportedAt: existingIssue?.issue.reportedAt ?? undefined,
       resolution: existingIssue?.resolution ?? undefined,

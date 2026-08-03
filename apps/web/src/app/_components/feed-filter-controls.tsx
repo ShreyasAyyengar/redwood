@@ -29,6 +29,7 @@ export type IssueFeedFilterValue = {
   hasCruzfixId?: boolean;
   hasFindings?: boolean;
   hasSodId?: boolean;
+  onHold?: boolean;
   resolved?: DateRange;
   search?: string;
   supervisorNeeded?: boolean;
@@ -157,6 +158,11 @@ export function FeedFilterControls(props: FeedFilterControlsProps) {
                           checked={Boolean(props.value.hasFindings)}
                           label="Has findings"
                           onChange={(hasFindings) => props.onChange({ ...props.value, hasFindings })}
+                        />
+                        <CheckboxOption
+                          checked={Boolean(props.value.onHold)}
+                          label="On hold"
+                          onChange={(onHold) => props.onChange({ ...props.value, onHold })}
                         />
                       </>
                     )}
@@ -306,6 +312,7 @@ function getIssueActiveFilters(value: IssueFeedFilterValue, setValue: (next: Iss
   if (value.hasSodId) filters.push({ key: "hasSodId", label: "Has SOD", remove: () => setValue({ ...value, hasSodId: false }) });
   if (value.hasCruzfixId) filters.push({ key: "hasCruzfixId", label: "Has CruzFix", remove: () => setValue({ ...value, hasCruzfixId: false }) });
   if (value.hasFindings) filters.push({ key: "hasFindings", label: "Has findings", remove: () => setValue({ ...value, hasFindings: false }) });
+  if (value.onHold) filters.push({ key: "onHold", label: "On hold", remove: () => setValue({ ...value, onHold: false }) });
 
   return filters;
 }

@@ -5,6 +5,7 @@ import type { z } from "zod";
 import CruzfixField from "./fields/cruzfix-field";
 import DescriptionField from "./fields/description-field";
 import IssueDateField from "./fields/issue-date-field";
+import OnHoldField from "./fields/on-hold-field";
 import ReportedByFieldSelector from "./fields/reported-by-field-selector";
 import ResolutionField from "./fields/resolution-field";
 import SodIDField from "./fields/sod-field";
@@ -23,15 +24,20 @@ const issueFieldComponents = {
   SodIDField,
   ReportedByFieldSelector,
   IssueDateField,
+  OnHoldField,
   ResolutionField,
 };
 
 export type IssueFormBodyApi = {
   AppField: ComponentType<{
-    name: "cruzfixId" | "description" | "resolution" | "sodId" | "supervisorNeeded" | "urgent";
+    name: "cruzfixId" | "description" | "onHold" | "resolution" | "sodId" | "supervisorNeeded" | "urgent";
     children: (field: typeof issueFieldComponents) => ReactNode;
   }>;
-  setFieldValue: (field: "description", value: string) => void;
+  setFieldValue: {
+    (field: "description", value: string): void;
+    (field: "onHold", value: boolean): void;
+    (field: "resolution", value: undefined): void;
+  };
 };
 
 export const issueAppForm = createFormHook({

@@ -78,6 +78,8 @@ async function getIssueFeedQuery(filter: IssueFeedFilter | undefined): Promise<I
   if (filter?.hasSodId) scopeQuery["issue.sodId"] = { $exists: true, $ne: "" };
   if (filter?.hasCruzfixId) scopeQuery["issue.cruzfixId"] = { $exists: true, $ne: "" };
   if (filter?.hasFindings) scopeQuery["resolution.findings.0"] = { $exists: true };
+  if (filter?.onHold === true) scopeQuery["issue.onHold"] = true;
+  if (filter?.onHold === false) scopeQuery["issue.onHold"] = { $ne: true };
 
   return {
     baseQuery: scopeQuery,
@@ -225,6 +227,7 @@ export const issueRouter = {
         supervisorNeeded: input.supervisorNeeded,
         cruzfixId: input.cruzfixId,
         sodId: input.sodId,
+        onHold: input.onHold,
         reportedBy: context.user.email,
         reportedAt: new Date(),
       },
@@ -236,7 +239,7 @@ export const issueRouter = {
     try {
       await IssueService.insertOne(newIssue);
 
-      recomputeRoomStatus(newIssue.classroomId);
+      await recomputeRoomStatus(newIssue.classroomId);
 
       return {
         mutatedIssue: newIssue,
@@ -269,6 +272,7 @@ export const issueRouter = {
         supervisorNeeded: input.supervisorNeeded,
         cruzfixId: input.cruzfixId,
         sodId: input.sodId,
+        onHold: input.onHold,
         reportedBy: context.user.email,
         reportedAt: now,
       },
@@ -306,6 +310,7 @@ export const issueRouter = {
       input.supervisorNeeded !== issue.issue.supervisorNeeded ||
       input.cruzfixId !== issue.issue.cruzfixId ||
       input.sodId !== issue.issue.sodId ||
+      input.onHold !== issue.issue.onHold ||
       newReportedBy !== issue.issue.reportedBy ||
       newReportedAt.getTime() !== issue.issue.reportedAt.getTime();
 
@@ -318,6 +323,7 @@ export const issueRouter = {
         supervisorNeeded: input.supervisorNeeded,
         cruzfixId: input.cruzfixId,
         sodId: input.sodId,
+        onHold: input.onHold,
         reportedBy: newReportedBy,
         reportedAt: newReportedAt,
       },
@@ -332,7 +338,7 @@ export const issueRouter = {
       }),
 
       // if input.resolution is provided, update resolution, else make it undefined
-      ...(input.resolution
+      ...(!input.onHold && input.resolution
         ? {
             resolution: {
               // the resolvedBy can be different than the context, only if user is admin
@@ -469,6 +475,7 @@ export async function recomputeRoomStatus(classroomId: string) {
     const issues: z.infer<typeof issueSchema>[] = await IssueService.find({
       classroomId,
       resolution: { $exists: false },
+      "issue.onHold": { $ne: true },
     }).lean();
 
     let currentStatus: z.infer<typeof classroomSchema>["roomStatus"] = "GOOD";

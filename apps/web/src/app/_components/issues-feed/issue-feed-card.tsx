@@ -4,7 +4,17 @@ import { Card } from "@redwood/shad-ui/components/card";
 import { MultiSelect, MultiSelectContent, MultiSelectItem, MultiSelectTrigger } from "@redwood/shad-ui/components/multi-select";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useMutation } from "@tanstack/react-query";
-import { CheckCircle2, ClipboardCheck, Clock3, type LucideIcon, MessageSquare, TriangleAlert, User, UserCheck } from "lucide-react";
+import {
+  CheckCircle2,
+  ClipboardCheck,
+  Clock3,
+  type LucideIcon,
+  MessageSquare,
+  OctagonPause,
+  TriangleAlert,
+  User,
+  UserCheck,
+} from "lucide-react";
 import { type ReactNode, type RefObject, useEffect, useRef, useState } from "react";
 import type { z } from "zod";
 import { webClientORPC } from "../../../lib/orpc-web-client";
@@ -200,7 +210,7 @@ function getIssueDisplayState(issue: IssueFeedCardIssue) {
   }
 
   return {
-    HeaderIcon: TriangleAlert,
+    HeaderIcon: issue.issue.onHold ? OctagonPause : TriangleAlert,
     headerIconClassName: issue.issue.urgent ? "border-red-500/20 bg-red-500/10" : "border-amber-500/20 bg-amber-500/10",
     headerIconTextClassName: issue.issue.urgent ? "text-red-400" : "text-amber-400",
     isResolved,

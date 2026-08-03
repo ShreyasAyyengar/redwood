@@ -10,6 +10,7 @@ const issueDetailsSchema = z.object({
   cruzfixId: z.string().optional(),
   urgent: z.boolean(),
   supervisorNeeded: z.boolean(),
+  onHold: z.stringbool().default(false),
 });
 
 const issueEditSchema = z.object({
@@ -55,6 +56,7 @@ export const issueFeedFilterSchema = z.object({
   hasSodId: z.coerce.boolean().optional(),
   hasCruzfixId: z.coerce.boolean().optional(),
   hasFindings: z.coerce.boolean().optional(),
+  onHold: z.coerce.boolean().optional(),
 });
 
 export const uiIssueFormSchema = z.object({
@@ -63,6 +65,7 @@ export const uiIssueFormSchema = z.object({
   supervisorNeeded: z.boolean().default(false),
   cruzfixId: z.string().optional(),
   sodId: z.string().optional(),
+  onHold: z.boolean().default(false),
 
   // edit-specific fields
   reportedBy: z.email().optional(),
