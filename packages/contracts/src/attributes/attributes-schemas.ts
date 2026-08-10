@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const attributeSchema = z.object({
-  _id: z.uuidv7(),
   label: z.string(),
   color: z.string(),
 });
