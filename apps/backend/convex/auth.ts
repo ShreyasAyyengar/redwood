@@ -17,7 +17,7 @@ export const authComponent = createClient<DataModel, typeof authSchema>(componen
 export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   return {
     database: authComponent.adapter(ctx),
-    plugins: [convex({ authConfig })],
+    plugins: [convex({ authConfig }), multiSession()],
     trustedOrigins: [env.WEBSITE_URL],
     baseURL: env.WEBSITE_URL + env.AUTH_BASE_PATH,
     socialProviders: {
