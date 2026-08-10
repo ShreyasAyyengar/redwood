@@ -11,6 +11,8 @@ const app = defineApp({
 
     GOOGLE_CLIENT_ID: v.string(),
     GOOGLE_CLIENT_SECRET: v.string(),
+
+    DISCORD_WEBHOOK_URL: v.string(),
   },
 });
 app.use(betterAuth);
