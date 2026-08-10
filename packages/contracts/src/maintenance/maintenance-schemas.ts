@@ -3,7 +3,7 @@ import { z } from "zod";
 export const maintenanceEntrySchema = z.object({
   _id: z.uuidv7(),
   classroomId: z.uuidv7(),
-  date: z.coerce.date(),
+  date: z.iso.datetime(),
   completedBy: z.email(),
   microphone: z
     .object({

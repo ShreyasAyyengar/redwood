@@ -26,7 +26,7 @@ export const classroomSchema = z.object({
   schedule: scheduleSchema.optional(),
   lastMaintenance: z
     .object({
-      date: z.coerce.date(),
+      date: z.iso.datetime(),
       by: z.email(),
     })
     .optional(),

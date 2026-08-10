@@ -4,7 +4,7 @@ import { classroomSchema, classroomSchemaPayload } from "../rooms/classroom-cont
 
 const issueDetailsSchema = z.object({
   reportedBy: z.email("Issue reportedBy must be provided."),
-  reportedAt: z.coerce.date("Issue reportedAt must be provided"),
+  reportedAt: z.iso.datetime("Issue reportedAt must be provided"),
   description: z.string("Issue description must be provided").min(1, "Issue description must be provided"),
   sodId: z.string().optional(),
   cruzfixId: z.string().optional(),
@@ -15,24 +15,24 @@ const issueDetailsSchema = z.object({
 
 const issueEditSchema = z.object({
   editedBy: z.email("Issue edited.editedBy must be provided"),
-  editDate: z.coerce.date("Issue edited.editDate must be provided"),
+  editDate: z.iso.datetime("Issue edited.editDate must be provided"),
 });
 
 export const FINDINGS_OPTIONS = ["NO SYSTEM FAULT"] as const;
 const issueResolutionSchema = z.object({
   resolvedBy: z.email("Issue resolution.resolvedBy must be provided"),
-  resolvedAt: z.coerce.date("Issue resolution.resolvedAt must be provided"),
+  resolvedAt: z.iso.datetime("Issue resolution.resolvedAt must be provided"),
   comment: z.string("Issue resolution.comment must be provided"),
   findings: z.array(z.enum(FINDINGS_OPTIONS)).optional(), // TOOD migrate and then enable
 });
 
 // DB Schema - The complete object as stored in the database
 export const issueSchema = z.object({
-  _id: z.uuidv7(),
-  classroomId: z.uuidv7(),
+  _id: z.string(),
+  classroomId: z.string(),
 
   createdBy: z.email(), // non-editable
-  createdAt: z.coerce.date(), // non-editable
+  createdAt: z.iso.datetime(), // non-editable
 
   issue: issueDetailsSchema,
   edited: issueEditSchema.optional(),
@@ -40,8 +40,8 @@ export const issueSchema = z.object({
 });
 
 export const issueFeedDateRangeFilterSchema = z.object({
-  from: z.coerce.date().optional(),
-  to: z.coerce.date().optional(),
+  from: z.iso.datetime().optional(),
+  to: z.iso.datetime().optional(),
 });
 
 export const issueFeedFilterSchema = z.object({
@@ -69,13 +69,13 @@ export const uiIssueFormSchema = z.object({
 
   // edit-specific fields
   reportedBy: z.email().optional(),
-  reportedAt: z.coerce.date().optional(),
+  reportedAt: z.iso.datetime().optional(),
 
   resolution: z
     .object({
       comment: z.string().min(1, "Issue resolution.comment must be provided"),
       resolvedBy: z.email(),
-      resolvedAt: z.coerce.date(),
+      resolvedAt: z.iso.datetime(),
     })
     .optional(),
 });
