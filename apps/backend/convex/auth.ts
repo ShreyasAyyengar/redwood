@@ -33,7 +33,24 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     //   errorURL: "http://localhost:3000/error",
     //   throw: true,
     // },
+    user: {
+      additionalFields: {
+        role: {
+          // The Convex schema generator cannot translate Better Auth enum-array field types.
+          type: "string",
+          required: true,
+          defaultValue: "employee",
+          input: false,
+        },
+      },
+    },
+    session: {
+      expiresIn: 60 * 60 * 8,
+      updateAge: 60 * 60 * 2,
+    },
   } satisfies BetterAuthOptions;
 };
+
+export const options = createAuthOptions({} as GenericCtx<DataModel>);
 
 export const createAuth = (ctx: GenericCtx<DataModel>) => betterAuth(createAuthOptions(ctx));
