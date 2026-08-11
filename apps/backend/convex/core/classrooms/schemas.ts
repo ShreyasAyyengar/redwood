@@ -1,5 +1,5 @@
+import { zid } from "convex-helpers/server/zod4";
 import { z } from "zod";
-import { attributeSchema } from "../attributes/attributes-schemas";
 
 const blockSchema = z
   .object({
@@ -19,7 +19,6 @@ export const scheduleSchema = z.object({
 });
 
 export const classroomSchema = z.object({
-  _id: z.uuidv7(),
   sourceRoomName: z.string(),
   displayName: z.string(), // by default will be sourceRoomName
   groupKey: z.string().default("Ungrouped"),
@@ -30,16 +29,15 @@ export const classroomSchema = z.object({
       by: z.email(),
     })
     .optional(),
-  roomStatus: z.enum(["GOOD", "NEEDS ATTENTION", "NEEDS URGENT ATTENTION"]).default("GOOD"),
   isActive: z.boolean().default(true),
   captioning: z
     .object({
-      isCaptioning: z.boolean(),
+      isCaptioningThisQuarter: z.boolean(),
       type: z.enum(["DTEN", "MAC"]),
       identifier: z.string(),
     })
     .optional(),
-  attributes: z.array(attributeSchema.shape._id).default([]),
+  attributes: z.array(zid("attributes")),
 });
 
 export const classroomSchemaPayload = classroomSchema.extend({
