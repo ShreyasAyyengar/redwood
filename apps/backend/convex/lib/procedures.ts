@@ -15,6 +15,7 @@ import {
   type QueryCtx,
   query,
 } from "../_generated/server";
+import { authComponent } from "../auth.ts";
 
 type AuthCtx = QueryCtx | MutationCtx | ActionCtx;
 
@@ -31,8 +32,25 @@ async function requireIdentity(ctx: AuthCtx) {
   return identity;
 }
 
+async function requireAdmin(ctx: AuthCtx) {
+  const identity = await authComponent.getAuthUser(ctx);
+
+  if (identity?.role !== "admin") {
+    throw new ConvexError({
+      code: "FORBIDDEN",
+      message: "Administrator access required",
+    });
+  }
+
+  return identity;
+}
+
 const withIdentity = customCtx(async (ctx: AuthCtx) => ({
   identity: await requireIdentity(ctx),
+}));
+
+const withAdminIdentity = customCtx(async (ctx: AuthCtx) => ({
+  identity: await requireAdmin(ctx),
 }));
 
 export const internalQuery = zCustomQuery(baseInternalQuery, NoOp);
@@ -42,3 +60,7 @@ export const internalAction = zCustomAction(baseInternalAction, NoOp);
 export const protectedQuery = zCustomQuery(query, withIdentity);
 export const protectedMutation = zCustomMutation(mutation, withIdentity);
 export const protectedAction = zCustomAction(action, withIdentity);
+
+export const adminQuery = zCustomQuery(query, withAdminIdentity);
+export const adminMutation = zCustomMutation(mutation, withAdminIdentity);
+export const adminAction = zCustomAction(action, withAdminIdentity);
