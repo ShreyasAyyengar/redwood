@@ -1,9 +1,9 @@
-import { attributeSchema } from "@redwood/contracts";
 import { ConvexError } from "convex/values";
 import { withSystemFields } from "convex-helpers/server/zod";
 import { z } from "zod";
-import { protectedMutation, protectedQuery } from "../lib/procedures.ts";
-import { classroomDoc } from "./classrooms.ts";
+import { protectedMutation, protectedQuery } from "../../lib/procedures.ts";
+import { classroomDoc } from "../classrooms/service.ts";
+import { attributeSchema } from "./schemas.ts";
 
 export const attributeDoc = z.object(withSystemFields("attributes", attributeSchema.shape));
 
