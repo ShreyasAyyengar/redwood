@@ -47,7 +47,7 @@ export const getAllRooms = protectedQuery({
         await ctx.db
           .query("tasks")
           .withIndex("byClassroomIdAndCompletionAndVisibleAt", (q) =>
-            q.eq("classroomId", room._id).ne("completion", null).lte("visibleAt", new Date())
+            q.eq("classroomId", room._id).eq("completion", undefined).lte("task.visibleAt", new Date().toISOString())
           )
           .collect()
       ).length;
