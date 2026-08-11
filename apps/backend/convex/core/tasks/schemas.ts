@@ -1,6 +1,5 @@
+import { zid } from "convex-helpers/server/zod4";
 import { z } from "zod";
-import { attributeSchema } from "../attributes/attributes-schemas";
-import { classroomSchema, classroomSchemaPayload } from "../rooms/classroom-contract";
 
 export const taskDetailsSchema = z.object({
   createdBy: z.email(),
@@ -24,13 +23,17 @@ export const taskCompletionSchema = z.object({
 });
 
 export const taskSchema = z.object({
-  _id: z.uuidv7(),
-  classroomId: z.uuidv7(),
+  classroomId: zid("classrooms"),
   createdBy: z.email(), // non-editable
   createdAt: z.iso.datetime(), // non-editable
   task: taskDetailsSchema,
   edited: taskEditSchema.optional(),
   completion: taskCompletionSchema.optional(),
+
+  // Derived fields used to reproduce the task feed's ordering in one index.
+  // OPEN sorts before COMPLETED when the feed index is read descending.
+  feedStatus: z.enum(["OPEN", "COMPLETED"]),
+  feedDate: z.iso.datetime(),
 });
 
 export const taskFeedDateRangeFilterSchema = z.object({
@@ -39,15 +42,15 @@ export const taskFeedDateRangeFilterSchema = z.object({
 });
 
 export const taskFeedFilterSchema = z.object({
-  classroomId: classroomSchema.shape._id.optional(),
+  classroomId: zid("classrooms").optional(),
   group: z.string().optional(),
   search: z.string().optional(),
   created: taskFeedDateRangeFilterSchema.optional(),
   completed: taskFeedDateRangeFilterSchema.optional(),
   status: z.enum(["OPEN", "COMPLETED"]).optional(),
-  urgent: z.coerce.boolean().optional(),
-  supervisorNeeded: z.coerce.boolean().optional(),
-  hasDueDate: z.coerce.boolean().optional(),
+  urgent: z.boolean().optional(),
+  supervisorNeeded: z.boolean().optional(),
+  hasDueDate: z.boolean().optional(),
 });
 
 export const uiTaskFormSchema = z.object({
@@ -70,25 +73,14 @@ export const uiTaskFormSchema = z.object({
     .optional(),
 });
 
-export const taskMutationResult = z.object({
-  mutatedTask: taskSchema,
-  roomSnapshot: classroomSchemaPayload,
-});
-
 export const bulkTaskFormSchema = uiTaskFormSchema.extend({
-  attributeIds: z.array(attributeSchema.shape._id).default([]),
-  classroomIds: z.array(classroomSchema.shape._id).default([]),
-});
-
-export const bulkTaskMutationResult = z.object({
-  mutatedTasks: z.array(taskSchema),
-  roomSnapshots: z.array(classroomSchemaPayload),
+  attributeIds: z.array(zid("attributes")).default([]),
+  classroomIds: z.array(zid("classrooms")).default([]),
 });
 
 export const taskTemplateSchema = z.object({
-  _id: z.uuidv7(),
   name: z.string().trim().min(1, "Task template name is required"),
   description: z.string().trim().min(1, "Task template description is required"),
-  attributeIds: z.array(attributeSchema.shape._id).default([]),
-  classroomIds: z.array(z.uuidv7()).default([]),
+  attributeIds: z.array(zid("attributes")).default([]),
+  classroomIds: z.array(zid("classrooms")).default([]),
 });
