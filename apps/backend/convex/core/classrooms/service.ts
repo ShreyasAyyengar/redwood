@@ -12,8 +12,8 @@ export const getRoom = protectedQuery({
     id: zid("classrooms"),
   }),
   returns: classroomDoc,
-  handler: (ctx, args) => {
-    const room = ctx.db.get("classrooms", args.id);
+  handler: async (ctx, args) => {
+    const room = await ctx.db.get("classrooms", args.id);
     if (!room)
       throw new ConvexError({
         code: "NOT_FOUND",
