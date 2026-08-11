@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const groupSchema = z.object({
-  _id: z.uuidv7(),
   label: z.string(),
 });
 
