@@ -1,8 +1,8 @@
+import { zid } from "convex-helpers/server/zod4";
 import { z } from "zod";
 
 export const maintenanceEntrySchema = z.object({
-  _id: z.uuidv7(),
-  classroomId: z.uuidv7(),
+  classroomId: zid("classrooms"),
   date: z.iso.datetime(),
   completedBy: z.email(),
   microphone: z
@@ -32,4 +32,4 @@ export const maintenanceEntrySchema = z.object({
   equipmentChecked: z.boolean(),
 });
 
-export const maintenanceFormSchema = maintenanceEntrySchema.omit({ _id: true, completedBy: true, classroomId: true });
+export const maintenanceFormSchema = maintenanceEntrySchema.omit({ completedBy: true, classroomId: true });
