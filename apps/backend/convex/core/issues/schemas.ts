@@ -1,6 +1,5 @@
+import { zid } from "convex-helpers/server/zod4";
 import z from "zod";
-import { attributeSchema } from "../attributes/attributes-schemas";
-import { classroomSchema, classroomSchemaPayload } from "../rooms/classroom-contract";
 
 const issueDetailsSchema = z.object({
   reportedBy: z.email("Issue reportedBy must be provided."),
@@ -10,7 +9,7 @@ const issueDetailsSchema = z.object({
   cruzfixId: z.string().optional(),
   urgent: z.boolean(),
   supervisorNeeded: z.boolean(),
-  onHold: z.stringbool().default(false),
+  onHold: z.boolean(),
 });
 
 const issueEditSchema = z.object({
@@ -28,7 +27,6 @@ const issueResolutionSchema = z.object({
 
 // DB Schema - The complete object as stored in the database
 export const issueSchema = z.object({
-  _id: z.string(),
   classroomId: z.string(),
 
   createdBy: z.email(), // non-editable
@@ -37,6 +35,11 @@ export const issueSchema = z.object({
   issue: issueDetailsSchema,
   edited: issueEditSchema.optional(),
   resolution: issueResolutionSchema.optional(),
+
+  // Derived fields used to reproduce the issue feed's ordering in one index.
+  // UNRESOLVED sorts before RESOLVED when the feed index is read descending.
+  feedStatus: z.enum(["UNRESOLVED", "RESOLVED"]),
+  feedDate: z.iso.datetime(),
 });
 
 export const issueFeedDateRangeFilterSchema = z.object({
@@ -45,18 +48,18 @@ export const issueFeedDateRangeFilterSchema = z.object({
 });
 
 export const issueFeedFilterSchema = z.object({
-  classroomId: classroomSchema.shape._id.optional(),
+  classroomId: zid("classrooms").optional(),
   group: z.string().optional(),
   search: z.string().optional(),
   created: issueFeedDateRangeFilterSchema.optional(),
   resolved: issueFeedDateRangeFilterSchema.optional(),
   status: z.enum(["UNRESOLVED", "RESOLVED"]).optional(),
-  urgent: z.coerce.boolean().optional(),
-  supervisorNeeded: z.coerce.boolean().optional(),
-  hasSodId: z.coerce.boolean().optional(),
-  hasCruzfixId: z.coerce.boolean().optional(),
-  hasFindings: z.coerce.boolean().optional(),
-  onHold: z.coerce.boolean().optional(),
+  urgent: z.boolean().optional(),
+  supervisorNeeded: z.boolean().optional(),
+  hasSodId: z.boolean().optional(),
+  hasCruzfixId: z.boolean().optional(),
+  hasFindings: z.boolean().optional(),
+  onHold: z.boolean().optional(),
 });
 
 export const uiIssueFormSchema = z.object({
@@ -80,17 +83,7 @@ export const uiIssueFormSchema = z.object({
     .optional(),
 });
 
-export const issueMutationResult = z.object({
-  mutatedIssue: issueSchema,
-  roomSnapshot: classroomSchemaPayload,
-});
-
 export const bulkIssueFormSchema = uiIssueFormSchema.extend({
-  attributeIds: z.array(attributeSchema.shape._id).default([]),
-  classroomIds: z.array(classroomSchema.shape._id).default([]),
-});
-
-export const bulkIssueMutationResult = z.object({
-  mutatedIssues: z.array(issueSchema),
-  roomSnapshots: z.array(classroomSchemaPayload),
+  attributeIds: z.array(zid("attributes")).default([]),
+  classroomIds: z.array(zid("classrooms")).default([]),
 });
