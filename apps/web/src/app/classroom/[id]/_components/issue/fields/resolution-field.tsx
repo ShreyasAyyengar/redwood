@@ -15,7 +15,13 @@ import { authClientWeb } from "../../../../../../lib/auth-client-web";
 import { webClientORPC } from "../../../../../../lib/orpc-web-client";
 import { type IssueFormValues, useFieldContext } from "../issue-form-context";
 
-export default function ResolutionField({ existingValue }: { existingValue?: z.infer<typeof issueSchema>["resolution"] }) {
+export default function ResolutionField({
+  existingValue,
+  onMarkResolved,
+}: {
+  existingValue?: z.infer<typeof issueSchema>["resolution"];
+  onMarkResolved: () => void;
+}) {
   const field = useFieldContext<IssueFormValues["resolution"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 
@@ -25,9 +31,6 @@ export default function ResolutionField({ existingValue }: { existingValue?: z.i
 
   const isAdmin = session.user.role === "admin";
   const defaultResolvedBy = existingValue?.resolvedBy ?? session.user.email;
-
-  // resolving checkbox toggled
-  const [resolving, setResolving] = useState(Boolean(existingValue?.comment ?? field.state.value?.comment));
 
   // local values of the resolution
   const [localValue, setLocalValue] = useState(existingValue?.comment ?? "");
@@ -45,17 +48,17 @@ export default function ResolutionField({ existingValue }: { existingValue?: z.i
       <div className={cn("flex items-center gap-2")}>
         <Checkbox
           className="h-5 w-5 border border-neutral-400"
-          checked={resolving}
+          checked={Boolean(field.state.value)}
           onCheckedChange={(checked) => {
             const next = checked === true;
-            setResolving(next);
             field.handleChange(next ? { comment: localValue, resolvedBy: selectedResolvedBy, resolvedAt: localResolvedAt } : undefined);
+            if (next) onMarkResolved();
           }}
         />
         <span>Mark as Resolved</span>
       </div>
 
-      {resolving && (
+      {field.state.value && (
         <Field data-invalid={isInvalid}>
           <div className="flex flex-col space-y-1">
             <Textarea

@@ -1,13 +1,13 @@
 {
   "name": "@redwood/web",
   "version": "0.1.0",
-  "type": "module",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "bun run next dev --port 3000",
     "build": "bun run next build",
-    "start": "bun run next start",
-    "check-types": "bun run next typegen && bun run tsgo --noEmit"
+    "check-types": "bun run next typegen && bun run tsgo --noEmit",
+    "dev": "bun run next dev --port 3000",
+    "start": "bun run next start"
   },
   "dependencies": {
     "@better-auth/electron": "1.6.22",
@@ -42,7 +42,6 @@
     "@redwood/typescript-config": "workspace:*",
     "@types/node": "^26.0.1",
     "@types/react": "19.2.17",
-    "@types/react-dom": "19.2.3",
-    "typescript": "6.0.3"
+    "@types/react-dom": "19.2.3"
   }
 }
