@@ -16,8 +16,6 @@
     "@orpc/openapi": "^1.14.6",
     "@orpc/server": "^1.14.6",
     "@orpc/tanstack-query": "^1.14.6",
-    "@redwood/api": "workspace:*",
-    "@redwood/contracts": "workspace:*",
     "@redwood/shad-ui": "workspace:*",
     "@tailwindcss/postcss": "^4.3.2",
     "@tanstack/react-form": "^1.33.0",
