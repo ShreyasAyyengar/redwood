@@ -36,6 +36,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   emailVerified: boolean;
                   image?: null | string;
                   name: string;
+                  role: string;
                   updatedAt: number;
                   userId?: null | string;
                 };
@@ -112,6 +113,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "role"
                     | "_id";
                   mode?: "sensitive" | "insensitive";
                   operator?:
@@ -305,6 +307,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "role"
                     | "_id";
                   mode?: "sensitive" | "insensitive";
                   operator?:
@@ -557,6 +560,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   emailVerified?: boolean;
                   image?: null | string;
                   name?: string;
+                  role?: string;
                   updatedAt?: number;
                   userId?: null | string;
                 };
@@ -570,6 +574,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "role"
                     | "_id";
                   mode?: "sensitive" | "insensitive";
                   operator?:
@@ -795,6 +800,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                   emailVerified?: boolean;
                   image?: null | string;
                   name?: string;
+                  role?: string;
                   updatedAt?: number;
                   userId?: null | string;
                 };
@@ -808,6 +814,7 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
                     | "createdAt"
                     | "updatedAt"
                     | "userId"
+                    | "role"
                     | "_id";
                   mode?: "sensitive" | "insensitive";
                   operator?:
@@ -1010,6 +1017,15 @@ export type ComponentApi<Name extends string | undefined = string | undefined> =
           onUpdateHandle?: string;
         },
         any,
+        Name
+      >;
+    };
+    users: {
+      changeRole: FunctionReference<
+        "mutation",
+        "internal",
+        { email: string; newRole: string },
+        { success: boolean },
         Name
       >;
     };

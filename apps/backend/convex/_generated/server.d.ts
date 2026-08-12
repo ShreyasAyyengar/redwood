@@ -27,6 +27,7 @@ import type { DataModel } from "./dataModel.js";
 type Env = {
   readonly AUTH_BASE_PATH: string;
   readonly BETTER_AUTH_SECRET: string;
+  readonly DISCORD_WEBHOOK_URL: string;
   readonly GOOGLE_CLIENT_ID: string;
   readonly GOOGLE_CLIENT_SECRET: string;
   readonly WEBSITE_URL: string;
