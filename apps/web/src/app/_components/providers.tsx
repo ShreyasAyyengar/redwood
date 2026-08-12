@@ -28,14 +28,10 @@ function getQueryClient() {
 }
 
 const convex = new ConvexReactClient(env.NEXT_PUBLIC_CONVEX_URL);
-// The provider's AuthClient type is narrower than Better Auth's inferred type
-// when additional client plugins are present. The required Convex plugin is
-// included in authClientWeb, so the clients are runtime-compatible.
-const convexAuthClient = authClientWeb as unknown as AuthClient;
 
 export function ConvexClientProvider({ children, initialToken }: { children: ReactNode; initialToken?: string | null }) {
   return (
-    <ConvexBetterAuthProvider client={convex} authClient={convexAuthClient} initialToken={initialToken}>
+    <ConvexBetterAuthProvider client={convex} authClient={authClientWeb as unknown as AuthClient} initialToken={initialToken}>
       {children}
     </ConvexBetterAuthProvider>
   );
