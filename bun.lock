@@ -35,6 +35,7 @@
       "name": "@redwood/web",
       "version": "0.1.0",
       "dependencies": {
+        "@convex-dev/better-auth": "^0.12.5",
         "@lucide/lab": "^0.2.0",
         "@redwood/shad-ui": "workspace:*",
         "@tailwindcss/postcss": "^4.3.3",

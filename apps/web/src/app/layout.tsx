@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "@redwood/shad-ui/globals.css";
 import { Suspense } from "react";
 import { env } from "../env";
+import { getToken } from "../lib/auth-server";
 import ActionMenu from "./_components/action-menu/action-menu";
 import AuthLayer from "./_components/auth-layer";
 import NavigatorCommand from "./_components/navigate/navigator-command";
@@ -24,14 +25,16 @@ export const metadata: Metadata = {
 
 const reactScanEnabled = env.NEXT_PUBLIC_NODE_ENV === "development";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialToken = await getToken();
+
   return (
     <html lang="en">
-      <Providers>
+      <Providers initialToken={initialToken}>
         <Suspense fallback={null}>
           <AuthLayer />
         </Suspense>

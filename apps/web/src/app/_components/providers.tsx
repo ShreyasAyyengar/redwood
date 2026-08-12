@@ -1,9 +1,12 @@
 "use client";
 
+import { type AuthClient, ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
 import { isServer, QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ConvexProvider, ConvexReactClient } from "convex/react";
+import { ConvexReactClient } from "convex/react";
 import { NuqsAdapter } from "nuqs/adapters/next";
+import type { ReactNode } from "react";
 import { env } from "../../env";
+import { authClientWeb } from "../../lib/auth-client-web";
 
 const STALE_TIME = 60 * 1000;
 function makeQueryClient() {
@@ -24,15 +27,28 @@ function getQueryClient() {
   return browserQueryClient;
 }
 
-export default function Providers({ children }: { children: React.ReactNode }) {
+const convex = new ConvexReactClient(env.NEXT_PUBLIC_CONVEX_URL);
+// The provider's AuthClient type is narrower than Better Auth's inferred type
+// when additional client plugins are present. The required Convex plugin is
+// included in authClientWeb, so the clients are runtime-compatible.
+const convexAuthClient = authClientWeb as unknown as AuthClient;
+
+export function ConvexClientProvider({ children, initialToken }: { children: ReactNode; initialToken?: string | null }) {
+  return (
+    <ConvexBetterAuthProvider client={convex} authClient={convexAuthClient} initialToken={initialToken}>
+      {children}
+    </ConvexBetterAuthProvider>
+  );
+}
+
+export default function Providers({ children, initialToken }: { children: ReactNode; initialToken?: string | null }) {
   const queryClient = getQueryClient();
-  const convex = new ConvexReactClient(env.NEXT_PUBLIC_CONVEX_URL);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ConvexProvider client={convex}>
+      <ConvexClientProvider initialToken={initialToken}>
         <NuqsAdapter>{children}</NuqsAdapter>
-      </ConvexProvider>
+      </ConvexClientProvider>
     </QueryClientProvider>
   );
 }

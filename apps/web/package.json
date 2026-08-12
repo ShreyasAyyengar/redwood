@@ -10,6 +10,7 @@
     "start": "bun run next start"
   },
   "dependencies": {
+    "@convex-dev/better-auth": "^0.12.5",
     "@lucide/lab": "^0.2.0",
     "@redwood/shad-ui": "workspace:*",
     "@tailwindcss/postcss": "^4.3.3",
