@@ -1,7 +1,9 @@
 "use client";
 
 import { isServer, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { NuqsAdapter } from "nuqs/adapters/next";
+import { env } from "../../env";
 
 const STALE_TIME = 60 * 1000;
 function makeQueryClient() {
@@ -24,10 +26,13 @@ function getQueryClient() {
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
+  const convex = new ConvexReactClient(env.NEXT_PUBLIC_CONVEX_URL);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <NuqsAdapter>{children}</NuqsAdapter>
+      <ConvexProvider client={convex}>
+        <NuqsAdapter>{children}</NuqsAdapter>
+      </ConvexProvider>
     </QueryClientProvider>
   );
 }
