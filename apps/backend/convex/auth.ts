@@ -17,6 +17,12 @@ export const authComponent = createClient<DataModel, typeof authSchema>(componen
   },
 });
 
+type Role = (typeof roles)[number];
+
+async function getRoleForEmail(ctx: GenericCtx<DataModel>, email: string): Promise<Role> {
+  return await ctx.runQuery(internal.core.users.service.getRole, { email });
+}
+
 export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   return {
     database: authComponent.adapter(ctx),
@@ -62,8 +68,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
       user: {
         create: {
           before: async (user) => {
-            type Role = (typeof roles)[number];
-            const role: Role = await ctx.runQuery(internal.core.users.service.getRole, { email: user.email });
+            const role = await getRoleForEmail(ctx, user.email);
 
             return {
               data: {
