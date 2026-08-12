@@ -27,7 +27,7 @@ const issueResolutionSchema = z.object({
 
 // DB Schema - The complete object as stored in the database
 export const issueSchema = z.object({
-  classroomId: z.string(),
+  classroomId: zid("classrooms"),
 
   createdBy: z.email(), // non-editable
   createdAt: z.iso.datetime(), // non-editable
