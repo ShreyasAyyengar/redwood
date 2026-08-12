@@ -295,6 +295,9 @@ export const editIssue = protectedMutation({
             },
           }
         : { resolution: undefined }),
+
+      feedStatus: args.resolution ? "RESOLVED" : "UNRESOLVED",
+      feedDate: args.resolution?.resolvedAt ?? issueDocument.issue.reportedAt,
     };
 
     await ctx.db.patch("issues", args._id, updatedIssue);
