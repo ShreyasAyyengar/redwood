@@ -17,6 +17,7 @@
     "better-auth": "^1.6.25",
     "convex": "^1.43.0",
     "convex-helpers": "^0.1.120",
+    "csv-parse": "^7.0.0",
     "@redwood/contracts": "workspace:*"
   }
 }
