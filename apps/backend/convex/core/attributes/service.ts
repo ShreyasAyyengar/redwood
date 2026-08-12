@@ -51,7 +51,7 @@ export const updateAttribute = protectedMutation({
   },
 });
 
-export const applyAttributes = protectedMutation({
+export const bulkUpdateAttributes = protectedMutation({
   args: z.object({
     updates: z.array(
       z.object({
