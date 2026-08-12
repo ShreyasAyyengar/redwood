@@ -1,12 +1,15 @@
 import type { GenericCtx } from "@convex-dev/better-auth";
 import { createClient } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
+import { APIError } from "better-auth";
 import { type BetterAuthOptions, betterAuth } from "better-auth/minimal";
-import { components } from "./_generated/api";
+import { multiSession } from "better-auth/plugins";
+import { components, internal } from "./_generated/api";
 import type { DataModel } from "./_generated/dataModel";
 import { env } from "./_generated/server";
 import authConfig from "./auth.config.ts";
 import authSchema from "./betterAuth/schema";
+import type { roles } from "./core/users/schemas.ts";
 
 export const authComponent = createClient<DataModel, typeof authSchema>(components.betterAuth, {
   local: {
@@ -26,8 +29,19 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
         clientId: env.GOOGLE_CLIENT_ID,
         clientSecret: env.GOOGLE_CLIENT_SECRET,
         accessType: "offline",
+        mapProfileToUser: async (profile) => {
+          const { email } = profile;
+          const { exists } = await ctx.runQuery(internal.core.users.service.hasCredentials, { email });
+
+          if (exists) return profile;
+          const headers = new Headers();
+          headers.set("location", `${env.WEBSITE_URL}/auth/error`);
+          throw new APIError("FOUND", undefined, headers);
+          // status must be FOUND so that the redirect goes to WEBSITE_URL and not API_URL
+        },
       },
     },
+
     // THIS IS USELESS UNLESS BETTERAUTH CAN FIX THEIR ROUTING. IF WORKS, MOVE DOMAIN LOGIC TO mapProfileToUser
     // onAPIError: {
     //   errorURL: "http://localhost:3000/error",
@@ -41,6 +55,23 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
           required: true,
           defaultValue: "employee",
           input: false,
+        },
+      },
+    },
+    databaseHooks: {
+      user: {
+        create: {
+          before: async (user) => {
+            type Role = (typeof roles)[number];
+            const role: Role = await ctx.runQuery(internal.core.users.service.getRole, { email: user.email });
+
+            return {
+              data: {
+                ...user,
+                role,
+              },
+            };
+          },
         },
       },
     },
