@@ -1,12 +1,21 @@
-import { attributeSchema, classroomSchema, groupSchema, issueSchema, maintenanceEntrySchema, taskSchema } from "@redwood/contracts";
-import { defineSchema, defineTable } from "convex/server";
-import { zodOutputToConvex } from "convex-helpers/server/zod";
+import { defineSchema } from "convex/server";
+import { attributeTable } from "./core/attributes/table.ts";
+import { classroomTable } from "./core/classrooms/table.ts";
+import { csvRecordTable } from "./core/csv/table.ts";
+import { groupTable } from "./core/groups/table.ts";
+import { issueTable } from "./core/issues/table.ts";
+import { maintenanceEntryTable } from "./core/maintenance/table.ts";
+import { taskTable, taskTemplateTable } from "./core/tasks/table.ts";
+import { redwoodUserTable } from "./core/users/table.ts";
 
 export default defineSchema({
-  issues: defineTable(zodOutputToConvex(issueSchema)),
-  tasks: defineTable(zodOutputToConvex(taskSchema)),
-  classrooms: defineTable(zodOutputToConvex(classroomSchema)),
-  attributes: defineTable(zodOutputToConvex(attributeSchema)),
-  groups: defineTable(zodOutputToConvex(groupSchema)),
-  maintenance: defineTable(zodOutputToConvex(maintenanceEntrySchema)),
+  classrooms: classroomTable,
+  csvRecords: csvRecordTable,
+  issues: issueTable,
+  tasks: taskTable,
+  taskTemplates: taskTemplateTable,
+  maintenance: maintenanceEntryTable,
+  attributes: attributeTable,
+  redwoodUsers: redwoodUserTable,
+  groups: groupTable,
 });
