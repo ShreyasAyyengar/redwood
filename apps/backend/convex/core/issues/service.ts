@@ -73,9 +73,9 @@ function matchesSearch(issue: Issue, filters: IssueFeedFilter) {
   return descriptionMatches || resolutionMatches;
 }
 
-function matchesIssue(issue: Issue, view: "OPEN" | "ALL", filters: IssueFeedFilter | undefined, groupClassroomIds: Set<string> | undefined) {
-  const isOpen = issue.resolution === undefined && !issue.issue.onHold;
-  if (view === "OPEN" && !isOpen) return false;
+function matchesIssue(issue: Issue, view: "ACTIVE" | "ALL", filters: IssueFeedFilter | undefined, groupClassroomIds: Set<string> | undefined) {
+  const isActive = issue.resolution === undefined && !issue.issue.onHold;
+  if (view === "ACTIVE" && !isActive) return false;
   if (!filters) return true;
 
   return (
@@ -86,9 +86,11 @@ function matchesIssue(issue: Issue, view: "OPEN" | "ALL", filters: IssueFeedFilt
   );
 }
 
+// ACTIVE: returns paginated unresolved issues, excluding held issues
+// ALL: returns all issues
 export const getIssues = protectedQuery({
   args: z.object({
-    view: z.enum(["OPEN", "ALL"]),
+    view: z.enum(["ACTIVE", "ALL"]),
     filters: issueFeedFilterSchema.optional(),
     paginationOpts: convexToZod(paginationOptsValidator),
   }),
@@ -108,7 +110,7 @@ export const getIssues = protectedQuery({
     }
 
     const inferredStatus = filters?.status ?? (filters?.resolved || filters?.hasFindings ? "RESOLVED" : undefined);
-    const indexedStatus = view === "OPEN" ? "UNRESOLVED" : inferredStatus;
+    const indexedStatus = view === "ACTIVE" ? "UNRESOLVED" : inferredStatus;
     const issues = stream(ctx.db, schema);
 
     const orderedIssues = classroomId
@@ -136,7 +138,8 @@ export const getIssues = protectedQuery({
   },
 });
 
-export const getActiveIssues = protectedQuery({
+// returns all unresolved issues
+export const getClassroomIssues = protectedQuery({
   args: z.object({
     classroomId: zid("classrooms").optional(),
   }),
