@@ -1,11 +1,12 @@
 "use client";
 
+import { convexQuery, useConvexAuth } from "@convex-dev/react-query";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import { api } from "../../../../backend/convex/_generated/api";
 import { env } from "../../env";
 import { authClientWeb } from "../../lib/auth-client-web";
-import { webClientORPC } from "../../lib/orpc-web-client";
 import { useFetchedRoomsStore } from "./room-store";
 
 export default function AuthLayer() {
@@ -30,10 +31,9 @@ export default function AuthLayer() {
 
   const { setRoomsAndFetching } = useFetchedRoomsStore();
 
+  const { isLoading, isAuthenticated } = useConvexAuth();
   const { data: roomData, isFetched } = useQuery(
-    webClientORPC.classrooms.getRooms.queryOptions({
-      enabled: !isPending && !!data,
-    })
+    convexQuery(api.core.classrooms.service.getAllRooms, !isLoading && isAuthenticated ? {} : "skip")
   );
 
   useEffect(() => {
