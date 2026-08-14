@@ -5,7 +5,7 @@ import { z } from "zod";
 import { internal } from "../../_generated/api";
 import type { ActionCtx } from "../../_generated/server";
 import { csvRowSchema, emptySchedule, processTimeRanges } from "../../lib/csv.ts";
-import { adminAction, internalAction, internalMutation, protectedQuery } from "../../lib/procedures.ts";
+import { adminAction, adminMutation, internalAction, internalMutation, protectedQuery } from "../../lib/procedures.ts";
 import { scheduleSchema } from "../classrooms/schemas.ts";
 import { csvRecordSchema, csvRoomSchema } from "./schemas.ts";
 
@@ -17,6 +17,11 @@ const processClassroomsByCSVArgs = z.object({
 
 type ProcessClassroomsByCSVArgs = z.infer<typeof processClassroomsByCSVArgs>;
 type CsvActionCtx = Pick<ActionCtx, "runMutation" | "storage">;
+
+export const generateCSVUploadUrl = adminMutation({
+  returns: z.string(),
+  handler: (ctx) => ctx.storage.generateUploadUrl(),
+});
 
 async function processClassroomsByCSVFile(ctx: CsvActionCtx, args: ProcessClassroomsByCSVArgs): Promise<void> {
   const csvFile = await ctx.storage.get(args.csvFileStorageId);
