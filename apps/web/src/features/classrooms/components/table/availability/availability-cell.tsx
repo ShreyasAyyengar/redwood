@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@redwood/shad-ui/components/dialog";
 import type { LegacyRow as Row } from "@tanstack/react-table/legacy";
-import { convertMinutesToReadable, dayAvailability, getBlocksForToday, getCaliClock } from "@/util/date-time-utils";
+import { convertMinutesToReadable, dayAvailability, getBlocksForToday, getCaliClock } from "#/util/date-time-utils.ts";
 import type { Classroom, ClassroomSummary } from "../../../model/classroom-types";
 import Availability from "../../detail/availability";
 
