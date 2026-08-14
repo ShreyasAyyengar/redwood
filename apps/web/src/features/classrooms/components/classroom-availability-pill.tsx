@@ -1,7 +1,7 @@
 import type { Doc } from "@backend/convex/_generated/dataModel";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { Clock3 } from "lucide-react";
-import { formatMinutesRange, getScheduleAvailability, SHORT_WEEKDAY_LABEL_BY_KEY } from "@/util/date-time-utils";
+import { formatMinutesRange, getScheduleAvailability, SHORT_WEEKDAY_LABEL_BY_KEY } from "#/util/date-time-utils.ts";
 
 // TODO remove this pill from tasks/issues that are already completed.
 type Classroom = Doc<"classrooms">;

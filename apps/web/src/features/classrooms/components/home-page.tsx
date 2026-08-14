@@ -1,9 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@redwood/shad-ui/components/tabs";
 import Image from "next/image";
-import AdminPanel from "@/features/admin/components/admin-panel";
-import { IssuesFeed } from "@/features/issues/components/feed/issues-feed";
-import { TasksFeed } from "@/features/tasks/components/feed/tasks-feed";
-import { authClientWeb } from "@/lib/auth-client-web";
+import AdminPanel from "#/features/admin/components/admin-panel.tsx";
+import { IssuesFeed } from "#/features/issues/components/feed/issues-feed.tsx";
+import { TasksFeed } from "#/features/tasks/components/feed/tasks-feed.tsx";
+import { authClientWeb } from "#/lib/auth-client-web.ts";
 import type { ClassroomSummary } from "../model/classroom-types";
 import RoomList from "./list/room-list";
 import { columns } from "./table/columns";

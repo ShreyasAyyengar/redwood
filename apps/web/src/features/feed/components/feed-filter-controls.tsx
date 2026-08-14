@@ -9,8 +9,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@redwood/shad-ui/compon
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { CalendarDays, CheckCircle2, Filter, RotateCcw, Search, ShieldAlert, X } from "lucide-react";
 import type React from "react";
-import type { IssueFeedFilterValue } from "@/features/issues/model/issue-filters";
-import type { TaskFeedFilterValue } from "@/features/tasks/model/task-filters";
+import type { IssueFeedFilterValue } from "#/features/issues/model/issue-filters.ts";
+import type { TaskFeedFilterValue } from "#/features/tasks/model/task-filters.ts";
 
 type DateRange = {
   from: Date | undefined;
@@ -246,7 +246,7 @@ function CheckboxOption({ checked, label, onChange }: { checked: boolean; label:
 function getActiveFilters(props: FeedFilterControlsProps): ActiveFilter[] {
   const filters: ActiveFilter[] = [];
   const setValue = (next: TaskFeedFilterValue | IssueFeedFilterValue) => props.onChange(next as never);
-  const value = props.value;
+  const { value } = props;
 
   if (value.search?.trim()) {
     filters.push({ key: "search", label: `Text: ${value.search.trim()}`, remove: () => setValue({ ...value, search: undefined }) });

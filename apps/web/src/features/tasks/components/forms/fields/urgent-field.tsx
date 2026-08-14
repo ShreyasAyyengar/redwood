@@ -2,7 +2,7 @@ import { Checkbox } from "@redwood/shad-ui/components/checkbox";
 import { Field, FieldError, FieldLabel } from "@redwood/shad-ui/components/field";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useState } from "react";
-import { urgencyStyle } from "@/util/style-util";
+import { urgencyStyle } from "#/util/style-util.ts";
 import { type TaskFormValues, useFieldContext } from "../task-form-context";
 
 export default function UrgentField({ existingValue }: { existingValue?: boolean }) {

@@ -4,10 +4,10 @@ import { Button } from "@redwood/shad-ui/components/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@redwood/shad-ui/components/dialog";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { useQuery } from "convex/react";
-import { IssueCard } from "@/features/issues/components/cards/issue-card";
-import { isActiveIssue } from "@/features/issues/model/issue-state";
-import { TaskCard } from "@/features/tasks/components/cards/task-card";
-import { isOpenTask } from "@/features/tasks/model/task-state";
+import { IssueCard } from "#/features/issues/components/cards/issue-card.tsx";
+import { isActiveIssue } from "#/features/issues/model/issue-state.ts";
+import { TaskCard } from "#/features/tasks/components/cards/task-card.tsx";
+import { isOpenTask } from "#/features/tasks/model/task-state.ts";
 
 export function MaintenanceAideDialog({
   open,

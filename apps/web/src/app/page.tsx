@@ -1,8 +1,8 @@
 "use client";
 
-import { api } from "@backend/convex/_generated/api";
 import { useQuery } from "convex/react";
-import HomePage from "@/features/classrooms/components/home-page";
+import HomePage from "#/features/classrooms/components/home-page.tsx";
+import { api } from "../../../backend/convex/_generated/api";
 import { authClientWeb } from "../lib/auth-client-web";
 import LoadingComponent from "./_components/loading";
 

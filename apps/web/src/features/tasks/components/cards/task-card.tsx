@@ -6,8 +6,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwo
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { Check, ClipboardClock, ClipboardList, Flag, UserPen } from "lucide-react";
 import type React from "react";
-import { type DateTimeDisplay, getDateTimeDisplay } from "@/util/date-time-utils";
-import { urgencyStyle } from "@/util/style-util";
+import { type DateTimeDisplay, getDateTimeDisplay } from "#/util/date-time-utils.ts";
+import { urgencyStyle } from "#/util/style-util.ts";
 
 export const TaskCard = ({
   task,

@@ -1,7 +1,7 @@
 "use client";
 
 import { type LegacyColumnDef as ColumnDef, legacyCreateColumnHelper as createColumnHelper } from "@tanstack/react-table/legacy";
-import { dayAvailability, getBlocksForToday, getCaliClock, toSortKey } from "@/util/date-time-utils";
+import { dayAvailability, getBlocksForToday, getCaliClock, toSortKey } from "#/util/date-time-utils.ts";
 import type { ClassroomSummary } from "../../model/classroom-types";
 import AvailabilityCell from "./availability/availability-cell";
 import AvailabilityHeader from "./availability/availability-header";

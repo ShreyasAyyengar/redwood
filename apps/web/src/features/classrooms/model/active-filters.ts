@@ -1,5 +1,5 @@
 import { create } from "zustand/react";
-import { dayAvailability, getBlocksForToday, getCaliClock } from "@/util/date-time-utils";
+import { dayAvailability, getBlocksForToday, getCaliClock } from "#/util/date-time-utils.ts";
 import type { ClassroomSummary, RoomStatus } from "./classroom-types";
 
 export type RoomFilterState = {

@@ -2,8 +2,8 @@
 
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import { env } from "../../env";
-import { authClientWeb } from "../../lib/auth-client-web";
+import { env } from "#/env.ts";
+import { authClientWeb } from "#/lib/auth-client-web.ts";
 
 export default function AuthLayer() {
   const { data, isPending } = authClientWeb.useSession();

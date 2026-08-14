@@ -5,7 +5,7 @@ import { Computer, TvMinimal } from "lucide-react";
 import type { ClassroomSummary } from "../../../model/classroom-types";
 
 export default function ClassroomNameCell({ row }: { row: Row<ClassroomSummary> }) {
-  const displayName = row.original.displayName;
+  const { displayName } = row.original;
   const group = row.original.groupKey;
 
   let captioningIcon: React.ReactNode = null;

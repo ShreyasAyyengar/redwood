@@ -2,7 +2,7 @@ import { api } from "@backend/convex/_generated/api";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@redwood/shad-ui/components/select";
 import { useQuery } from "convex/react";
 import { useState } from "react";
-import { authClientWeb } from "@/lib/auth-client-web";
+import { authClientWeb } from "#/lib/auth-client-web.ts";
 import { type TaskFormValues, useFieldContext } from "../task-form-context";
 
 export default function CreatedByFieldSelector({ existingValue }: { existingValue?: string }) {

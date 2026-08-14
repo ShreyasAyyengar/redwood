@@ -10,7 +10,7 @@ import { Textarea } from "@redwood/shad-ui/components/textarea";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useMutation, useQuery } from "convex/react";
 import { useMemo, useState } from "react";
-import { BulkTargetSelector, resolveBulkTargetClassroomIds } from "@/features/classrooms/components/bulk-target-selector";
+import { BulkTargetSelector, resolveBulkTargetClassroomIds } from "#/features/classrooms/components/bulk-target-selector.tsx";
 import { serializeTaskFormValues, taskFormSchema } from "../../model/task-form-schema";
 import { type TaskFormValues, taskAppForm } from "./task-form-context";
 import { TaskFormFields } from "./task-form-fields";

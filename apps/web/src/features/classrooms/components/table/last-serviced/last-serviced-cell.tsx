@@ -1,11 +1,11 @@
 import { cn } from "@redwood/shad-ui/lib/utils";
 import type { LegacyRow as Row } from "@tanstack/react-table/legacy";
-import { daysAgoNumeric, formatDate, getDateTimeDisplay } from "@/util/date-time-utils";
-import { urgencyStyle } from "@/util/style-util";
+import { daysAgoNumeric, formatDate, getDateTimeDisplay } from "#/util/date-time-utils.ts";
+import { urgencyStyle } from "#/util/style-util.ts";
 import type { ClassroomSummary } from "../../../model/classroom-types";
 
 export default function LastServicedCell({ row }: { row: Row<ClassroomSummary> }) {
-  const lastMaintenance = row.original.lastMaintenance;
+  const { lastMaintenance } = row.original;
   if (!lastMaintenance) return <div className="text-center text-foreground text-lg">No Record Yet</div>;
 
   const date = new Date(lastMaintenance.date);

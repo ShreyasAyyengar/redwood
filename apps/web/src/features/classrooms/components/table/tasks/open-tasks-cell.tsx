@@ -6,14 +6,14 @@ import type { LegacyRow as Row } from "@tanstack/react-table/legacy";
 import { useQuery } from "convex/react";
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { MiniTaskCard } from "@/features/tasks/components/cards/task-card";
-import { TaskDialog } from "@/features/tasks/components/dialogs/task-dialog";
-import { isOpenTask, sortOpenTasks } from "@/features/tasks/model/task-state";
+import { MiniTaskCard } from "#/features/tasks/components/cards/task-card.tsx";
+import { TaskDialog } from "#/features/tasks/components/dialogs/task-dialog.tsx";
+import { isOpenTask, sortOpenTasks } from "#/features/tasks/model/task-state.ts";
 import type { ClassroomSummary } from "../../../model/classroom-types";
 
 export default function OpenTasksCell({ row }: { row: Row<ClassroomSummary> }) {
   const room = row.original;
-  const openTasksCount = room.openTasksCount;
+  const { openTasksCount } = room;
   const [isHoverOpen, setIsHoverOpen] = useState(false);
 
   const tasks = useQuery(api.core.tasks.service.getClassroomTasks, isHoverOpen ? { classroomId: room._id } : "skip");

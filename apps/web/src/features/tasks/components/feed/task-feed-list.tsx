@@ -3,7 +3,7 @@
 import { api } from "@backend/convex/_generated/api";
 import { usePaginatedQuery, useQuery } from "convex/react";
 import { useCallback, useEffect } from "react";
-import { FeedEmptyState, FeedLoadingState, VirtualizedFeedList } from "@/features/feed/components/feed-list-layout";
+import { FeedEmptyState, FeedLoadingState, VirtualizedFeedList } from "#/features/feed/components/feed-list-layout.tsx";
 import { serializeTaskFeedFilters, type TaskFeedFilterValue } from "../../model/task-filters";
 import { isTaskVisible } from "../../model/task-state";
 import { TaskFeedCard } from "../cards/task-feed-card";

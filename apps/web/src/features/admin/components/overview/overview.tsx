@@ -1,6 +1,6 @@
 import { Separator } from "@redwood/shad-ui/components/separator";
-import IssueOverview from "@/features/issues/components/issue-overview";
-import TaskOverview from "@/features/tasks/components/task-overview";
+import IssueOverview from "#/features/issues/components/issue-overview.tsx";
+import TaskOverview from "#/features/tasks/components/task-overview.tsx";
 
 export default function Overview() {
   return (

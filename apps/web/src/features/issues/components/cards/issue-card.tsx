@@ -3,8 +3,8 @@ import { Card } from "@redwood/shad-ui/components/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwood/shad-ui/components/tooltip";
 import { Check, Flag, TriangleAlert, UserPen } from "lucide-react";
 import type { RefObject } from "react";
-import { type DateTimeDisplay, getDateTimeDisplay } from "@/util/date-time-utils";
-import { urgencyStyle } from "@/util/style-util";
+import { type DateTimeDisplay, getDateTimeDisplay } from "#/util/date-time-utils.ts";
+import { urgencyStyle } from "#/util/style-util.ts";
 import type { Issue } from "../../model/issue-state";
 import { IssueStatusIcon } from "./issue-status-icon";
 

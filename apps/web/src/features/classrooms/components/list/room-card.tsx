@@ -8,8 +8,8 @@ import {
   getBlocksForToday,
   getCaliClock,
   getDateTimeDisplay,
-} from "@/util/date-time-utils";
-import { urgencyStyle } from "@/util/style-util";
+} from "#/util/date-time-utils.ts";
+import { urgencyStyle } from "#/util/style-util.ts";
 import type { ClassroomSummary } from "../../model/classroom-types";
 
 export default function RoomCard({ room }: { room: ClassroomSummary }) {
@@ -48,30 +48,30 @@ export default function RoomCard({ room }: { room: ClassroomSummary }) {
     // biome-ignore lint/style/noNonNullAssertion: this can only be invoked by a classroom displayed with a schedule
     const blocks = getBlocksForToday(room.schedule!, weekdayKey);
 
-    const availability = dayAvailability(blocks, nowMin);
+    const roomAvailability = dayAvailability(blocks, nowMin);
 
-    if (availability.kind === "none")
+    if (roomAvailability.kind === "none")
       return (
         <div className="flex flex-col items-end">
           <p className="font-normal text-sm">Next Available:</p>
           <p className="font-semibold text-[#e57373] text-sm">Closed Until Tomorrow</p>
         </div>
       );
-    if (availability.kind === "closed")
+    if (roomAvailability.kind === "closed")
       return (
         <div className="flex flex-col items-end">
           <p className="font-normal text-sm">Next Available:</p>
           <p className="text-neutral-400 text-sm">
-            {convertMinutesToReadable(availability.nextStartMinTime)} - {convertMinutesToReadable(availability.nextEndMinTime)}
+            {convertMinutesToReadable(roomAvailability.nextStartMinTime)} - {convertMinutesToReadable(roomAvailability.nextEndMinTime)}
           </p>
         </div>
       );
-    if (availability.kind === "open")
+    if (roomAvailability.kind === "open")
       return (
         <div className="flex flex-col items-end">
           <p className="font-bold text-[#84bd68] text-sm">Available Now:</p>
           <p className="text-neutral-400 text-sm">
-            {convertMinutesToReadable(availability.startMinTime)} - {convertMinutesToReadable(availability.endMinTime)}
+            {convertMinutesToReadable(roomAvailability.startMinTime)} - {convertMinutesToReadable(roomAvailability.endMinTime)}
           </p>
         </div>
       );

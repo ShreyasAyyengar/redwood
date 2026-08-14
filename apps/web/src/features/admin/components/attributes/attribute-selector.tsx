@@ -1,3 +1,4 @@
+import { api } from "@backend/convex/_generated/api";
 import type { Doc, Id } from "@backend/convex/_generated/dataModel";
 import { Button } from "@redwood/shad-ui/components/button";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
@@ -189,5 +190,3 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
     </div>
   );
 }
-
-import { api } from "@backend/convex/_generated/api";

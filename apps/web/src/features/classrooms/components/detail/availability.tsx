@@ -13,7 +13,7 @@ import {
   SHORT_WEEKDAY_LABELS,
   WEEKDAY_KEYS,
   type WeekdayKey,
-} from "@/util/date-time-utils";
+} from "#/util/date-time-utils.ts";
 import type { Classroom } from "../../model/classroom-types";
 
 const SHORT_BREAK_MINUTES = 15;
@@ -451,6 +451,7 @@ function AvailabilityBlockSkeleton() {
 
 function ShimmyStyles() {
   return (
+    // TODO jsx error
     <style jsx global>{`
       @keyframes shimmy {
         0%, 100% {

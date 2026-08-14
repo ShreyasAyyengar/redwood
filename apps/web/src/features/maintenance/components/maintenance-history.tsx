@@ -9,8 +9,8 @@ import { usePaginatedQuery } from "convex/react";
 import { CalendarDays, ClipboardClock, UserCog } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
-import { formatDate, getDateTimeDisplay } from "@/util/date-time-utils";
-import MaintenanceDialog from "./dialogs/maintenance-dialog";
+import { formatDate, getDateTimeDisplay } from "#/util/date-time-utils.ts";
+import MaintenanceDialog from "./dialogs/maintenance-dialog.tsx";
 
 const INTERSECTION_ROOT_MARGIN = "160px 0px";
 const MAINTENANCE_ROW_ESTIMATE_PX = 140;

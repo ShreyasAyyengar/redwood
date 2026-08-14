@@ -2,7 +2,7 @@ import { Button } from "@redwood/shad-ui/components/button";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import type { LegacyRow as Row } from "@tanstack/react-table/legacy";
 import { CircleAlert, ThumbsUp, TriangleAlert } from "lucide-react";
-import { ClassroomIssuesPopover } from "@/features/issues/components/classroom-issues-popover";
+import { ClassroomIssuesPopover } from "#/features/issues/components/classroom-issues-popover.tsx";
 import type { ClassroomSummary } from "../../../model/classroom-types";
 
 export default function StatusCell({ row }: { row: Row<ClassroomSummary> }) {

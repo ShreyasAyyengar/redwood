@@ -152,6 +152,7 @@ export default function UserEditor() {
                       <Select
                         defaultValue={user.role}
                         onValueChange={(value) =>
+                          // TODO investigate `void` usage
                           void (async () => {
                             setPendingAction(`role:${user.email}`);
                             try {

@@ -5,7 +5,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@redwood/shad-ui/
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { CircleQuestionMark } from "lucide-react";
 import { useEffect, useState } from "react";
-import { urgencyStyle } from "@/util/style-util";
+import { urgencyStyle } from "#/util/style-util.ts";
 import { type FormValues, useFieldContext } from "../maintenance-form";
 
 export default function SurfacesWipedField({ existingEntry }: { existingEntry?: Doc<"maintenance"> }) {

@@ -17,9 +17,9 @@ import {
   UserCheck,
 } from "lucide-react";
 import { type ReactNode, type RefObject, useEffect, useRef, useState } from "react";
-import { ClassroomAvailabilityPill } from "@/features/classrooms/components/classroom-availability-pill";
-import { getDateTimeDisplay } from "@/util/date-time-utils";
-import { urgencyStyle } from "@/util/style-util";
+import { ClassroomAvailabilityPill } from "#/features/classrooms/components/classroom-availability-pill.tsx";
+import { getDateTimeDisplay } from "#/util/date-time-utils.ts";
+import { urgencyStyle } from "#/util/style-util.ts";
 import { ISSUE_FINDINGS_OPTIONS, type Issue } from "../../model/issue-state";
 import { IssueStatusIcon } from "./issue-status-icon";
 

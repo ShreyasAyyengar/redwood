@@ -3,7 +3,7 @@
 import { api } from "@backend/convex/_generated/api";
 import { usePaginatedQuery, useQuery } from "convex/react";
 import { useCallback } from "react";
-import { FeedEmptyState, FeedLoadingState, VirtualizedFeedList } from "@/features/feed/components/feed-list-layout";
+import { FeedEmptyState, FeedLoadingState, VirtualizedFeedList } from "#/features/feed/components/feed-list-layout.tsx";
 import { type IssueFeedFilterValue, toIssueFeedFilters } from "../../model/issue-filters";
 import { IssueFeedCard } from "../cards/issue-feed-card";
 import { IssueDialog } from "../dialogs/issue-dialog";

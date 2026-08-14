@@ -19,6 +19,7 @@ import { Separator } from "@redwood/shad-ui/components/separator";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useMutation, useQuery } from "convex/react";
 import { Loader2, Settings } from "lucide-react";
+import type React from "react";
 import { useEffect, useMemo, useState } from "react";
 import type { ClassroomSummary } from "../../model/classroom-types";
 
@@ -56,7 +57,7 @@ export function RoomSettingsDialog({ room }: { room: Room }) {
     setCaptioning(room.captioning ?? defaultCaptioning);
   }, [open, room]);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const identifier = captioning.identifier.trim();

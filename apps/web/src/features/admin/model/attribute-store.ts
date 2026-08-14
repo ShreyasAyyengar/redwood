@@ -1,6 +1,7 @@
 import type { Doc, Id } from "@backend/convex/_generated/dataModel";
 import { create } from "zustand";
 
+// TODO: read & integrate https://tkdodo.eu/blog/zustand-and-react-context
 type AttributeStore = {
   classrooms: Doc<"classrooms">[];
   selectedClassroomIds: Id<"classrooms">[];

@@ -11,7 +11,7 @@ import { cn } from "@redwood/shad-ui/lib/utils";
 import { useQuery } from "convex/react";
 import { CalendarDays } from "lucide-react";
 import { useState } from "react";
-import { authClientWeb } from "@/lib/auth-client-web";
+import { authClientWeb } from "#/lib/auth-client-web.ts";
 import { type TaskFormValues, useFieldContext } from "../task-form-context";
 
 export default function CompletionField({ existingValue }: { existingValue?: Doc<"tasks">["completion"] }) {

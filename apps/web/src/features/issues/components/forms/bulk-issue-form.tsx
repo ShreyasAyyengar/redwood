@@ -6,7 +6,7 @@ import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useMutation, useQuery } from "convex/react";
 import { useMemo, useState } from "react";
-import { BulkTargetSelector } from "@/features/classrooms/components/bulk-target-selector";
+import { BulkTargetSelector } from "#/features/classrooms/components/bulk-target-selector.tsx";
 import { issueFormSchema, serializeIssueFormValues } from "../../model/issue-form-schema";
 import { type IssueFormValues, issueAppForm } from "./issue-form-context";
 import { IssueFormFields } from "./issue-form-fields";

@@ -67,6 +67,7 @@ export function GroupForm({ existingGroup, onSuccess }: { existingGroup?: Doc<"g
                       id={field.name}
                       value={field.state.value ?? ""}
                       onChange={(e) => field.handleChange(e.target.value)}
+                      // TODO check placeholder appropriate
                       placeholder="e.g. Science Wing"
                       className="border-zinc-700 bg-zinc-900/50"
                       autoComplete={"off"}

@@ -2,6 +2,7 @@ import { Field, FieldError, FieldLabel } from "@redwood/shad-ui/components/field
 import { Textarea } from "@redwood/shad-ui/components/textarea";
 import { type TaskFormValues, useFieldContext } from "../task-form-context";
 
+// TODO why existingValue unused?
 export default function DescriptionField({ existingValue }: { existingValue?: string }) {
   const field = useFieldContext<TaskFormValues["description"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;

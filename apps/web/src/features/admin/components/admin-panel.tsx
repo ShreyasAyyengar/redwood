@@ -17,7 +17,9 @@ export default function AdminPanel() {
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="attributes">Room Attributes</TabsTrigger>
           <TabsTrigger value="groups">Room Groups</TabsTrigger>
-          <TabsTrigger value="statistics">Statistics</TabsTrigger>
+          <TabsTrigger disabled value="statistics">
+            Statistics
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">

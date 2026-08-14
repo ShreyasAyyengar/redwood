@@ -1,6 +1,9 @@
 {
   "extends": "@redwood/typescript-config/nextjs.json",
   "compilerOptions": {
+    "paths": {
+      "@backend/*": ["../backend/*"]
+    },
     "allowImportingTsExtensions": true,
     "plugins": [
       {
