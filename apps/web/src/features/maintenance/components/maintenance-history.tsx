@@ -1,0 +1,365 @@
+import { api } from "@backend/convex/_generated/api";
+import type { Id } from "@backend/convex/_generated/dataModel";
+import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
+import { Separator } from "@redwood/shad-ui/components/separator";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwood/shad-ui/components/tooltip";
+import { cn } from "@redwood/shad-ui/lib/utils";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { usePaginatedQuery } from "convex/react";
+import { CalendarDays, ClipboardClock, UserCog } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { useInView } from "react-intersection-observer";
+import { formatDate, getDateTimeDisplay } from "@/util/date-time-utils";
+import MaintenanceDialog from "./dialogs/maintenance-dialog";
+
+const INTERSECTION_ROOT_MARGIN = "160px 0px";
+const MAINTENANCE_ROW_ESTIMATE_PX = 140;
+const END_SEPARATOR_ROW_ESTIMATE_PX = 40;
+const MAINTENANCE_PAGE_SIZE = 2;
+
+export default function MaintenanceHistory({ roomId }: { roomId: Id<"classrooms"> | undefined }) {
+  const {
+    results: maintenanceHistory,
+    status,
+    loadMore,
+  } = usePaginatedQuery(api.core.maintenance.service.getHistory, roomId ? { classroomId: roomId } : "skip", {
+    initialNumItems: MAINTENANCE_PAGE_SIZE,
+  });
+  const hasNextPage = status === "CanLoadMore" || status === "LoadingMore";
+  const isFetchingNextPage = status === "LoadingMore";
+  const isLoading = status === "LoadingFirstPage";
+  const [viewportElement, setViewportElement] = useState<HTMLDivElement | null>(null);
+  const { inView, ref: loadMoreRef } = useInView({
+    root: viewportElement,
+    rootMargin: INTERSECTION_ROOT_MARGIN,
+  });
+  const loadMoreIndex = hasNextPage && maintenanceHistory.length > 1 ? maintenanceHistory.length - 2 : undefined;
+  const showEndSeparator = !hasNextPage && !isFetchingNextPage && maintenanceHistory.length > 0;
+  const rowCount = maintenanceHistory.length + (showEndSeparator ? 1 : 0);
+
+  const viewportRef = useCallback((node: HTMLDivElement | null) => {
+    setViewportElement((prev) => (prev === node ? prev : node));
+  }, []);
+
+  const rowVirtualizer = useVirtualizer({
+    count: rowCount,
+    getScrollElement: () => viewportElement,
+    estimateSize: (index) =>
+      showEndSeparator && index === maintenanceHistory.length ? END_SEPARATOR_ROW_ESTIMATE_PX : MAINTENANCE_ROW_ESTIMATE_PX,
+    overscan: 3,
+    getItemKey: (index) => maintenanceHistory[index]?._id ?? "end-of-maintenance-history",
+  });
+
+  useEffect(() => {
+    if (!inView || !hasNextPage || isFetchingNextPage) return;
+    loadMore(MAINTENANCE_PAGE_SIZE);
+  }, [hasNextPage, inView, isFetchingNextPage, loadMore]);
+
+  if (isLoading) return <MaintenanceHistorySkeleton />;
+
+  return (
+    <div className="flex h-full flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/80 sm:text-2xl">
+      <div className="flex items-center">
+        <ClipboardClock className="mr-2 size-6" />
+        <div>Maintenance History</div>
+      </div>
+
+      <ScrollArea className="mt-3 h-full min-h-0 flex-1 rounded-2xl bg-zinc-950/50 p-3" viewportRef={viewportRef}>
+        <TooltipProvider skipDelayDuration={0}>
+          <div
+            className="mt-1"
+            style={{
+              height: `${rowVirtualizer.getTotalSize()}px`,
+              position: "relative",
+              width: "100%",
+            }}
+          >
+            {rowVirtualizer.getVirtualItems().map((virtualItem) => {
+              const isEndSeparator = showEndSeparator && virtualItem.index === maintenanceHistory.length;
+
+              if (isEndSeparator) {
+                return (
+                  <div
+                    key={virtualItem.key}
+                    data-index={virtualItem.index}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      transform: `translateY(${virtualItem.start}px)`,
+                    }}
+                    ref={rowVirtualizer.measureElement}
+                  >
+                    <div className="flex items-center py-5">
+                      <Separator className="bg-zinc-700" />
+                    </div>
+                  </div>
+                );
+              }
+
+              const entry = maintenanceHistory[virtualItem.index];
+              if (!entry) return null;
+
+              const date = new Date(entry.date);
+              const formatDateShort = formatDate(date);
+              const { dateAbsolute } = getDateTimeDisplay(date);
+
+              const who = entry.completedBy.split("@")[0];
+
+              const microphoneEntries = entry.microphone ? Object.entries(entry.microphone) : [];
+              const dtenEntries = entry.dten ? Object.entries(entry.dten) : [];
+              const allChecks = [...microphoneEntries, ...dtenEntries];
+
+              const issueChecks = allChecks.filter(([, value]) => value === "No, issue preventing completion");
+              const taskChecks = allChecks.filter(([, value]) => value === "No, task created for completion");
+              const fixedChecks = allChecks.filter(
+                ([, value]) =>
+                  typeof value === "string" &&
+                  (value.startsWith("Re-") || value.includes("Battery replaced") || value.includes("now re-charging"))
+              );
+
+              const hasIssues = issueChecks.length > 0;
+              const hasTasks = taskChecks.length > 0;
+              const hasFixes = fixedChecks.length > 0;
+
+              const overallTone = hasIssues
+                ? "border-red-500/30 hover:border-red-400/40"
+                : hasTasks
+                  ? "border-amber-500/30 hover:border-amber-400/40"
+                  : "border-emerald-500/20 hover:border-emerald-400/30";
+
+              const leftAccent = hasIssues
+                ? "bg-red-500/70 group-hover:bg-red-400/90"
+                : hasTasks
+                  ? "bg-amber-500/70 group-hover:bg-amber-400/90"
+                  : "bg-emerald-500/60 group-hover:bg-emerald-400/80";
+
+              return (
+                <div
+                  key={virtualItem.key}
+                  data-index={virtualItem.index}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    transform: `translateY(${virtualItem.start}px)`,
+                    paddingBottom: "8px", // replaces old space-y-2
+                  }}
+                  ref={(node) => {
+                    rowVirtualizer.measureElement(node);
+                    if (virtualItem.index === loadMoreIndex) loadMoreRef(node);
+                  }}
+                >
+                  <Tooltip delayDuration={500}>
+                    {roomId && (
+                      <MaintenanceDialog roomId={roomId} maintenanceEntry={entry}>
+                        <TooltipTrigger asChild>
+                          <div
+                            className={cn(
+                              "group relative cursor-pointer overflow-hidden rounded-xl border bg-neutral-800/70 px-3 py-3",
+                              "shadow-sm transition-all duration-200 hover:bg-neutral-800/90 hover:shadow-md",
+                              "duration-150 active:scale-[0.99] active:transform",
+                              overallTone
+                            )}
+                          >
+                            <div className={cn("absolute inset-y-0 left-0 w-1 transition-all duration-200", leftAccent)} />
+
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <CalendarDays className="size-5 text-neutral-400" />
+
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <div className="font-semibold text-base text-neutral-100 sm:text-lg">{formatDateShort}</div>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="bg-zinc-900 fill-zinc-900" tooltipArrowClassName="bg-zinc-900 fill-zinc-900">
+                                      <p className="font-bold text-neutral-300 text-sm">{dateAbsolute}</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </div>
+
+                                <div className="mt-1 flex items-center gap-2 text-neutral-400 text-xs sm:text-sm">
+                                  <UserCog className="size-5 text-neutral-400" />
+                                  <span className="inline-flex h-5 items-center rounded-md bg-neutral-500/15 px-2 font-mono text-neutral-300">
+                                    {who}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="flex shrink-0 flex-col flex-wrap items-end justify-end space-y-1">
+                                {!hasIssues && !hasTasks && (
+                                  <span className="rounded-md border border-emerald-500/30 bg-emerald-500/15 px-2 py-0.5 font-semibold text-[11px] text-emerald-300">
+                                    clean pass
+                                  </span>
+                                )}
+
+                                {hasIssues && (
+                                  <div className="flex text-sm">
+                                    <span className="rounded-md rounded-r-none border border-red-500/30 border-r-0 bg-red-500/15 px-2 py-0.5 font-semibold text-[11px] text-red-300">
+                                      {issueChecks.length} blocked
+                                    </span>
+                                    <span className="rounded-md rounded-l-none border border-red-500/30 bg-red-500/15 px-2 py-0.5 font-semibold text-[11px] text-red-300">
+                                      {issueChecks
+                                        .slice(0, 1)
+                                        .map(([key]) => key)
+                                        .join(", ")}
+                                      {issueChecks.length > 1 ? ` +${issueChecks.length - 1} more` : ""}
+                                    </span>
+                                  </div>
+                                )}
+
+                                {hasTasks && (
+                                  <div className="flex text-sm">
+                                    <span className="rounded-md rounded-r-none border border-amber-500/30 border-r-0 bg-amber-500/15 px-2 py-0.5 font-semibold text-[11px] text-amber-300">
+                                      {taskChecks.length} follow-up
+                                    </span>
+                                    <span className="rounded-md rounded-l-none border border-amber-500/30 bg-amber-500/15 px-2 py-0.5 font-semibold text-[11px] text-amber-300">
+                                      {taskChecks
+                                        .slice(0, 1)
+                                        .map(([key]) => key)
+                                        .join(", ")}
+                                      {taskChecks.length > 1 ? ` +${taskChecks.length - 1} more` : ""}
+                                    </span>
+                                  </div>
+                                )}
+
+                                {hasFixes && (
+                                  <div className="flex text-sm">
+                                    <span className="rounded-md rounded-r-none border border-sky-500/30 border-r-0 bg-sky-500/15 px-2 py-0.5 font-semibold text-[11px] text-sky-300">
+                                      {fixedChecks.length} corrected
+                                    </span>
+                                    <span className="rounded-md rounded-l-none border border-sky-500/30 bg-sky-500/15 px-2 py-0.5 font-semibold text-[11px] text-sky-300">
+                                      {fixedChecks
+                                        .slice(0, 1)
+                                        .map(([key]) => key)
+                                        .join(", ")}
+                                      {fixedChecks.length > 1 ? ` +${fixedChecks.length - 1} more` : ""}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {(!entry.surfacesWiped || !entry.equipmentChecked || entry.microphone || entry.dten) && (
+                              <div className="mt-2 flex w-fit flex-col flex-wrap space-y-1.5">
+                                {(!entry.surfacesWiped || !entry.equipmentChecked) && (
+                                  <div className="flex items-center gap-2">
+                                    <span
+                                      className={cn(
+                                        "w-fit rounded-md px-2 py-1 font-semibold text-[11px]",
+                                        entry.surfacesWiped ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"
+                                      )}
+                                    >
+                                      Surfaces {entry.surfacesWiped ? "wiped" : "not wiped"}
+                                    </span>
+                                    <span
+                                      className={cn(
+                                        "w-fit rounded-md px-2 py-1 font-semibold text-[11px]",
+                                        entry.equipmentChecked ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"
+                                      )}
+                                    >
+                                      Equipment {entry.equipmentChecked ? "checked" : "not checked"}
+                                    </span>
+                                  </div>
+                                )}
+
+                                {(entry.microphone || entry.dten) && (
+                                  <div className="flex items-center gap-2">
+                                    {entry.microphone && (
+                                      <span className="w-fit rounded-md bg-neutral-700/70 px-2 py-1 font-semibold text-[11px] text-neutral-200">
+                                        Mic checked
+                                      </span>
+                                    )}
+                                    {entry.dten && (
+                                      <span className="w-fit rounded-md bg-neutral-700/70 px-2 py-1 font-semibold text-[11px] text-neutral-200">
+                                        DTEN checked
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </TooltipTrigger>
+                      </MaintenanceDialog>
+                    )}
+                  </Tooltip>
+                </div>
+              );
+            })}
+          </div>
+        </TooltipProvider>
+      </ScrollArea>
+    </div>
+  );
+}
+
+export function MaintenanceHistorySkeleton() {
+  return (
+    <div className="flex h-full flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/80 sm:text-2xl">
+      <div className="flex items-center">
+        <ClipboardClock className="mr-2 size-6" />
+        <div>Maintenance History</div>
+      </div>
+
+      <ScrollArea className="mt-3 h-full min-h-0 flex-1 rounded-2xl bg-zinc-950/50 p-3">
+        <div className="mt-1 space-y-2">
+          <MaintenanceHistoryCardSkeleton />
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}
+
+function MaintenanceHistoryCardSkeleton() {
+  return (
+    <div className="group relative overflow-hidden rounded-xl border border-zinc-700/40 bg-neutral-800/70 px-3 py-3 shadow-sm">
+      <div className="absolute inset-y-0 left-0 w-1 bg-zinc-700/60" />
+
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          {/* Date row */}
+          <div className="flex items-center gap-2">
+            <CalendarDays className="size-5 text-neutral-400" />
+            <div className="h-5 w-28 animate-pulse rounded bg-zinc-700/50" />
+          </div>
+
+          {/* Completed by row */}
+          <div className="mt-1 flex items-center gap-2 text-neutral-400 text-xs sm:text-sm">
+            <UserCog className="size-5 text-neutral-400" />
+            <div className="h-5 w-20 animate-pulse rounded-md bg-zinc-700/50" />
+          </div>
+        </div>
+
+        {/* Summary badges */}
+        <div className="flex shrink-0 flex-col flex-wrap items-end justify-end space-y-1">
+          <div className="flex text-sm">
+            <div className="h-5 w-20 animate-pulse rounded-md rounded-r-none bg-zinc-700/50" />
+            <div className="h-5 w-24 animate-pulse rounded-md rounded-l-none bg-zinc-700/40" />
+          </div>
+
+          <div className="flex text-sm">
+            <div className="h-5 w-20 animate-pulse rounded-md rounded-r-none bg-zinc-700/50" />
+            <div className="h-5 w-28 animate-pulse rounded-md rounded-l-none bg-zinc-700/40" />
+          </div>
+        </div>
+      </div>
+
+      {/* Detail badges */}
+      <div className="mt-2 flex w-fit flex-col flex-wrap space-y-1.5">
+        <div className="flex items-center gap-2">
+          <div className="h-5 w-24 animate-pulse rounded-md bg-zinc-700/50" />
+          <div className="h-5 w-28 animate-pulse rounded-md bg-zinc-700/50" />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="h-5 w-20 animate-pulse rounded-md bg-zinc-700/40" />
+          <div className="h-5 w-24 animate-pulse rounded-md bg-zinc-700/40" />
+        </div>
+      </div>
+    </div>
+  );
+}

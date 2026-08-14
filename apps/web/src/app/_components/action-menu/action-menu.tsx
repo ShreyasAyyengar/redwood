@@ -5,7 +5,7 @@ import { ArrowLeft, LogOut, MessageSquareText, Plus, Repeat2, X } from "lucide-r
 import { useState } from "react";
 import { env } from "../../../env";
 import { authClientWeb } from "../../../lib/auth-client-web";
-import FeedbackDialog from "../feedback/feedback-dialog";
+import FeedbackDialog from "@/features/feedback/components/dialogs/feedback-dialog";
 import { AccountAvatar } from "./account-avatar";
 import { AccountSessionButton } from "./account-session-button";
 import { ActionButton, TooltipActionButton } from "./action-button";

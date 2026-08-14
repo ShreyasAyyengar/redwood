@@ -1,0 +1,49 @@
+import { api } from "@backend/convex/_generated/api";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@redwood/shad-ui/components/select";
+import { useQuery } from "convex/react";
+import { useState } from "react";
+import { authClientWeb } from "@/lib/auth-client-web";
+import { type IssueFormValues, useFieldContext } from "../issue-form-context";
+
+export default function ReportedByFieldSelector({ existingValue }: { existingValue?: string }) {
+  const field = useFieldContext<IssueFormValues["reportedBy"]>();
+
+  const { data: session } = authClientWeb.useSession();
+  const isAdmin = session?.user.role === "admin";
+  const [selectedUser, setSelectedUser] = useState<string | undefined>(existingValue);
+
+  const fetchedUsers = useQuery(api.core.users.service.getUsers, isAdmin ? {} : "skip") ?? [];
+
+  return (
+    <>
+      {isAdmin ? (
+        <div className="flex items-center justify-center">
+          <Select
+            value={selectedUser}
+            onValueChange={(value) => {
+              setSelectedUser(value);
+              field.handleChange(value);
+            }}
+          >
+            <SelectTrigger
+              hasArrow={false}
+              className="inline-flex h-auto w-auto border bg-transparent px-1 font-semibold text-2xl shadow-none focus:ring-0 focus:ring-offset-0"
+            >
+              <SelectValue>{selectedUser?.split("@")[0]}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {fetchedUsers.map((user) => (
+                <SelectItem key={user.email} value={user.email} className="border px-2 py-1 text-2xl" hasCheck={false}>
+                  {user.email.split("@")[0]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <span>&apos;s Issue Report</span>
+        </div>
+      ) : (
+        `${selectedUser?.split("@")[0]}'s Issue Report`
+      )}
+    </>
+  );
+}

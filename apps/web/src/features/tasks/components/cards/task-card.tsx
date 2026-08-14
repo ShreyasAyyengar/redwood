@@ -1,0 +1,200 @@
+import type { Doc } from "@backend/convex/_generated/dataModel";
+import { Badge } from "@redwood/shad-ui/components/badge";
+import { Card } from "@redwood/shad-ui/components/card";
+import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwood/shad-ui/components/tooltip";
+import { cn } from "@redwood/shad-ui/lib/utils";
+import { Check, ClipboardClock, ClipboardList, Flag, UserPen } from "lucide-react";
+import type React from "react";
+import { type DateTimeDisplay, getDateTimeDisplay } from "@/util/date-time-utils";
+import { urgencyStyle } from "@/util/style-util";
+
+export const TaskCard = ({
+  task,
+  foreignView = false,
+  classroomName,
+  ref,
+  ...props
+}: {
+  task: Doc<"tasks">;
+  foreignView?: boolean;
+  classroomName?: string;
+} & React.HTMLAttributes<HTMLDivElement> & {
+    ref?: React.RefObject<HTMLDivElement | null>;
+  }) => {
+  const reportedDateDisplay: DateTimeDisplay = getDateTimeDisplay(new Date(task.task.createdAt));
+  const completionDateDisplay: DateTimeDisplay | undefined = task.completion
+    ? getDateTimeDisplay(new Date(task.completion.completedAt))
+    : undefined;
+  const editDateDisplay: DateTimeDisplay | undefined = task.edited ? getDateTimeDisplay(new Date(task.edited.editDate)) : undefined;
+  const visibleDateDisplay: DateTimeDisplay | undefined = task.task.visibleAt ? getDateTimeDisplay(new Date(task.task.visibleAt)) : undefined;
+
+  const isOverdue = task.task.completeBy && !task.completion && Date.now() > new Date(task.task.completeBy).getTime();
+  const isVisible = !task.task.visibleAt || Date.parse(task.task.visibleAt) <= Date.now();
+
+  return (
+    <Card
+      ref={ref}
+      key={task._id}
+      className="my-1 border-zinc-800 bg-zinc-900/50 p-4 shadow-md/100 transition-all duration-100 hover:border-zinc-700 active:scale-[0.99]"
+      {...props}
+    >
+      {foreignView && <span className="mb-2 text-center text-[14px] text-neutral-400 text-sm uppercase tracking-widest">{classroomName}</span>}
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5">
+          <ClipboardList className={cn("size-5", task.task.urgent ? "text-red-400" : "text-amber-400")} />
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flow-root font-normal text-sm text-zinc-200">
+            <div className="float-right ml-2 flex flex-wrap justify-end gap-1.5">
+              {task.task.urgent && (
+                <Badge variant="outline" className={urgencyStyle("red")}>
+                  Urgent
+                </Badge>
+              )}
+              {task.task.supervisorNeeded && (
+                <Badge variant="outline" className={urgencyStyle("purple")}>
+                  Supervisor Needed
+                </Badge>
+              )}
+              {isOverdue && (
+                <Badge variant="outline" className={urgencyStyle("orange")}>
+                  Overdue
+                </Badge>
+              )}
+            </div>
+            {task.task.description}
+          </div>
+
+          <div className="flex flex-col items-start gap-1 font-normal text-xs text-zinc-500">
+            {task.completion && (
+              <div className="flex items-center gap-1 text-sm">
+                <Check className="size-5 text-emerald-400" />
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span>Completed {completionDateDisplay?.dateDaysAgo}</span>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-zinc-800 fill-zinc-800" tooltipArrowClassName="bg-zinc-800 fill-zinc-800">
+                      <p className="font-bold text-neutral-300 text-sm">{completionDateDisplay?.dateAbsolute}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <span className="text-zinc-700">•</span>
+                <span>by {task.completion.completedBy.split("@")[0]}</span>
+              </div>
+            )}
+
+            <div className="flex items-center gap-1 text-sm">
+              <Flag className="size-5 text-indigo-300" />
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span>Created {reportedDateDisplay.dateDaysAgo}</span>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-zinc-800 fill-zinc-800" tooltipArrowClassName="bg-zinc-800 fill-zinc-800">
+                    <p className="font-bold text-neutral-300 text-sm">{reportedDateDisplay.dateAbsolute}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <span className="text-zinc-700">•</span>
+              <span>by {task.task.createdBy.split("@")[0]}</span>
+            </div>
+
+            {!isVisible && (
+              <div className="flex items-center gap-1 text-sm">
+                <ClipboardClock className="size-5 text-neutral-400" />
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span>Visible {visibleDateDisplay?.dateDaysAgo}</span>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-zinc-800 fill-zinc-800" tooltipArrowClassName="bg-zinc-800 fill-zinc-800">
+                      <p className="font-bold text-neutral-300 text-sm">{visibleDateDisplay?.dateAbsolute}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            )}
+
+            {task.edited && (
+              <div className="flex items-center gap-1 text-sm">
+                <UserPen className="size-5 text-neutral-400" />
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span>Edited {editDateDisplay?.dateDaysAgo}</span>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-zinc-800 fill-zinc-800" tooltipArrowClassName="bg-zinc-800 fill-zinc-800">
+                      <p className="font-bold text-neutral-300 text-sm">{editDateDisplay?.dateAbsolute}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <span className="text-zinc-700">•</span>
+                <span>by {task.edited.editedBy.split("@")[0]}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+export function MiniTaskCard({
+  task,
+  ref,
+  ...props
+}: { task: Doc<"tasks"> } & React.HTMLAttributes<HTMLDivElement> & { ref?: React.RefObject<HTMLDivElement | null> }) {
+  const priorityAccentClassName = task.task.urgent ? "bg-red-500" : "bg-amber-400";
+  const supervisorAccentClassName = task.task.supervisorNeeded ? "bg-purple-500" : priorityAccentClassName;
+
+  return (
+    <div
+      ref={ref}
+      className="flex w-72 cursor-pointer flex-row overflow-hidden rounded-md border border-zinc-800/80 bg-zinc-950/70 shadow-sm transition-colors hover:border-zinc-700 hover:bg-zinc-950"
+      {...props}
+    >
+      <div className="flex w-1.5 shrink-0 flex-col" aria-hidden="true">
+        <div className={cn("h-1/2", priorityAccentClassName)} />
+        <div className={cn("h-1/2", supervisorAccentClassName)} />
+      </div>
+      <ScrollArea className="max-h-16 min-h-14 flex-1">
+        <p className="whitespace-pre-wrap px-3 py-2 text-left text-sm text-zinc-200 leading-snug">{task.task.description}</p>
+      </ScrollArea>
+    </div>
+  );
+}
+
+export function TaskCardSkeleton() {
+  return (
+    <div className="my-1 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 shadow-md/100">
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5">
+          <ClipboardList className="size-5 text-zinc-600" />
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flow-root">
+            <div className="float-right ml-2 flex gap-1.5">
+              <div className="h-5 w-16 animate-pulse rounded-md bg-zinc-700/50" />
+              <div className="h-5 w-16 animate-pulse rounded-md bg-zinc-700/40" />
+            </div>
+            <div className="h-5 w-full max-w-[420px] animate-pulse rounded bg-zinc-700/50" />
+          </div>
+
+          <div className="flex flex-col items-start gap-1 font-normal text-xs text-zinc-500">
+            {/* created metadata */}
+            <div className="flex items-center gap-1 text-sm">
+              <Flag className="size-5 text-indigo-300/60" />
+              <div className="h-4 w-24 animate-pulse rounded bg-zinc-700/50" />
+              <span className="text-zinc-700">•</span>
+              <div className="h-4 w-16 animate-pulse rounded bg-zinc-700/40" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
