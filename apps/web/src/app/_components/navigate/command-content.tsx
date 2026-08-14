@@ -1,8 +1,8 @@
-import { api } from "@backend/convex/_generated/api";
 import { CommandEmpty, CommandGroup, CommandItem, CommandList, CommandSeparator } from "@redwood/shad-ui/components/command";
 import { usePaginatedQuery, useQuery } from "convex/react";
 import { ClipboardList, School, TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { api } from "../../../../../backend/convex/_generated/api";
 
 export default function CommandContent({ closeNavigator }: { closeNavigator: () => void }) {
   const rooms = useQuery(api.core.classrooms.service.getAllRooms, {}) ?? [];
