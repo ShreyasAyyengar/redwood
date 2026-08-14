@@ -138,27 +138,19 @@ export const getIssues = protectedQuery({
   },
 });
 
-// returns all unresolved issues
+// Returns the complete issue history for one classroom. Consumers decide
+// whether resolved or on-hold issues belong in their local view.
 export const getClassroomIssues = protectedQuery({
   args: z.object({
-    classroomId: zid("classrooms").optional(),
+    classroomId: zid("classrooms"),
   }),
   returns: z.array(issueDoc),
-  handler: (ctx, { classroomId }) => {
-    if (classroomId) {
-      return ctx.db
-        .query("issues")
-        .withIndex("byClassroomIdAndFeed", (query) => query.eq("classroomId", classroomId).eq("feedStatus", "UNRESOLVED"))
-        .order("desc")
-        .collect();
-    }
-
-    return ctx.db
+  handler: (ctx, { classroomId }) =>
+    ctx.db
       .query("issues")
-      .withIndex("byFeed", (query) => query.eq("feedStatus", "UNRESOLVED"))
+      .withIndex("byClassroomIdAndFeed", (query) => query.eq("classroomId", classroomId))
       .order("desc")
-      .collect();
-  },
+      .collect(),
 });
 
 export const createIssue = protectedMutation({
@@ -262,6 +254,22 @@ export const editIssue = protectedMutation({
       newReportedBy !== issueDocument.issue.reportedBy ||
       new Date(newReportedAt).getTime() !== new Date(issueDocument.issue.reportedAt).getTime();
 
+    const nextResolution =
+      !args.onHold && args.resolution
+        ? {
+            // the resolvedBy can be different than the context, only if user is admin
+            resolvedBy: isAdmin ? args.resolution.resolvedBy : (issueDocument.resolution?.resolvedBy ?? user.email),
+            resolvedAt: isAdmin ? args.resolution.resolvedAt : (issueDocument.resolution?.resolvedAt ?? now),
+            comment: args.resolution.comment,
+            findings: issueDocument.resolution?.findings,
+          }
+        : undefined;
+
+    const resolutionChanged =
+      issueDocument.resolution?.comment !== nextResolution?.comment ||
+      issueDocument.resolution?.resolvedBy !== nextResolution?.resolvedBy ||
+      issueDocument.resolution?.resolvedAt !== nextResolution?.resolvedAt;
+
     const updatedIssue: z.infer<typeof issueSchema> = {
       ...issueDocument,
       issue: {
@@ -278,29 +286,16 @@ export const editIssue = protectedMutation({
 
       // if the resolution existed and was changed, mark as edited
       // if any other field was changed, mark as edited
-      ...((nonResolutionChanged || (issueDocument.resolution && args.resolution !== issueDocument.resolution)) && {
+      ...((nonResolutionChanged || resolutionChanged) && {
         edited: {
           editedBy: user.email,
           editDate: now,
         },
       }),
 
-      // if input.resolution is provided, update resolution, else make it undefined
-      ...(!args.onHold && args.resolution
-        ? {
-            resolution: {
-              // the resolvedBy can be different than the context, only if user is admin
-              resolvedBy: isAdmin ? args.resolution.resolvedBy : user.email,
-              resolvedAt: isAdmin ? args.resolution.resolvedAt : now,
-              comment: args.resolution.comment,
-
-              findings: issueDocument.resolution?.findings,
-            },
-          }
-        : { resolution: undefined }),
-
-      feedStatus: args.resolution ? "RESOLVED" : "UNRESOLVED",
-      feedDate: args.resolution?.resolvedAt ?? issueDocument.issue.reportedAt,
+      resolution: nextResolution,
+      feedStatus: nextResolution ? "RESOLVED" : "UNRESOLVED",
+      feedDate: nextResolution?.resolvedAt ?? newReportedAt,
     };
 
     await ctx.db.patch("issues", args._id, updatedIssue);

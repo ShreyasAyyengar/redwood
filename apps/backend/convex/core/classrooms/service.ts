@@ -3,15 +3,20 @@ import { withSystemFields } from "convex-helpers/server/zod";
 import { zid } from "convex-helpers/server/zod4";
 import { z } from "zod";
 import { protectedMutation, protectedQuery } from "../../lib/procedures.ts";
-import { classroomSchema, classroomSchemaPayload } from "./schemas.ts";
+import { classroomSchema } from "./schemas.ts";
 
 export const classroomDoc = z.object(withSystemFields("classrooms", classroomSchema.shape));
+export const classroomPayloadDoc = classroomDoc.extend({
+  openTasksCount: z.number(),
+  activeIssuesCount: z.number(),
+  roomStatus: z.enum(["GOOD", "NEEDS ATTENTION", "NEEDS URGENT ATTENTION"]),
+});
 
 export const getRoom = protectedQuery({
   args: z.object({
     id: zid("classrooms"),
   }),
-  returns: classroomDoc,
+  returns: classroomPayloadDoc,
   handler: async (ctx, args) => {
     const room = await ctx.db.get("classrooms", args.id);
     if (!room)
@@ -20,14 +25,38 @@ export const getRoom = protectedQuery({
         message: `Room with id ${args.id} not found`,
       });
 
-    return room;
+    const unresolvedIssues = await ctx.db
+      .query("issues")
+      .withIndex("byClassroomIdAndResolution", (q) => q.eq("classroomId", room._id).eq("resolution", undefined))
+      .collect();
+    const activeIssues = unresolvedIssues.filter((issue) => !issue.issue.onHold);
+    const roomStatus: z.infer<typeof classroomPayloadDoc>["roomStatus"] = activeIssues.some((issue) => issue.issue.urgent)
+      ? "NEEDS URGENT ATTENTION"
+      : activeIssues.length > 0
+        ? "NEEDS ATTENTION"
+        : "GOOD";
+    const openTasksCount = (
+      await ctx.db
+        .query("tasks")
+        .withIndex("byClassroomIdAndCompletionAndVisibleAt", (q) =>
+          q.eq("classroomId", room._id).eq("completion", undefined).lte("task.visibleAt", new Date().toISOString())
+        )
+        .collect()
+    ).length;
+
+    return {
+      ...room,
+      activeIssuesCount: activeIssues.length,
+      openTasksCount,
+      roomStatus,
+    };
   },
 });
 
 export const getAllRooms = protectedQuery({
-  returns: z.array(classroomSchemaPayload),
+  returns: z.array(classroomPayloadDoc),
   handler: async (ctx) => {
-    const payloads: z.infer<typeof classroomSchemaPayload>[] = [];
+    const payloads: z.infer<typeof classroomPayloadDoc>[] = [];
 
     const rooms = await ctx.db
       .query("classrooms")
@@ -35,13 +64,17 @@ export const getAllRooms = protectedQuery({
       .collect();
 
     for (const room of rooms) {
-      // TODO: Exclude on-hold issues from appearing here as well
-      const activeIssuesCount = (
-        await ctx.db
-          .query("issues")
-          .withIndex("byClassroomIdAndResolution", (q) => q.eq("classroomId", room._id).eq("resolution", undefined))
-          .collect()
-      ).length;
+      const unresolvedIssues = await ctx.db
+        .query("issues")
+        .withIndex("byClassroomIdAndResolution", (q) => q.eq("classroomId", room._id).eq("resolution", undefined))
+        .collect();
+      const activeIssues = unresolvedIssues.filter((issue) => !issue.issue.onHold);
+      const activeIssuesCount = activeIssues.length;
+      const roomStatus = activeIssues.some((issue) => issue.issue.urgent)
+        ? "NEEDS URGENT ATTENTION"
+        : activeIssuesCount > 0
+          ? "NEEDS ATTENTION"
+          : "GOOD";
 
       const openTasksCount = (
         await ctx.db
@@ -53,13 +86,21 @@ export const getAllRooms = protectedQuery({
       ).length;
 
       payloads.push({
-        ...classroomSchemaPayload.parse(room),
+        ...room,
         activeIssuesCount,
         openTasksCount,
+        roomStatus,
       });
     }
     return payloads;
   },
+});
+
+// Lookup for consumers that must display archived classrooms too, such as
+// historical issue feeds.
+export const getClassroomLookup = protectedQuery({
+  returns: z.array(classroomDoc),
+  handler: (ctx) => ctx.db.query("classrooms").collect(),
 });
 
 export const setAttributes = protectedMutation({
