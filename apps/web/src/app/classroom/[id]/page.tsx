@@ -3,16 +3,16 @@
 import { api } from "@backend/convex/_generated/api";
 import type { Id } from "@backend/convex/_generated/dataModel";
 import { Button } from "@redwood/shad-ui/components/button";
+import { useQuery } from "convex/react";
 import { CornerUpLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery } from "convex/react";
-import { authClientWeb } from "../../../lib/auth-client-web";
-import ActiveIssuesPanel from "@/features/issues/components/active-issues-panel";
 import Availability from "@/features/classrooms/components/detail/availability";
 import { RoomSettingsDialog } from "@/features/classrooms/components/detail/room-settings-dialog";
 import RoomSummary from "@/features/classrooms/components/detail/room-summary";
+import ActiveIssuesPanel from "@/features/issues/components/active-issues-panel";
 import MaintenanceHistory from "@/features/maintenance/components/maintenance-history";
 import OpenTasks from "@/features/tasks/components/open-tasks-panel";
+import { authClientWeb } from "../../../lib/auth-client-web";
 
 export default function Page() {
   const params = useParams();

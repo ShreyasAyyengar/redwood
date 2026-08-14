@@ -1,4 +1,4 @@
-import { api } from "@backend/convex/_generated/api";
+import type { api } from "@backend/convex/_generated/api";
 import type { FunctionArgs } from "convex/server";
 
 export type TaskDateRange = {
@@ -14,7 +14,7 @@ export type TaskFeedFilterValue = Omit<TaskQueryFilters, "completed" | "created"
 };
 
 function serializeDateRange(range: TaskDateRange | undefined) {
-  if (!range) return undefined;
+  if (!range) return;
   return {
     ...(range.from ? { from: range.from.toISOString() } : {}),
     ...(range.to ? { to: range.to.toISOString() } : {}),

@@ -2,9 +2,9 @@ import { Button } from "@redwood/shad-ui/components/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwood/shad-ui/components/tooltip";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { Bug, Building2, Info, SquareCheckBig, Wrench } from "lucide-react";
+import MaintenanceDialog from "@/features/maintenance/components/dialogs/maintenance-dialog";
 import { daysAgoRelative, formatDateAbsolute } from "@/util/date-time-utils";
 import { urgencyStyle } from "@/util/style-util";
-import MaintenanceDialog from "@/features/maintenance/components/dialogs/maintenance-dialog";
 import type { ClassroomSummary } from "../../model/classroom-types";
 
 type LastServiced = {

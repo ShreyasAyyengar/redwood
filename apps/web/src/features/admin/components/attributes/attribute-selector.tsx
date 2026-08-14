@@ -2,10 +2,10 @@ import type { Doc, Id } from "@backend/convex/_generated/dataModel";
 import { Button } from "@redwood/shad-ui/components/button";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { useMutation } from "convex/react";
-import { useState } from "react";
 import { AlertCircle, Loader2, Minus, Plus } from "lucide-react";
-import AttributeDialog from "./attribute-dialog";
+import { useState } from "react";
 import { useAttributeStore } from "../../model/attribute-store";
+import AttributeDialog from "./attribute-dialog";
 
 export function AttributeSelector({ availableAttributes }: { availableAttributes: Doc<"attributes">[] }) {
   const [isUpdating, setIsUpdating] = useState(false);
@@ -189,4 +189,5 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
     </div>
   );
 }
+
 import { api } from "@backend/convex/_generated/api";

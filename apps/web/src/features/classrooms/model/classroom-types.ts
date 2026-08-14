@@ -1,4 +1,4 @@
-import { api } from "@backend/convex/_generated/api";
+import type { api } from "@backend/convex/_generated/api";
 import type { Doc } from "@backend/convex/_generated/dataModel";
 import type { FunctionReturnType } from "convex/server";
 

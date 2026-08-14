@@ -6,7 +6,7 @@
     "ultracite/biome/next"
   ],
   "files": {
-    "includes": ["**/*", "!packages/ui"]
+    "includes": ["**/*", "!packages/ui", "!**/convex/**/_generated"]
   },
   "javascript": {
     "formatter": {

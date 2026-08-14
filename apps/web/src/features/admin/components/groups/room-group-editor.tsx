@@ -1,9 +1,9 @@
 import { api } from "@backend/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { useEffect } from "react";
+import { useGroupStore } from "../../model/group-store";
 import { GroupClassroomSelector } from "./group-classroom-selector";
 import { GroupSelector } from "./group-selector";
-import { useGroupStore } from "../../model/group-store";
 
 export function RoomGroupEditor() {
   const { setClassrooms } = useGroupStore();

@@ -1,8 +1,8 @@
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { Search } from "lucide-react";
 import { useState } from "react";
-import { GroupClassroomCard } from "./group-classroom-card";
 import { useGroupStore } from "../../model/group-store";
+import { GroupClassroomCard } from "./group-classroom-card";
 
 export function GroupClassroomSelector() {
   const [searchQuery, setSearchQuery] = useState("");

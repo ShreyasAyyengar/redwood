@@ -4,9 +4,9 @@ import { Card } from "@redwood/shad-ui/components/card";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { Calendar, CheckCircle2, ClipboardList, Clock3, Eye, type LucideIcon, MessageSquare, User, UserCheck } from "lucide-react";
 import type { RefObject } from "react";
+import { ClassroomAvailabilityPill } from "@/features/classrooms/components/classroom-availability-pill";
 import { getDateTimeDisplay } from "@/util/date-time-utils";
 import { urgencyStyle } from "@/util/style-util";
-import { ClassroomAvailabilityPill } from "@/features/classrooms/components/classroom-availability-pill";
 
 type TaskFeedCardTask = Doc<"tasks">;
 type DateDisplay = ReturnType<typeof getDateTimeDisplay>;

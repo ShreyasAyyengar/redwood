@@ -10,7 +10,7 @@ import { useMutation } from "convex/react";
 import { useState } from "react";
 import { IssueDialog } from "@/features/issues/components/dialogs/issue-dialog";
 import { TaskDialog } from "@/features/tasks/components/dialogs/task-dialog";
-import { maintenanceFormSchema, type MaintenanceFormValues, serializeMaintenanceFormValues } from "../../model/maintenance-form-schema";
+import { type MaintenanceFormValues, maintenanceFormSchema, serializeMaintenanceFormValues } from "../../model/maintenance-form-schema";
 import { MaintenanceAideDialog } from "../dialogs/maintenance-aide-dialog";
 import DateField from "./fields/date-field";
 import DTENField from "./fields/dten-field";

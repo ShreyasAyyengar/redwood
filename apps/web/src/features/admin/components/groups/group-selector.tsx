@@ -5,8 +5,8 @@ import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { useMutation } from "convex/react";
 import { AlertCircle, Loader2, Minus, Plus } from "lucide-react";
 import { useState } from "react";
-import GroupDialog from "./group-dialog";
 import { useGroupStore } from "../../model/group-store";
+import GroupDialog from "./group-dialog";
 
 export function GroupSelector({ availableGroups }: { availableGroups: Doc<"groups">[] }) {
   const [isUpdating, setIsUpdating] = useState(false);

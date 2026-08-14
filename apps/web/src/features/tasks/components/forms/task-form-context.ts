@@ -1,6 +1,5 @@
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import type { ComponentType, ReactNode } from "react";
-import type { TaskFormValues } from "../../model/task-form-schema";
 import CompletionField from "./fields/completion-field";
 import CreatedByFieldSelector from "./fields/created-by-field-selector";
 import DescriptionField from "./fields/description-field";

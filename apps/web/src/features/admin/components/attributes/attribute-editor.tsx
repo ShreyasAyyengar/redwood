@@ -1,8 +1,8 @@
 import { api } from "@backend/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { useEffect } from "react";
-import { AttributeSelector } from "./attribute-selector";
 import { useAttributeStore } from "../../model/attribute-store";
+import { AttributeSelector } from "./attribute-selector";
 import { ClassroomSelector } from "./classroom-selector";
 
 export function AttributeEditor() {

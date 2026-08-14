@@ -2,8 +2,8 @@
 
 import { api } from "@backend/convex/_generated/api";
 import { useQuery } from "convex/react";
-import { authClientWeb } from "../lib/auth-client-web";
 import HomePage from "@/features/classrooms/components/home-page";
+import { authClientWeb } from "../lib/auth-client-web";
 import LoadingComponent from "./_components/loading";
 
 export default function Home() {
