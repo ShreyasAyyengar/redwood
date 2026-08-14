@@ -73,7 +73,8 @@
       },
       "suspicious": {
         "useAwait": "warn",
-        "noConsole": "warn"
+        "noConsole": "warn",
+        "noLeakedRender": "off"
       },
       "complexity": {
         "useSimplifiedLogicExpression": "off",
