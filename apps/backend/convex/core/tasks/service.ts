@@ -163,6 +163,21 @@ export const getOpenTasks = protectedQuery({
   },
 });
 
+// Returns the complete task history for one classroom. Consumers derive open,
+// scheduled, overdue, and completed views from this reactive collection.
+export const getClassroomTasks = protectedQuery({
+  args: z.object({
+    classroomId: zid("classrooms"),
+  }),
+  returns: z.array(taskDoc),
+  handler: (ctx, { classroomId }) =>
+    ctx.db
+      .query("tasks")
+      .withIndex("byClassroomIdAndFeed", (query) => query.eq("classroomId", classroomId))
+      .order("desc")
+      .collect(),
+});
+
 export const addTask = protectedMutation({
   args: uiTaskFormSchema.extend({ classroomId: zid("classrooms") }),
   handler: async (ctx, args) => {
@@ -172,11 +187,13 @@ export const addTask = protectedMutation({
 
     const user = await authComponent.getAuthUser(ctx);
     const now = new Date().toISOString();
-    const createdBy = args.createdBy ?? user.email;
+    const isAdmin = user.role === "admin";
+    const createdBy = isAdmin ? (args.createdBy ?? user.email) : user.email;
+    const createdAt = isAdmin ? (args.createdAt ?? now) : now;
     const newTask: z.infer<typeof taskSchema> = {
       classroomId: args.classroomId,
       createdBy,
-      createdAt: now,
+      createdAt,
       task: {
         description: args.description,
         urgent: args.urgent,
@@ -184,10 +201,10 @@ export const addTask = protectedMutation({
         visibleAt: args.visibleAt,
         completeBy: args.completeBy,
         createdBy,
-        createdAt: now,
+        createdAt,
       },
       feedStatus: "OPEN",
-      feedDate: now,
+      feedDate: createdAt,
     };
 
     await ctx.db.insert("tasks", newTask);
@@ -255,11 +272,11 @@ export const editTask = protectedMutation({
     const newCreatedAt = isAdmin ? (args.createdAt ?? taskDocument.task.createdAt) : taskDocument.task.createdAt;
     const newCompletion = args.completion
       ? {
-          completedBy: isAdmin ? args.completion.completedBy : user.email,
-          completedAt: isAdmin ? args.completion.completedAt : now,
+          completedBy: isAdmin ? args.completion.completedBy : (taskDocument.completion?.completedBy ?? user.email),
+          completedAt: isAdmin ? args.completion.completedAt : (taskDocument.completion?.completedAt ?? now),
           comment: args.completion.comment,
         }
-      : taskDocument.completion;
+      : undefined;
 
     const nonCompletionChanged =
       args.description !== taskDocument.task.description ||

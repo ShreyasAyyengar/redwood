@@ -4,13 +4,15 @@ import { AccountAvatar } from "./account-avatar";
 import { ActionButton } from "./action-button";
 import type { DeviceSession } from "./types";
 
-type AccountSessionButtonProps = {
+export function AccountSessionButton({
+  activeSessionToken,
+  deviceSession,
+  onSwitchSession,
+}: {
   activeSessionToken?: string;
   deviceSession: DeviceSession;
   onSwitchSession: (sessionToken: string) => void;
-};
-
-export function AccountSessionButton({ activeSessionToken, deviceSession, onSwitchSession }: AccountSessionButtonProps) {
+}) {
   const isActive = deviceSession.session.token === activeSessionToken;
   const accountLabel = deviceSession.user.name ?? deviceSession.user.email ?? "account";
 

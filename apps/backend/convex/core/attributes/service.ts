@@ -8,8 +8,8 @@ import { attributeSchema } from "./schemas.ts";
 export const attributeDoc = z.object(withSystemFields("attributes", attributeSchema.shape));
 
 export const getAllAttributes = protectedQuery({
-  returns: z.array(attributeSchema),
-  handler: (ctx, args) => ctx.db.query("attributes").collect(),
+  returns: z.array(attributeDoc),
+  handler: (ctx) => ctx.db.query("attributes").collect(),
 });
 
 export const addAttribute = protectedMutation({

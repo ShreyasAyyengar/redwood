@@ -34,11 +34,13 @@ import type * as core_tasks_table from "../core/tasks/table.js";
 import type * as core_users_schemas from "../core/users/schemas.js";
 import type * as core_users_service from "../core/users/service.js";
 import type * as core_users_table from "../core/users/table.js";
-import type * as danger from "../danger.js";
 import type * as http from "../http.js";
 import type * as lib_csv from "../lib/csv.js";
 import type * as lib_procedures from "../lib/procedures.js";
 import type * as lib_time from "../lib/time.js";
+import type * as migrations_mongoImport from "../migrations/mongoImport.js";
+import type * as migrations_schemas from "../migrations/schemas.js";
+import type * as migrations_table from "../migrations/table.js";
 
 import type {
   ApiFromModules,
@@ -73,11 +75,13 @@ declare const fullApi: ApiFromModules<{
   "core/users/schemas": typeof core_users_schemas;
   "core/users/service": typeof core_users_service;
   "core/users/table": typeof core_users_table;
-  danger: typeof danger;
   http: typeof http;
   "lib/csv": typeof lib_csv;
   "lib/procedures": typeof lib_procedures;
   "lib/time": typeof lib_time;
+  "migrations/mongoImport": typeof migrations_mongoImport;
+  "migrations/schemas": typeof migrations_schemas;
+  "migrations/table": typeof migrations_table;
 }>;
 
 /**

@@ -1,33 +1,26 @@
 "use client";
 
-import type { classroomSchemaPayload } from "@redwood/contracts";
 import { Button } from "@redwood/shad-ui/components/button";
+import { useQuery } from "convex/react";
 import { CornerUpLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import type { z } from "zod";
-import { authClientWeb } from "../../../lib/auth-client-web";
-import { useFetchedRoomsStore } from "../../_components/room-store";
-import ActiveIssues from "./_components/active-issues";
-import Availability from "./_components/availability";
-import MaintenanceHistory from "./_components/maintenance-history";
-import OpenTasks from "./_components/open-tasks";
-import { RoomSettingsDialog } from "./_components/room-settings-dialog";
-import RoomSummary from "./_components/room-summary";
+import Availability from "#/features/classrooms/components/detail/availability.tsx";
+import { RoomSettingsDialog } from "#/features/classrooms/components/detail/room-settings-dialog.tsx";
+import RoomSummary from "#/features/classrooms/components/detail/room-summary.tsx";
+import ActiveIssuesPanel from "#/features/issues/components/active-issues-panel.tsx";
+import MaintenanceHistory from "#/features/maintenance/components/maintenance-history.tsx";
+import OpenTasks from "#/features/tasks/components/open-tasks-panel.tsx";
+import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { api } from "../../../../../backend/convex/_generated/api";
+import type { Id } from "../../../../../backend/convex/_generated/dataModel";
 
 export default function Page() {
   const params = useParams();
-  const roomId = params.id as string;
-  const { fetchedRooms } = useFetchedRoomsStore();
-  const [room, setRoom] = useState<z.infer<typeof classroomSchemaPayload> | undefined>(undefined);
+  const roomId = params.id as Id<"classrooms">;
+  const room = useQuery(api.core.classrooms.service.getRoom, { id: roomId });
   const router = useRouter();
   const { data: session } = authClientWeb.useSession();
   const canManageRoom = session?.user.role === "admin";
-
-  useEffect(() => {
-    const foundRoom = fetchedRooms.find((room) => room._id === roomId);
-    setRoom(foundRoom || undefined);
-  }, [fetchedRooms, roomId]);
 
   return (
     <>
@@ -56,7 +49,7 @@ export default function Page() {
             <Availability room={room} />
           </div>
           <div className="h-[45dvh]">
-            <ActiveIssues room={room} />
+            <ActiveIssuesPanel room={room} />
           </div>
           <div className="h-[45dvh]">
             <OpenTasks room={room} />
@@ -83,7 +76,7 @@ export default function Page() {
           <MaintenanceHistory roomId={roomId} />
         </div>
         <div className="mt-10 flex h-[45dvh] gap-10">
-          <ActiveIssues room={room} />
+          <ActiveIssuesPanel room={room} />
           <OpenTasks room={room} />
         </div>
       </div>

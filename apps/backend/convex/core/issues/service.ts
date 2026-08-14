@@ -73,9 +73,9 @@ function matchesSearch(issue: Issue, filters: IssueFeedFilter) {
   return descriptionMatches || resolutionMatches;
 }
 
-function matchesIssue(issue: Issue, view: "OPEN" | "ALL", filters: IssueFeedFilter | undefined, groupClassroomIds: Set<string> | undefined) {
-  const isOpen = issue.resolution === undefined && !issue.issue.onHold;
-  if (view === "OPEN" && !isOpen) return false;
+function matchesIssue(issue: Issue, view: "ACTIVE" | "ALL", filters: IssueFeedFilter | undefined, groupClassroomIds: Set<string> | undefined) {
+  const isActive = issue.resolution === undefined && !issue.issue.onHold;
+  if (view === "ACTIVE" && !isActive) return false;
   if (!filters) return true;
 
   return (
@@ -86,9 +86,11 @@ function matchesIssue(issue: Issue, view: "OPEN" | "ALL", filters: IssueFeedFilt
   );
 }
 
+// ACTIVE: returns paginated unresolved issues, excluding held issues
+// ALL: returns all issues
 export const getIssues = protectedQuery({
   args: z.object({
-    view: z.enum(["OPEN", "ALL"]),
+    view: z.enum(["ACTIVE", "ALL"]),
     filters: issueFeedFilterSchema.optional(),
     paginationOpts: convexToZod(paginationOptsValidator),
   }),
@@ -108,7 +110,7 @@ export const getIssues = protectedQuery({
     }
 
     const inferredStatus = filters?.status ?? (filters?.resolved || filters?.hasFindings ? "RESOLVED" : undefined);
-    const indexedStatus = view === "OPEN" ? "UNRESOLVED" : inferredStatus;
+    const indexedStatus = view === "ACTIVE" ? "UNRESOLVED" : inferredStatus;
     const issues = stream(ctx.db, schema);
 
     const orderedIssues = classroomId
@@ -136,26 +138,19 @@ export const getIssues = protectedQuery({
   },
 });
 
-export const getActiveIssues = protectedQuery({
+// Returns the complete issue history for one classroom. Consumers decide
+// whether resolved or on-hold issues belong in their local view.
+export const getClassroomIssues = protectedQuery({
   args: z.object({
-    classroomId: zid("classrooms").optional(),
+    classroomId: zid("classrooms"),
   }),
   returns: z.array(issueDoc),
-  handler: (ctx, { classroomId }) => {
-    if (classroomId) {
-      return ctx.db
-        .query("issues")
-        .withIndex("byClassroomIdAndFeed", (query) => query.eq("classroomId", classroomId).eq("feedStatus", "UNRESOLVED"))
-        .order("desc")
-        .collect();
-    }
-
-    return ctx.db
+  handler: (ctx, { classroomId }) =>
+    ctx.db
       .query("issues")
-      .withIndex("byFeed", (query) => query.eq("feedStatus", "UNRESOLVED"))
+      .withIndex("byClassroomIdAndFeed", (query) => query.eq("classroomId", classroomId))
       .order("desc")
-      .collect();
-  },
+      .collect(),
 });
 
 export const createIssue = protectedMutation({
@@ -259,6 +254,22 @@ export const editIssue = protectedMutation({
       newReportedBy !== issueDocument.issue.reportedBy ||
       new Date(newReportedAt).getTime() !== new Date(issueDocument.issue.reportedAt).getTime();
 
+    const nextResolution =
+      !args.onHold && args.resolution
+        ? {
+            // the resolvedBy can be different than the context, only if user is admin
+            resolvedBy: isAdmin ? args.resolution.resolvedBy : (issueDocument.resolution?.resolvedBy ?? user.email),
+            resolvedAt: isAdmin ? args.resolution.resolvedAt : (issueDocument.resolution?.resolvedAt ?? now),
+            comment: args.resolution.comment,
+            findings: issueDocument.resolution?.findings,
+          }
+        : undefined;
+
+    const resolutionChanged =
+      issueDocument.resolution?.comment !== nextResolution?.comment ||
+      issueDocument.resolution?.resolvedBy !== nextResolution?.resolvedBy ||
+      issueDocument.resolution?.resolvedAt !== nextResolution?.resolvedAt;
+
     const updatedIssue: z.infer<typeof issueSchema> = {
       ...issueDocument,
       issue: {
@@ -275,26 +286,16 @@ export const editIssue = protectedMutation({
 
       // if the resolution existed and was changed, mark as edited
       // if any other field was changed, mark as edited
-      ...((nonResolutionChanged || (issueDocument.resolution && args.resolution !== issueDocument.resolution)) && {
+      ...((nonResolutionChanged || resolutionChanged) && {
         edited: {
           editedBy: user.email,
           editDate: now,
         },
       }),
 
-      // if input.resolution is provided, update resolution, else make it undefined
-      ...(!args.onHold && args.resolution
-        ? {
-            resolution: {
-              // the resolvedBy can be different than the context, only if user is admin
-              resolvedBy: isAdmin ? args.resolution.resolvedBy : user.email,
-              resolvedAt: isAdmin ? args.resolution.resolvedAt : now,
-              comment: args.resolution.comment,
-
-              findings: issueDocument.resolution?.findings,
-            },
-          }
-        : { resolution: undefined }),
+      resolution: nextResolution,
+      feedStatus: nextResolution ? "RESOLVED" : "UNRESOLVED",
+      feedDate: nextResolution?.resolvedAt ?? newReportedAt,
     };
 
     await ctx.db.patch("issues", args._id, updatedIssue);
