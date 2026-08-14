@@ -1,23 +1,23 @@
 import type { Doc } from "@backend/convex/_generated/dataModel";
+import { uiIssueFormSchema } from "@backend/convex/core/issues/schemas.ts";
 import { z } from "zod";
 
-export const issueFormSchema = z.object({
-  description: z.string().min(1, "Issue description must be provided"),
-  urgent: z.boolean(),
-  supervisorNeeded: z.boolean(),
-  cruzfixId: z.string().optional(),
-  sodId: z.string().optional(),
-  onHold: z.boolean(),
-  reportedBy: z.email().optional(),
-  reportedAt: z.date().optional(),
-  resolution: z
-    .object({
-      comment: z.string().min(1, "Issue resolution.comment must be provided"),
-      resolvedBy: z.email(),
-      resolvedAt: z.date(),
-    })
-    .optional(),
+/**
+ * Convex methods expect ISO date strings for date fields. These are utility schemas and methods to handle the conversions
+ */
+const issueResolutionFormSchema = uiIssueFormSchema.shape.resolution.unwrap().omit({ resolvedAt: true }).extend({
+  resolvedAt: z.date(),
 });
+
+export const issueFormSchema = uiIssueFormSchema
+  .omit({
+    reportedAt: true,
+    resolution: true,
+  })
+  .extend({
+    reportedAt: z.date().optional(),
+    resolution: issueResolutionFormSchema.optional(),
+  });
 
 export type IssueFormValues = z.input<typeof issueFormSchema>;
 

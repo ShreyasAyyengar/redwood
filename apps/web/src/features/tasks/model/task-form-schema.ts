@@ -1,21 +1,17 @@
 import type { Doc } from "@backend/convex/_generated/dataModel";
+import { uiTaskFormSchema } from "@backend/convex/core/tasks/schemas";
 import { z } from "zod";
 
-export const taskFormSchema = z.object({
-  description: z.string().min(1, "Task description is required."),
-  urgent: z.boolean(),
-  supervisorNeeded: z.boolean(),
+/**
+ * Convex methods expect ISO date strings for date fields. These are utility schemas and methods to handle the conversions
+ */
+const taskCompletionFormSchema = uiTaskFormSchema.shape.completion.unwrap().omit({ completedAt: true }).extend({ completedAt: z.date() });
+
+export const taskFormSchema = uiTaskFormSchema.omit({ visibleAt: true, completeBy: true, createdAt: true, completion: true }).extend({
   visibleAt: z.date().optional(),
   completeBy: z.date().optional(),
-  createdBy: z.email().optional(),
   createdAt: z.date().optional(),
-  completion: z
-    .object({
-      comment: z.string().optional(),
-      completedBy: z.email(),
-      completedAt: z.date(),
-    })
-    .optional(),
+  completion: taskCompletionFormSchema.optional(),
 });
 
 export type TaskFormValues = z.input<typeof taskFormSchema>;
