@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "imports": {
+    "#/*": "./src/*"
+  },
   "scripts": {
     "build": "bun run next build",
     "check-types": "bun run next typegen && bun run tsgo --noEmit",
