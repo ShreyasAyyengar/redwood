@@ -88,7 +88,8 @@
         "noForEach": "off"
       },
       "performance": {
-        "noBarrelFile": "warn"
+        "noBarrelFile": "warn",
+        "noJsxPropsBind": "off"
       },
       "nursery": {
         "useSortedClasses": "warn"
