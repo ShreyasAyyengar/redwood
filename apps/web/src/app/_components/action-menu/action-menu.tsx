@@ -3,9 +3,9 @@
 import { Button } from "@redwood/shad-ui/components/button";
 import { ArrowLeft, LogOut, MessageSquareText, Plus, Repeat2, X } from "lucide-react";
 import { useState } from "react";
-import FeedbackDialog from "@/features/feedback/components/dialogs/feedback-dialog";
-import { env } from "../../../env";
-import { authClientWeb } from "../../../lib/auth-client-web";
+import { env } from "#/env.ts";
+import FeedbackDialog from "#/features/feedback/components/dialogs/feedback-dialog.tsx";
+import { authClientWeb } from "#/lib/auth-client-web.ts";
 import { AccountAvatar } from "./account-avatar";
 import { AccountSessionButton } from "./account-session-button";
 import { ActionButton, TooltipActionButton } from "./action-button";
