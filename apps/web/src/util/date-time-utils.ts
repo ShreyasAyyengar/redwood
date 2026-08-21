@@ -1,5 +1,4 @@
-import type { scheduleSchema } from "@redwood/contracts";
-import type { z } from "zod";
+import type { Doc } from "@backend/convex/_generated/dataModel";
 
 export const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -21,7 +20,7 @@ export const WEEKDAY_KEYS = ["sunday", "monday", "tuesday", "wednesday", "thursd
 export const SHORT_WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 
 export type WeekdayKey = (typeof WEEKDAY_KEYS)[number];
-export type Schedule = z.infer<typeof scheduleSchema>;
+export type Schedule = NonNullable<Doc<"classrooms">["schedule"]>;
 export type ScheduleBlock = Schedule[WeekdayKey][number];
 
 export const SHORT_WEEKDAY_LABEL_BY_KEY: Record<WeekdayKey, string> = {

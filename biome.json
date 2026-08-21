@@ -1,8 +1,12 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "extends": ["ultracite/biome/core", "ultracite/biome/react", "ultracite/biome/next"],
+  "extends": [
+    "ultracite/biome/core",
+    "ultracite/biome/react",
+    "ultracite/biome/next"
+  ],
   "files": {
-    "includes": ["!packages/ui"]
+    "includes": ["**/*", "!packages/ui", "!**/convex/**/_generated"]
   },
   "javascript": {
     "formatter": {
@@ -12,7 +16,8 @@
   "assist": {
     "actions": {
       "source": {
-        "useSortedAttributes": "off"
+        "useSortedAttributes": "off",
+        "useSortedKeys": "off"
       }
     }
   },
@@ -38,6 +43,19 @@
         "useExhaustiveDependencies": "warn"
       },
       "style": {
+        "noRestrictedImports": {
+          "level": "error",
+          "options": {
+            "patterns": [
+              {
+                "group": ["**/_generated/server"],
+                "importNamePattern": "(query|mutation|action|internalQuery|internalMutation|internalAction|zQuery|zMutation|zAction)",
+                "message": "SECURITY: Use procedure wrappers from convex/lib/procedures instead of importing Convex builders directly from _generated/server."
+              }
+            ]
+          }
+        },
+        "useDefaultSwitchClause": "off",
         "useBlockStatements": "off",
         "noMagicNumbers": "warn",
         "noUselessElse": "warn",
@@ -50,11 +68,13 @@
         },
         "noNestedTernary": "off",
         "useConsistentArrowReturn": "warn",
-        "useImportType": "warn"
+        "useImportType": "warn",
+        "useErrorCause": "off"
       },
       "suspicious": {
         "useAwait": "warn",
-        "noConsole": "warn"
+        "noConsole": "warn",
+        "noLeakedRender": "off"
       },
       "complexity": {
         "useSimplifiedLogicExpression": "off",
@@ -68,11 +88,24 @@
         "noForEach": "off"
       },
       "performance": {
-        "noBarrelFile": "warn"
+        "noBarrelFile": "warn",
+        "noJsxPropsBind": "off"
       },
       "nursery": {
         "useSortedClasses": "warn"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["apps/backend/convex/**"],
+      "linter": {
+        "rules": {
+          "performance": {
+            "noAwaitInLoops": "off"
+          }
+        }
+      }
+    }
+  ]
 }

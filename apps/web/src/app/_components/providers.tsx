@@ -1,33 +1,26 @@
 "use client";
 
-import { isServer, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { type AuthClient, ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
+import { ConvexReactClient } from "convex/react";
 import { NuqsAdapter } from "nuqs/adapters/next";
+import type { ReactNode } from "react";
+import { env } from "#/env.ts";
+import { authClientWeb } from "#/lib/auth-client-web.ts";
 
-const STALE_TIME = 60 * 1000;
-function makeQueryClient() {
-  return new QueryClient({
-    defaultOptions: {
-      queries: {
-        // With SSR, we usually want to set some default staleTime
-        // above 0 to avoid refetching immediately on the client
-        staleTime: STALE_TIME,
-      },
-    },
-  });
-}
-let browserQueryClient: QueryClient | undefined;
-function getQueryClient() {
-  if (isServer) return makeQueryClient();
-  if (!browserQueryClient) browserQueryClient = makeQueryClient();
-  return browserQueryClient;
-}
+const convex = new ConvexReactClient(env.NEXT_PUBLIC_CONVEX_URL);
 
-export default function Providers({ children }: { children: React.ReactNode }) {
-  const queryClient = getQueryClient();
-
+export function ConvexClientProvider({ children, initialToken }: { children: ReactNode; initialToken?: string | null }) {
   return (
-    <QueryClientProvider client={queryClient}>
+    <ConvexBetterAuthProvider client={convex} authClient={authClientWeb as unknown as AuthClient} initialToken={initialToken}>
+      {children}
+    </ConvexBetterAuthProvider>
+  );
+}
+
+export default function Providers({ children, initialToken }: { children: ReactNode; initialToken?: string | null }) {
+  return (
+    <ConvexClientProvider initialToken={initialToken}>
       <NuqsAdapter>{children}</NuqsAdapter>
-    </QueryClientProvider>
+    </ConvexClientProvider>
   );
 }
