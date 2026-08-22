@@ -4,16 +4,16 @@
   "type": "module",
   "module": "index.ts",
   "scripts": {
-    "dev": "convex dev",
+    "dev": "convex dev --env-file .env.local",
     "env": "set -e; bunx convex env set --from-file .env.local --force; for var in $(bunx convex env list --names-only); do if ! grep -qE \"^[[:space:]]*(export[[:space:]]+)?${var}[[:space:]]*=\" .env.local; then bunx convex env remove \"$var\"; fi; done; bunx convex env list",
     "generate-auth-schema": "cd convex/betterAuth && bunx auth generate"
   },
   "dependencies": {
     "@convex-dev/better-auth": "^0.12.5",
     "bcryptjs": "^3.0.3",
-    "better-auth": "^1.6.27",
-    "convex": "^1.43.0",
-    "convex-helpers": "^0.1.122",
+    "better-auth": "1.6.27",
+    "convex": "^1.45.0",
+    "convex-helpers": "^0.1.123",
     "csv-parse": "^7.0.2"
   },
   "devDependencies": {
