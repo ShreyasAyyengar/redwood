@@ -9,7 +9,8 @@
     "build": "turbo run build",
     "check-types": "turbo run check-types",
     "dev": "turbo run dev",
-    "lint": "biome check ."
+    "lint": "biome check .",
+    "migrate:mongo": "bun apps/backend/scripts/migrate-mongo-to-convex.ts"
   },
   "dependencies": {
     "@t3-oss/env-core": "^0.13.11",
