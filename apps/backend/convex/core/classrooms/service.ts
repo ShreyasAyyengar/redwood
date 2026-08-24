@@ -66,6 +66,8 @@ export const getAllRooms = protectedQuery({
       .withIndex("byIsActive", (q) => q.eq("isActive", true))
       .collect();
 
+    rooms.sort((a, b) => a.displayName.localeCompare(b.displayName, undefined, { numeric: true, sensitivity: "base" }));
+
     for (const room of rooms) {
       const unresolvedIssues = await ctx.db
         .query("issues")
