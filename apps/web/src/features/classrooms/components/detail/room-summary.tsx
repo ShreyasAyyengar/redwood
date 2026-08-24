@@ -92,26 +92,6 @@ export default function RoomSummary({ room }: { room: ClassroomSummary | undefin
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <Bug className="size-5" />
-        <div className="mt-2 flex flex-col">
-          <div className="flex items-center font-bold text-neutral-400 text-sm">Active Issues</div>
-          <div className="flex items-center font-normal text-sm text-white/80">
-            {room.activeIssuesCount} issue{room.activeIssuesCount !== 1 ? "s" : ""}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <SquareCheckBig className="size-5" />
-        <div className="mt-2 flex flex-col">
-          <div className="flex items-center font-bold text-neutral-400 text-sm">Open Tasks</div>
-          <div className="flex items-center font-normal text-sm text-white/80">
-            {room.openTasksCount} task{room.openTasksCount !== 1 ? "s" : ""}
-          </div>
-        </div>
-      </div>
-
       <div className="flex justify-start lg:justify-center">
         <MaintenanceDialog roomId={room._id}>
           <Button className="mt-4 flex w-fit items-center rounded-md bg-neutral-300 px-2 py-0.5 text-center font-semibold text-base text-black transition-all duration-150 hover:bg-neutral-400 focus:ring-5! focus:ring-neutral-600! active:scale-95 active:transform">
