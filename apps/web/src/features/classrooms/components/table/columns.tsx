@@ -2,7 +2,7 @@
 
 import { type LegacyColumnDef as ColumnDef, legacyCreateColumnHelper as createColumnHelper } from "@tanstack/react-table/legacy";
 import { dayAvailability, getBlocksForToday, getCaliClock, toSortKey } from "#/util/date-time-utils.ts";
-import type { ClassroomSummary } from "../../model/classroom-types";
+import type { ClassroomSummary, RoomStatus } from "../../model/classroom-types";
 import AvailabilityCell from "./availability/availability-cell";
 import AvailabilityHeader from "./availability/availability-header";
 import LastServicedCell from "./last-serviced/last-serviced-cell";
@@ -14,10 +14,11 @@ import StatusHeader from "./status/status-header";
 import OpenTasksCell from "./tasks/open-tasks-cell";
 import OpenTasksHeader from "./tasks/open-tasks-header";
 
-const statusOrder: Record<string, number> = {
+const statusOrder: Record<RoomStatus, number> = {
   "NEEDS URGENT ATTENTION": 0,
   "NEEDS ATTENTION": 1,
-  GOOD: 2,
+  "ON HOLD": 2,
+  GOOD: 3,
 };
 
 const columnHelper = createColumnHelper<ClassroomSummary>();
@@ -26,8 +27,7 @@ export const columns: ColumnDef<ClassroomSummary, any>[] = [
   columnHelper.accessor("roomStatus", {
     header: ({ column }) => <StatusHeader column={column} />,
     cell: ({ row }) => <StatusCell row={row} />,
-    // biome-ignore lint/style/noNonNullAssertion: everything is strongly typed
-    sortFn: (rowA, rowB) => statusOrder[rowA.original.roomStatus]! - statusOrder[rowB.original.roomStatus]!,
+    sortFn: (rowA, rowB) => statusOrder[rowA.original.roomStatus] - statusOrder[rowB.original.roomStatus],
   }),
 
   columnHelper.accessor("displayName", {

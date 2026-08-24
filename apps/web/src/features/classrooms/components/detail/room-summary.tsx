@@ -30,6 +30,7 @@ export default function RoomSummary({ room }: { room: ClassroomSummary | undefin
       className={cn(
         "rounded-2xl px-2 text-center font-bold font-mono text-sm",
         room.roomStatus === "GOOD" && urgencyStyle("green"),
+        room.roomStatus === "ON HOLD" && "bg-zinc-500/10 text-zinc-400",
         room.roomStatus === "NEEDS ATTENTION" && urgencyStyle("orange"),
         room.roomStatus === "NEEDS URGENT ATTENTION" && urgencyStyle("red")
       )}
@@ -43,6 +44,7 @@ export default function RoomSummary({ room }: { room: ClassroomSummary | undefin
       className={cn(
         "flex flex-col rounded-2xl p-5 pt-3 font-bold text-2xl text-zinc-300/80 shadow-xl/80",
         room.roomStatus === "GOOD" && "bg-green-500/10",
+        room.roomStatus === "ON HOLD" && "bg-zinc-500/25",
         room.roomStatus === "NEEDS ATTENTION" && "bg-yellow-500/10",
         room.roomStatus === "NEEDS URGENT ATTENTION" && "bg-red-500/10"
       )}

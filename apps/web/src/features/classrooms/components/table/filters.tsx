@@ -138,6 +138,7 @@ function FilterControls({ controller, idPrefix, compact = false }: { controller:
             <SelectContent className="border-white/10 bg-neutral-900 text-neutral-200">
               <SelectItem value="ALL">All Statuses</SelectItem>
               <SelectItem value="GOOD">Good</SelectItem>
+              <SelectItem value="ON HOLD">On Hold</SelectItem>
               <SelectItem value="NEEDS ATTENTION">Needs Attention</SelectItem>
               <SelectItem value="NEEDS URGENT ATTENTION">Needs Urgent Attention</SelectItem>
             </SelectContent>

@@ -9,7 +9,7 @@ export const classroomDoc = z.object(withSystemFields("classrooms", classroomSch
 export const classroomPayloadDoc = classroomDoc.extend({
   openTasksCount: z.number(),
   activeIssuesCount: z.number(),
-  roomStatus: z.enum(["GOOD", "NEEDS ATTENTION", "NEEDS URGENT ATTENTION"]),
+  roomStatus: z.enum(["GOOD", "ON HOLD", "NEEDS ATTENTION", "NEEDS URGENT ATTENTION"]),
 });
 
 export const getRoom = protectedQuery({
@@ -34,7 +34,9 @@ export const getRoom = protectedQuery({
       ? "NEEDS URGENT ATTENTION"
       : activeIssues.length > 0
         ? "NEEDS ATTENTION"
-        : "GOOD";
+        : unresolvedIssues.length > 0
+          ? "ON HOLD"
+          : "GOOD";
     const openTasksCount = (
       await ctx.db
         .query("tasks")
@@ -70,11 +72,13 @@ export const getAllRooms = protectedQuery({
         .collect();
       const activeIssues = unresolvedIssues.filter((issue) => !issue.issue.onHold);
       const activeIssuesCount = activeIssues.length;
-      const roomStatus = activeIssues.some((issue) => issue.issue.urgent)
+      const roomStatus: z.infer<typeof classroomPayloadDoc>["roomStatus"] = activeIssues.some((issue) => issue.issue.urgent)
         ? "NEEDS URGENT ATTENTION"
         : activeIssuesCount > 0
           ? "NEEDS ATTENTION"
-          : "GOOD";
+          : unresolvedIssues.length > 0
+            ? "ON HOLD"
+            : "GOOD";
 
       const openTasksCount = (
         await ctx.db

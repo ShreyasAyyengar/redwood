@@ -1,28 +1,32 @@
 import { Button } from "@redwood/shad-ui/components/button";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import type { LegacyRow as Row } from "@tanstack/react-table/legacy";
-import { CircleAlert, ThumbsUp, TriangleAlert } from "lucide-react";
+import { CircleAlert, OctagonPause, ThumbsUp, TriangleAlert } from "lucide-react";
 import { ClassroomIssuesPopover } from "#/features/issues/components/classroom-issues-popover.tsx";
 import type { ClassroomSummary } from "../../../model/classroom-types";
 
+const statusConfig = {
+  "NEEDS URGENT ATTENTION": {
+    icon: TriangleAlert,
+    className: "text-red-500 hover:bg-red-500/10",
+  },
+  "NEEDS ATTENTION": {
+    icon: CircleAlert,
+    className: "text-yellow-500 hover:bg-yellow-500/10",
+  },
+  "ON HOLD": {
+    icon: OctagonPause,
+    className: "text-zinc-500 hover:bg-zinc-500/10",
+  },
+  GOOD: {
+    icon: ThumbsUp,
+    className: "",
+  },
+} as const;
+
 export default function StatusCell({ row }: { row: Row<ClassroomSummary> }) {
   const room = row.original;
-  const statusConfig = {
-    "NEEDS URGENT ATTENTION": {
-      icon: TriangleAlert,
-      className: "text-red-500 hover:bg-red-500/10",
-    },
-    "NEEDS ATTENTION": {
-      icon: CircleAlert,
-      className: "text-yellow-500 hover:bg-yellow-500/10",
-    },
-    GOOD: {
-      icon: ThumbsUp,
-      className: "",
-    },
-  } as const;
-
-  const { icon: Icon, className } = statusConfig[room.roomStatus as keyof typeof statusConfig] ?? statusConfig.GOOD;
+  const { icon: Icon, className } = statusConfig[room.roomStatus];
 
   return (
     <ClassroomIssuesPopover classroomId={room._id}>

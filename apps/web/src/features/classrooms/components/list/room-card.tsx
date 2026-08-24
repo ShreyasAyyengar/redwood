@@ -1,5 +1,5 @@
 import { cn } from "@redwood/shad-ui/lib/utils";
-import { CircleAlert, ThumbsUp, TriangleAlert } from "lucide-react";
+import { CircleAlert, OctagonPause, ThumbsUp, TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
   convertMinutesToReadable,
@@ -40,6 +40,7 @@ export default function RoomCard({ room }: { room: ClassroomSummary }) {
   const roomStatus = () => {
     if (room.roomStatus === "NEEDS URGENT ATTENTION") return <TriangleAlert className="flex size-4 text-red-500" />;
     if (room.roomStatus === "NEEDS ATTENTION") return <CircleAlert className="flex size-4 text-yellow-500" />;
+    if (room.roomStatus === "ON HOLD") return <OctagonPause className="flex size-4 text-zinc-500" />;
     return <ThumbsUp className="flex size-4" />;
   };
 

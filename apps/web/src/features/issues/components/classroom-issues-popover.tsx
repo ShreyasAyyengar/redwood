@@ -15,6 +15,8 @@ export function ClassroomIssuesPopover({ classroomId, children }: { classroomId:
   const issues = useQuery(api.core.issues.service.getClassroomIssues, open ? { classroomId } : "skip");
   const activeIssues = issues?.filter(isActiveIssue) ?? [];
 
+  const holdCount = issues?.filter((issue) => issue.issue.onHold).length ?? 0;
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
@@ -44,7 +46,14 @@ export function ClassroomIssuesPopover({ classroomId, children }: { classroomId:
             ))}
           </div>
         ) : (
-          <span className="py-2 text-center text-sm text-zinc-500">No active issues</span>
+          <>
+            <span className="text-center text-sm text-zinc-500">No active issues</span>
+            {holdCount > 0 && (
+              <span className="text-center text-xs text-zinc-500">
+                There {holdCount === 1 ? "is" : "are"} {holdCount} issue{holdCount === 1 ? "" : "s"} on hold.
+              </span>
+            )}
+          </>
         )}
       </PopoverContent>
     </Popover>
