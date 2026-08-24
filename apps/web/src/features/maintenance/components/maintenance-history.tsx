@@ -15,7 +15,8 @@ import MaintenanceDialog from "./dialogs/maintenance-dialog.tsx";
 const INTERSECTION_ROOT_MARGIN = "160px 0px";
 const MAINTENANCE_ROW_ESTIMATE_PX = 140;
 const END_SEPARATOR_ROW_ESTIMATE_PX = 40;
-const MAINTENANCE_PAGE_SIZE = 2;
+// TODO figure this out, it still prefetches hella many
+const MAINTENANCE_PAGE_SIZE = 10;
 
 export default function MaintenanceHistory({ roomId }: { roomId: Id<"classrooms"> | undefined }) {
   const {
