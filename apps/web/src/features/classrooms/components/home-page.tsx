@@ -35,6 +35,7 @@ export default function HomePage({ rooms }: { rooms: ClassroomSummary[] }) {
             <TabsTrigger value="classrooms">Classrooms</TabsTrigger>
             <TabsTrigger value="issues">Issues</TabsTrigger>
             <TabsTrigger value="tasks">Tasks</TabsTrigger>
+            <TabsTrigger value="hotline">Hotline</TabsTrigger>
             <TabsTrigger value="builder">Shift Builder</TabsTrigger>
             {canAccessAdminPanel && <TabsTrigger value="admin">Admin Panel</TabsTrigger>}
           </TabsList>
@@ -55,6 +56,12 @@ export default function HomePage({ rooms }: { rooms: ClassroomSummary[] }) {
           <TabsContent value="tasks" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
             <div className="flex w-full flex-1 overflow-hidden p-5">
               <TasksFeed />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="hotline" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
+            <div className="flex w-full flex-1 items-center justify-center overflow-hidden p-5">
+              <h1>Hello World!</h1>
             </div>
           </TabsContent>
 
