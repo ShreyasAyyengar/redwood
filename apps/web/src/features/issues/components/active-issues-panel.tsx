@@ -5,7 +5,7 @@ import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useQuery } from "convex/react";
 import { BookAlert, Plus, TriangleAlert } from "lucide-react";
-import { isActiveIssue, sortActiveIssues } from "../model/issue-state";
+import { sortActiveIssues } from "../model/issue-state";
 import { IssueCard, IssueCardSkeleton } from "./cards/issue-card";
 import { ClassroomIssueHistoryDialog } from "./dialogs/classroom-issue-history-dialog";
 import { IssueDialog } from "./dialogs/issue-dialog";
@@ -15,7 +15,7 @@ export default function ActiveIssuesPanel({ room }: { room: Pick<Doc<"classrooms
 
   if (!issues || !room) return <ActiveIssuesSkeleton />;
 
-  const openIssues = sortActiveIssues(issues.filter(isActiveIssue));
+  const openIssues = sortActiveIssues(issues.filter((issue) => !issue.resolution));
   return (
     <div className="group relative flex h-full flex-1">
       {/* gradient blur background */}
