@@ -5,16 +5,20 @@ import { RoomGroupEditor } from "./groups/room-group-editor";
 import Overview from "./overview/overview";
 import UserEditor from "./users/user-editor";
 
-export default function AdminPanel() {
+const supervisorTabs = ["overview", "csv", "attributes", "groups"];
+
+export default function AdminPanel({ isAdmin }: { isAdmin: boolean }) {
   const storeLastTab = (tab: string) => localStorage.setItem("adminLastTab", tab);
-  const lastTab = localStorage.getItem("adminLastTab") ?? "overview";
+  const storedTab = localStorage.getItem("adminLastTab");
+  const allowedTabs = isAdmin ? [...supervisorTabs, "users"] : supervisorTabs;
+  const lastTab = storedTab && allowedTabs.includes(storedTab) ? storedTab : "overview";
   return (
     <div className="flex justify-center">
       <Tabs defaultValue={lastTab} orientation="vertical" onValueChange={storeLastTab}>
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="csv">CSV Upload</TabsTrigger>
-          <TabsTrigger value="users">Users</TabsTrigger>
+          {isAdmin && <TabsTrigger value="users">Users</TabsTrigger>}
           <TabsTrigger value="attributes">Room Attributes</TabsTrigger>
           <TabsTrigger value="groups">Room Groups</TabsTrigger>
           <TabsTrigger disabled value="statistics">
@@ -28,9 +32,11 @@ export default function AdminPanel() {
         <TabsContent value="csv">
           <CSVUpload />
         </TabsContent>
-        <TabsContent value="users">
-          <UserEditor />
-        </TabsContent>
+        {isAdmin && (
+          <TabsContent value="users">
+            <UserEditor />
+          </TabsContent>
+        )}
         <TabsContent value="attributes">
           <AttributeEditor />
         </TabsContent>

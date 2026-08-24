@@ -7,10 +7,10 @@ import { CalendarDays, ChevronDownIcon } from "lucide-react";
 import { useState } from "react";
 import { authClientWeb } from "#/lib/auth-client-web.ts";
 import { hasAdminAccess } from "#/lib/permissions.ts";
-import { useFieldContext } from "../issue-form-context";
+import { type TaskFormValues, useFieldContext } from "../task-form-context";
 
-export default function IssueDateField({ existingDate }: { existingDate: Date }) {
-  const field = useFieldContext<Date>();
+export default function CreatedAtField({ existingDate }: { existingDate: Date }) {
+  const field = useFieldContext<TaskFormValues["createdAt"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
   const [date, setDate] = useState<Date | undefined>(existingDate);
   const { data: session } = authClientWeb.useSession();
@@ -20,7 +20,7 @@ export default function IssueDateField({ existingDate }: { existingDate: Date })
     <Field data-invalid={isInvalid}>
       <div className={cn("mt-5 flex gap-2", !isAdmin && "cursor-not-allowed")}>
         <FieldLabel htmlFor={field.name} className="font-semibold text-xl">
-          Issue Date:
+          Created Date:
         </FieldLabel>
 
         <Popover>
@@ -43,7 +43,7 @@ export default function IssueDateField({ existingDate }: { existingDate: Date })
               selected={date}
               onSelect={(nextDate) => {
                 setDate(nextDate);
-                if (nextDate) field.handleChange(nextDate);
+                field.handleChange(nextDate);
               }}
               defaultMonth={date}
             />

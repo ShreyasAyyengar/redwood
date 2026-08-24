@@ -3,13 +3,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useQuery } from "convex/react";
 import { useState } from "react";
 import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { hasAdminAccess } from "#/lib/permissions.ts";
 import { type IssueFormValues, useFieldContext } from "../issue-form-context";
 
 export default function ReportedByFieldSelector({ existingValue }: { existingValue?: string }) {
   const field = useFieldContext<IssueFormValues["reportedBy"]>();
 
   const { data: session } = authClientWeb.useSession();
-  const isAdmin = session?.user.role === "admin";
+  const isAdmin = hasAdminAccess(session?.user.role);
   const [selectedUser, setSelectedUser] = useState<string | undefined>(existingValue);
 
   const fetchedUsers = useQuery(api.core.users.service.getUsers, isAdmin ? {} : "skip") ?? [];

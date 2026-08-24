@@ -5,7 +5,7 @@ import { withSystemFields } from "convex-helpers/server/zod";
 import { convexToZod, zid } from "convex-helpers/server/zod4";
 import { z } from "zod";
 import { authComponent } from "../../auth.ts";
-import { protectedMutation, protectedQuery } from "../../lib/procedures.ts";
+import { protectedMutation, protectedQuery, supervisorMutation } from "../../lib/procedures.ts";
 import schema from "../../schema.ts";
 import {
   bulkIssueFormSchema,
@@ -182,7 +182,7 @@ export const createIssue = protectedMutation({
   },
 });
 
-export const createBulkIssues = protectedMutation({
+export const createBulkIssues = supervisorMutation({
   args: bulkIssueFormSchema,
   handler: async (ctx, args) => {
     const selectedClassrooms = new Set(args.classroomIds);

@@ -1,7 +1,7 @@
 import { ConvexError } from "convex/values";
 import { withSystemFields } from "convex-helpers/server/zod";
 import { z } from "zod";
-import { protectedMutation, protectedQuery } from "../../lib/procedures.ts";
+import { protectedQuery, supervisorMutation } from "../../lib/procedures.ts";
 import { classroomDoc } from "../classrooms/service.ts";
 import { attributeSchema } from "./schemas.ts";
 
@@ -12,7 +12,7 @@ export const getAllAttributes = protectedQuery({
   handler: (ctx) => ctx.db.query("attributes").collect(),
 });
 
-export const addAttribute = protectedMutation({
+export const addAttribute = supervisorMutation({
   args: attributeDoc.pick({ label: true, color: true }),
   returns: z.object({ success: z.boolean() }),
   handler: async (ctx, args) => {
@@ -33,7 +33,7 @@ export const addAttribute = protectedMutation({
   },
 });
 
-export const deleteAttribute = protectedMutation({
+export const deleteAttribute = supervisorMutation({
   args: attributeDoc.pick({ _id: true }),
   returns: z.object({ success: z.boolean() }),
   handler: async (ctx, args) => {
@@ -42,7 +42,7 @@ export const deleteAttribute = protectedMutation({
   },
 });
 
-export const updateAttribute = protectedMutation({
+export const updateAttribute = supervisorMutation({
   args: attributeDoc.pick({ _id: true, label: true, color: true }).partial().required({ _id: true }),
   returns: z.object({ success: z.boolean() }),
   handler: async (ctx, args) => {
@@ -51,7 +51,7 @@ export const updateAttribute = protectedMutation({
   },
 });
 
-export const bulkUpdateAttributes = protectedMutation({
+export const bulkUpdateAttributes = supervisorMutation({
   args: z.object({
     updates: z.array(
       z.object({

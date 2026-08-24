@@ -12,6 +12,7 @@ import { useQuery } from "convex/react";
 import { CalendarDays } from "lucide-react";
 import { useState } from "react";
 import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { hasAdminAccess } from "#/lib/permissions.ts";
 import { type TaskFormValues, useFieldContext } from "../task-form-context";
 
 export default function CompletionField({ existingValue }: { existingValue?: Doc<"tasks">["completion"] }) {
@@ -22,7 +23,7 @@ export default function CompletionField({ existingValue }: { existingValue?: Doc
   // biome-ignore lint/style/noNonNullAssertion: user must be logged in to see this page
   const session = data!;
 
-  const isAdmin = session.user.role === "admin";
+  const isAdmin = hasAdminAccess(session.user.role);
   const defaultCompletedBy = existingValue?.completedBy ?? session.user.email;
 
   // completing checkbox toggled

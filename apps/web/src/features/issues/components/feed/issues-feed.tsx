@@ -6,6 +6,7 @@ import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { FeedRoomFilter, type FeedRoomFilterValue } from "#/features/classrooms/components/feed-room-filter.tsx";
 import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { hasSupervisorAccess } from "#/lib/permissions.ts";
 import type { IssueFeedFilterValue } from "../../model/issue-filters";
 import { BulkIssueDialog } from "../dialogs/bulk-issue-dialog";
 import { IssueFeedFilters } from "./issue-feed-filters";
@@ -15,7 +16,7 @@ export function IssuesFeed() {
   const [roomFilter, setRoomFilter] = useState<FeedRoomFilterValue | undefined>();
   const [feedFilter, setFeedFilter] = useState<IssueFeedFilterValue>({});
   const { data: session } = authClientWeb.useSession();
-  const isAdmin = session?.user.role === "admin";
+  const canBulkCreate = hasSupervisorAccess(session?.user.role);
   const issueFilter = useMemo(
     () => ({
       ...feedFilter,
@@ -32,7 +33,7 @@ export function IssuesFeed() {
             <TabsTrigger value="open">Open Issues</TabsTrigger>
             <TabsTrigger value="all">All Issues</TabsTrigger>
           </TabsList>
-          {isAdmin && (
+          {canBulkCreate && (
             <BulkIssueDialog>
               <Button className="h-2/3 px-0.5 active:scale-95 active:transform">
                 <Plus className="size-4" />

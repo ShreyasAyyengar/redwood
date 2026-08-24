@@ -54,9 +54,14 @@ export function TaskForm({
       <DialogHeader>
         <DialogTitle className="mx-auto rounded-md bg-zinc-950/30 px-10 py-3 text-center text-2xl ring-1 ring-white/15">
           {existingTask ? (
-            <form.AppField name="createdBy">
-              {(field) => <field.CreatedByFieldSelector existingValue={existingTask?.task.createdBy} />}
-            </form.AppField>
+            <>
+              <form.AppField name="createdBy">
+                {(field) => <field.CreatedByFieldSelector existingValue={existingTask.task.createdBy} />}
+              </form.AppField>
+              <form.AppField name="createdAt">
+                {(field) => <field.CreatedAtField existingDate={new Date(existingTask.task.createdAt)} />}
+              </form.AppField>
+            </>
           ) : (
             <p>Create New Task</p>
           )}

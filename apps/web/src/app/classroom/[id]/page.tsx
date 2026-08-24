@@ -11,6 +11,7 @@ import ActiveIssuesPanel from "#/features/issues/components/active-issues-panel.
 import MaintenanceHistory from "#/features/maintenance/components/maintenance-history.tsx";
 import OpenTasks from "#/features/tasks/components/open-tasks-panel.tsx";
 import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { hasSupervisorAccess } from "#/lib/permissions.ts";
 import { api } from "../../../../../backend/convex/_generated/api";
 import type { Id } from "../../../../../backend/convex/_generated/dataModel";
 
@@ -20,7 +21,7 @@ export default function Page() {
   const room = useQuery(api.core.classrooms.service.getRoom, { id: roomId });
   const router = useRouter();
   const { data: session } = authClientWeb.useSession();
-  const canManageRoom = session?.user.role === "admin";
+  const canManageRoom = hasSupervisorAccess(session?.user.role);
 
   return (
     <>

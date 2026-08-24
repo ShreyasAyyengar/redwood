@@ -2,7 +2,7 @@ import { ConvexError } from "convex/values";
 import { withSystemFields } from "convex-helpers/server/zod";
 import { zid } from "convex-helpers/server/zod4";
 import { z } from "zod";
-import { protectedMutation, protectedQuery } from "../../lib/procedures.ts";
+import { protectedQuery, supervisorMutation } from "../../lib/procedures.ts";
 import { classroomSchema } from "./schemas.ts";
 
 export const classroomDoc = z.object(withSystemFields("classrooms", classroomSchema.shape));
@@ -55,6 +55,7 @@ export const getRoom = protectedQuery({
   },
 });
 
+// TODO maybe remove activeIssuesCount and openTasksCount
 export const getAllRooms = protectedQuery({
   returns: z.array(classroomPayloadDoc),
   handler: async (ctx) => {
@@ -107,7 +108,7 @@ export const getClassroomLookup = protectedQuery({
   handler: (ctx) => ctx.db.query("classrooms").collect(),
 });
 
-export const setAttributes = protectedMutation({
+export const setAttributes = supervisorMutation({
   args: z.object({
     classroomId: zid("classrooms"),
     attributeIds: z.array(zid("attributes")),
@@ -122,7 +123,7 @@ export const setAttributes = protectedMutation({
   },
 });
 
-export const updateRoomMetadata = protectedMutation({
+export const updateRoomMetadata = supervisorMutation({
   args: z.object({
     classroomId: zid("classrooms"),
     metadata: classroomSchema.pick({ groupKey: true, attributes: true, captioning: true }),

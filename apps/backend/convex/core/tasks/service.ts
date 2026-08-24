@@ -4,7 +4,7 @@ import { stream } from "convex-helpers/server/stream";
 import { convexToZod, withSystemFields, zid } from "convex-helpers/server/zod4";
 import { z } from "zod";
 import { authComponent } from "../../auth.ts";
-import { adminMutation, adminQuery, protectedMutation, protectedQuery } from "../../lib/procedures.ts";
+import { adminMutation, protectedMutation, protectedQuery, supervisorMutation, supervisorQuery } from "../../lib/procedures.ts";
 import schema from "../../schema.ts";
 import {
   bulkTaskFormSchema,
@@ -211,7 +211,7 @@ export const addTask = protectedMutation({
   },
 });
 
-export const bulkAddTasks = adminMutation({
+export const bulkAddTasks = supervisorMutation({
   args: bulkTaskFormSchema,
   handler: async (ctx, args) => {
     const selectedClassrooms = new Set(args.classroomIds);
@@ -237,7 +237,7 @@ export const bulkAddTasks = adminMutation({
 
     const user = await authComponent.getAuthUser(ctx);
     const now = new Date().toISOString();
-    const createdBy = args.createdBy ?? user.email;
+    const createdBy = user.role === "admin" ? (args.createdBy ?? user.email) : user.email;
     const newTasks: z.infer<typeof taskSchema>[] = classroomIds.map((classroomId) => ({
       classroomId,
       createdBy,
@@ -330,12 +330,12 @@ export const deleteTask = protectedMutation({
   },
 });
 
-export const getTaskTemplates = adminQuery({
+export const getTaskTemplates = supervisorQuery({
   returns: z.array(taskTemplateDoc),
   handler: (ctx) => ctx.db.query("taskTemplates").order("desc").collect(),
 });
 
-export const addTaskTemplate = adminMutation({
+export const addTaskTemplate = supervisorMutation({
   args: taskTemplateSchema,
   returns: taskTemplateDoc,
   handler: async (ctx, args) => {

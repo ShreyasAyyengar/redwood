@@ -12,6 +12,7 @@ import { useQuery } from "convex/react";
 import { CalendarDays } from "lucide-react";
 import { useState } from "react";
 import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { hasAdminAccess } from "#/lib/permissions.ts";
 import { type IssueFormValues, useFieldContext } from "../issue-form-context";
 
 export default function ResolutionField({
@@ -28,7 +29,7 @@ export default function ResolutionField({
   // biome-ignore lint/style/noNonNullAssertion: user must be logged in to see this page
   const session = data!;
 
-  const isAdmin = session.user.role === "admin";
+  const isAdmin = hasAdminAccess(session.user.role);
   const defaultResolvedBy = existingValue?.resolvedBy ?? session.user.email;
 
   // local values of the resolution

@@ -1,7 +1,7 @@
 import { ConvexError } from "convex/values";
 import { withSystemFields, zid } from "convex-helpers/server/zod4";
 import { z } from "zod";
-import { adminMutation, protectedQuery } from "../../lib/procedures.ts";
+import { protectedQuery, supervisorMutation } from "../../lib/procedures.ts";
 import { groupFormSchema, groupSchema } from "./schemas.ts";
 
 export const groupDoc = z.object(withSystemFields("groups", groupSchema.shape));
@@ -11,7 +11,7 @@ export const getGroups = protectedQuery({
   handler: (ctx) => ctx.db.query("groups").withIndex("byLabel").collect(),
 });
 
-export const addGroup = adminMutation({
+export const addGroup = supervisorMutation({
   args: groupFormSchema,
   returns: z.object({ success: z.boolean() }),
   handler: async (ctx, args) => {
@@ -26,7 +26,7 @@ export const addGroup = adminMutation({
   },
 });
 
-export const deleteGroup = adminMutation({
+export const deleteGroup = supervisorMutation({
   args: z.object({ id: zid("groups") }),
   returns: z.object({ success: z.boolean() }),
   handler: async (ctx, args) => {
@@ -45,7 +45,7 @@ export const deleteGroup = adminMutation({
   },
 });
 
-export const updateGroup = adminMutation({
+export const updateGroup = supervisorMutation({
   args: groupFormSchema.extend({ _id: zid("groups") }),
   returns: z.object({ success: z.boolean() }),
   handler: async (ctx, args) => {
@@ -73,7 +73,7 @@ export const updateGroup = adminMutation({
   },
 });
 
-export const bulkUpdateClassrooms = adminMutation({
+export const bulkUpdateClassrooms = supervisorMutation({
   args: z.object({
     updates: z.array(
       z.object({

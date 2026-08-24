@@ -6,6 +6,7 @@ import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { FeedRoomFilter, type FeedRoomFilterValue } from "#/features/classrooms/components/feed-room-filter.tsx";
 import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { hasSupervisorAccess } from "#/lib/permissions.ts";
 import type { TaskFeedFilterValue } from "../../model/task-filters";
 import { BulkTaskDialog } from "../dialogs/bulk-task-dialog";
 import { TaskFeedFilters } from "./task-feed-filters";
@@ -15,7 +16,7 @@ export function TasksFeed() {
   const [roomFilter, setRoomFilter] = useState<FeedRoomFilterValue | undefined>();
   const [feedFilter, setFeedFilter] = useState<TaskFeedFilterValue>({});
   const { data: session } = authClientWeb.useSession();
-  const isAdmin = session?.user.role === "admin";
+  const canBulkCreate = hasSupervisorAccess(session?.user.role);
   const taskFilter = useMemo(
     () => ({
       ...feedFilter,
@@ -32,7 +33,7 @@ export function TasksFeed() {
             <TabsTrigger value="open">Open Tasks</TabsTrigger>
             <TabsTrigger value="all">All Tasks</TabsTrigger>
           </TabsList>
-          {isAdmin && (
+          {canBulkCreate && (
             <BulkTaskDialog>
               <Button className="h-2/3 px-0.5 active:scale-95 active:transform">
                 <Plus className="size-4" />
