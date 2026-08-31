@@ -6,7 +6,7 @@ import { Button } from "@redwood/shad-ui/components/button";
 import { Kbd } from "@redwood/shad-ui/components/kbd";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useQuery } from "convex/react";
-import { Phone, Plus, Tags } from "lucide-react";
+import { Phone, Plus } from "lucide-react";
 import { useCallback, useState } from "react";
 import { authClientWeb } from "#/lib/auth-client-web.ts";
 import { hasAdminAccess, hasSupervisorAccess } from "#/lib/permissions.ts";
@@ -60,12 +60,6 @@ export function HotlinePage() {
         </div>
 
         <div className="flex shrink-0 items-center gap-3">
-          {categories.length === 0 && (
-            <div className="hidden items-center gap-2 text-amber-400/80 text-xs xl:flex">
-              <Tags className="size-4" />
-              Add a category before saving a call
-            </div>
-          )}
           <Button disabled={isCreating || Boolean(editingEntry)} onClick={openNewEntry} className="bg-sky-500 text-sky-950 hover:bg-sky-400">
             <Plus className="size-4" />
             New call
