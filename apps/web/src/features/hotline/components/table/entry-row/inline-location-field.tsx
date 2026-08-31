@@ -2,9 +2,10 @@
 
 import type { Doc } from "@backend/convex/_generated/dataModel";
 import { Input } from "@redwood/shad-ui/components/input";
+import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { Building2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 type InlineLocationFieldProps = {
   classrooms: Doc<"classrooms">[];
@@ -17,6 +18,8 @@ type InlineLocationFieldProps = {
 export function InlineLocationField({ classrooms, invalid, onBlur, onChange, value }: InlineLocationFieldProps) {
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const filteredClassrooms = useMemo(() => {
     const query = value.trim().toLocaleLowerCase();
     if (!query) return classrooms;
@@ -31,14 +34,20 @@ export function InlineLocationField({ classrooms, invalid, onBlur, onChange, val
 
   return (
     <div
+      ref={containerRef}
       className="relative"
       onBlur={(event) => {
+        if (event.currentTarget.dataset.listPointerActive === "true") {
+          requestAnimationFrame(() => inputRef.current?.focus({ preventScroll: true }));
+          return;
+        }
         if (event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget)) return;
         setOpen(false);
         onBlur();
       }}
     >
       <Input
+        ref={inputRef}
         autoFocus
         role="combobox"
         aria-label="Caller location"
@@ -80,30 +89,45 @@ export function InlineLocationField({ classrooms, invalid, onBlur, onChange, val
         <div
           id="inline-caller-location-options"
           role="listbox"
-          className="absolute top-full right-0 left-0 z-40 mt-1 max-h-56 overflow-y-auto rounded-lg border border-zinc-700 bg-zinc-900 p-1 shadow-2xl shadow-black/50"
+          className="absolute top-full right-0 left-0 z-40 mt-1 overflow-hidden rounded-lg border border-zinc-700 bg-zinc-900 shadow-2xl shadow-black/50"
+          onPointerDownCapture={() => {
+            containerRef.current?.setAttribute("data-list-pointer-active", "true");
+          }}
+          onPointerUpCapture={() => {
+            containerRef.current?.removeAttribute("data-list-pointer-active");
+            inputRef.current?.focus({ preventScroll: true });
+          }}
+          onPointerCancelCapture={() => {
+            containerRef.current?.removeAttribute("data-list-pointer-active");
+            inputRef.current?.focus({ preventScroll: true });
+          }}
         >
-          {filteredClassrooms.length > 0 ? (
-            filteredClassrooms.map((classroom, index) => (
-              <button
-                key={classroom._id}
-                type="button"
-                role="option"
-                aria-selected={index === activeIndex}
-                className={cn(
-                  "flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-xs text-zinc-300 outline-none hover:bg-zinc-800 focus:bg-zinc-800",
-                  index === activeIndex && "bg-zinc-800 text-white"
-                )}
-                onMouseDown={(event) => event.preventDefault()}
-                onMouseEnter={() => setActiveIndex(index)}
-                onClick={() => selectClassroom(classroom)}
-              >
-                <Building2 className="size-3.5 shrink-0 text-sky-500" />
-                <span>{classroom.displayName}</span>
-              </button>
-            ))
-          ) : (
-            <p className="px-3 py-2 text-[10px] text-zinc-500">No match. The custom location will be saved.</p>
-          )}
+          <ScrollArea type="always" className="h-56 [&_[data-slot=scroll-area-thumb]]:bg-zinc-600/90">
+            <div className="p-1 pr-3">
+              {filteredClassrooms.length > 0 ? (
+                filteredClassrooms.map((classroom, index) => (
+                  <button
+                    key={classroom._id}
+                    type="button"
+                    role="option"
+                    aria-selected={index === activeIndex}
+                    className={cn(
+                      "flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-xs text-zinc-300 outline-none hover:bg-zinc-800 focus:bg-zinc-800",
+                      index === activeIndex && "bg-zinc-800 text-white"
+                    )}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onMouseEnter={() => setActiveIndex(index)}
+                    onClick={() => selectClassroom(classroom)}
+                  >
+                    <Building2 className="size-3.5 shrink-0 text-sky-500" />
+                    <span>{classroom.displayName}</span>
+                  </button>
+                ))
+              ) : (
+                <p className="px-3 py-2 text-[10px] text-zinc-500">No match. The custom location will be saved.</p>
+              )}
+            </div>
+          </ScrollArea>
         </div>
       )}
     </div>

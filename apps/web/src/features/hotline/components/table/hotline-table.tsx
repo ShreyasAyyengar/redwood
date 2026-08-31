@@ -1,6 +1,7 @@
 "use client";
 
 import type { Id } from "@backend/convex/_generated/dataModel";
+import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { useTable } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -73,7 +74,11 @@ export function HotlineTable({
     <>
       {canManageCategories && <CategoryManagerDialog categories={categories} onOpenChange={setCategoryManagerOpen} open={categoryManagerOpen} />}
 
-      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden bg-zinc-950/40">
+      <ScrollArea
+        viewportRef={scrollRef}
+        type="always"
+        className="min-h-0 flex-1 bg-zinc-950/40 [&_[data-slot=scroll-area-scrollbar]]:z-30 [&_[data-slot=scroll-area-thumb]]:bg-zinc-600/80"
+      >
         <div className="w-full">
           <HotlineTableHeader table={table} />
 
@@ -127,7 +132,7 @@ export function HotlineTable({
             </>
           )}
         </div>
-      </div>
+      </ScrollArea>
     </>
   );
 }
