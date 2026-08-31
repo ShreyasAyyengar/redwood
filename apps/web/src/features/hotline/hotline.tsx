@@ -37,7 +37,13 @@ export function HotlinePage() {
     setEditingEntry(entry);
   }, []);
 
+  const cancelActiveEntry = useCallback(() => {
+    setIsCreating(false);
+    setEditingEntry(undefined);
+  }, []);
+
   useHotkey("N", openNewEntry, { enabled: !editingEntry && !isCreating, ignoreInputs: true });
+  useHotkey("Escape", cancelActiveEntry, { enabled: isCreating || Boolean(editingEntry), ignoreInputs: false });
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 shadow-2xl shadow-black/25">
@@ -78,8 +84,8 @@ export function HotlinePage() {
         editingEntry={editingEntry}
         isAdmin={isAdmin}
         isCreating={isCreating}
-        onCancelCreate={() => setIsCreating(false)}
-        onCancelEdit={() => setEditingEntry(undefined)}
+        onCancelCreate={cancelActiveEntry}
+        onCancelEdit={cancelActiveEntry}
         onCreateSuccess={() => setIsCreating(false)}
         onEditSuccess={() => setEditingEntry(undefined)}
         onEdit={openExistingEntry}
