@@ -5,9 +5,15 @@ import type { Doc } from "@backend/convex/_generated/dataModel";
 import { Button } from "@redwood/shad-ui/components/button";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "convex/react";
-import { Check, LoaderCircle, X } from "lucide-react";
+import { Check, Hash, LoaderCircle, X } from "lucide-react";
 import { useState } from "react";
-import { getHotlineFormValues, hotlineFormSchema, serializeHotlineFormValues } from "../../../model/hotline-form.ts";
+import {
+  getHotlineFormValues,
+  hotlineFormSchema,
+  MEDIA_CODE_CATEGORY_LABEL,
+  MEDIA_CODE_PRESET,
+  serializeHotlineFormValues,
+} from "../../../model/hotline-form.ts";
 import { HOTLINE_COLUMN_WIDTHS } from "../../../model/hotline-table-layout.ts";
 import { CalleeControl } from "./callee-control.tsx";
 import { CategoryControl } from "./category-control.tsx";
@@ -48,6 +54,9 @@ export function HotlineEntryRow({
   const createEntry = useMutation(api.core.hotline.service.createHotlineEntry);
   const updateEntry = useMutation(api.core.hotline.service.updateHotlineEntry);
   const [submitError, setSubmitError] = useState<string>();
+  const mediaCodeCategory = categories.find(
+    (category) => category.label.trim().localeCompare(MEDIA_CODE_CATEGORY_LABEL, undefined, { sensitivity: "accent" }) === 0
+  );
   const form = useForm({
     defaultValues: getHotlineFormValues(existingEntry, classrooms, currentUserEmail),
     validators: {
@@ -67,8 +76,33 @@ export function HotlineEntryRow({
     },
   });
 
+  const applyMediaCodeTemplate = () => {
+    if (!mediaCodeCategory) return;
+    form.setFieldValue("callerIssueDescription", MEDIA_CODE_PRESET.callerIssueDescription);
+    form.setFieldValue("calleeResolution", MEDIA_CODE_PRESET.calleeResolution);
+    form.setFieldValue("hotlineCategory", mediaCodeCategory._id);
+    form.setFieldValue("serviceLocation", MEDIA_CODE_PRESET.serviceLocation);
+    form.setFieldValue("department", MEDIA_CODE_PRESET.department);
+  };
+
   return (
     <div className="relative z-10 w-full border-sky-500/40 border-b bg-sky-500/[0.045] shadow-[inset_3px_0_0_rgb(56_189_248)]">
+      <div className="flex h-9 items-center gap-2 border-zinc-800/70 border-b px-3">
+        <span className="font-semibold text-[10px] text-zinc-500 uppercase tracking-[0.14em]">Quick fill</span>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          className="h-7 border-zinc-700 bg-zinc-900 px-2.5 text-xs"
+          disabled={!mediaCodeCategory}
+          onClick={applyMediaCodeTemplate}
+          title={mediaCodeCategory ? "Apply the Media Code template" : `Create the “${MEDIA_CODE_CATEGORY_LABEL}” category first`}
+        >
+          <Hash className="size-3.5" />
+          Media Code
+        </Button>
+      </div>
+
       <form
         className="flex min-h-36 items-stretch"
         onSubmit={(event) => {

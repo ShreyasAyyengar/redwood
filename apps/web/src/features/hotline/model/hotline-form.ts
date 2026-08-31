@@ -17,6 +17,17 @@ export const hotlineFormSchema = z.object({
 });
 
 export type HotlineFormValues = z.infer<typeof hotlineFormSchema>;
+type HotlineFormPreset = Partial<
+  Pick<HotlineFormValues, "calleeResolution" | "callerIssueDescription" | "department" | "hotlineCategory" | "serviceLocation">
+>;
+
+export const MEDIA_CODE_CATEGORY_LABEL = "Media Code Request";
+export const MEDIA_CODE_PRESET = {
+  callerIssueDescription: "Media Code Request",
+  calleeResolution: "Gave caller media code.",
+  department: "INSTRUCTION",
+  serviceLocation: "PHONE",
+} satisfies HotlineFormPreset;
 
 export function toDateTimeLocalValue(value: string | Date) {
   const date = typeof value === "string" ? new Date(value) : value;
