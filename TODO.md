@@ -1,22 +1,18 @@
-### ASAP Priority
-- [ ] list view for issues/tasks (BEFORE FALL 2026)
-- [ ] exporting / copy / pull out / aggregate of a search (BEFORE FALL 2026)
-- [ ] hold issues for status (BEFORE FALL 2026)
-- [ ] maintenance fields linked to attributes.
+### Before Fall 2026
+- [ ] list view for issues/tasks
+- [ ] exporting / copy / pull out / aggregate of a search
 
-Rework permissions:
-- [ ] admins can change who made that report (BEFORE FALL 2026)
-- [ ] admins can change dates of records (BEFORE FALL 2026)
-- [ ] admin panels for supervisors (BEFORE FALL 2026)
-- [ ] anything attributes and groups related should be available by supervisors (BEFORE FALL 2026)
-- [ ] Make an MSE role > subset of supervisors with recently files issues on main screen (BEFORE FALL 2026) 
+- [ ] Make an MSE role > subset of supervisors with recently files issues on main screen
 
-- [ ] MIKO is scope-crept right now (BEFORE FALL 2026)
-  - [ ] Move Hotline functionality to Redwood
+- [] MIKO is scope-crept right now
+  - [x] Move Hotline functionality to Redwood
   - [ ] availabilities to inform who is free to be dispatch for a hotline call (LAST CALL / DO NOT CALL / SOLO / AVAILABLE)
   - [ ] when2meet style scheduling for making your availability.
   - [ ] badge for displaying who is on hotline
 
+
+### ASAP Priority
+- [ ] maintenance fields linked to attributes.
 
 ### High Priority
 - [ ] statistics view
@@ -25,11 +21,11 @@ Rework permissions:
 - [ ] fix relative times 
 - [ ] webhooks for realtime data
   - [ ] edits
-- alphabetize classrooms whenever lists are available.
 
 ### Medium Priority
 - [ ] Proper error handling for API calls in the UI. infra is there, use it.
 - [ ] filtering by attributes
+- [ ] Take care of CSV ingestion direct from coursedog, eliminate the middle-man python script
 
 ## Low Priority
 - [ ] email notifications / weekly reports for supervisors (maybe explore Rsend 'like')
