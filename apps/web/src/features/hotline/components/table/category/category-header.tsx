@@ -1,5 +1,5 @@
 import { Button } from "@redwood/shad-ui/components/button";
-import { Settings2 } from "lucide-react";
+import { Settings } from "lucide-react";
 
 export function CategoryHeader({
   canManageCategories,
@@ -21,7 +21,7 @@ export function CategoryHeader({
           title="Manage hotline categories"
           onClick={onOpenCategoryManager}
         >
-          <Settings2 className="size-3.5" />
+          <Settings className="size-3.5" />
         </Button>
       )}
     </div>
