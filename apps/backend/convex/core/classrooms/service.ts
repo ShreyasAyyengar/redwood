@@ -107,7 +107,11 @@ export const getAllRooms = protectedQuery({
 // historical issue feeds.
 export const getClassroomLookup = protectedQuery({
   returns: z.array(classroomDoc),
-  handler: (ctx) => ctx.db.query("classrooms").collect(),
+  handler: (ctx) =>
+    ctx.db
+      .query("classrooms")
+      .collect()
+      .then((rooms) => rooms.sort((a, b) => a.displayName.localeCompare(b.displayName, undefined, { numeric: true, sensitivity: "base" }))),
 });
 
 export const setAttributes = supervisorMutation({

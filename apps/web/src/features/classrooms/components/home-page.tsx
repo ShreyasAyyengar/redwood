@@ -1,6 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@redwood/shad-ui/components/tabs";
 import Image from "next/image";
 import AdminPanel from "#/features/admin/components/admin-panel.tsx";
+import { HotlinePage } from "#/features/hotline/hotline.tsx";
 import { IssuesFeed } from "#/features/issues/components/feed/issues-feed.tsx";
 import { TasksFeed } from "#/features/tasks/components/feed/tasks-feed.tsx";
 import { authClientWeb } from "#/lib/auth-client-web.ts";
@@ -35,6 +36,7 @@ export default function HomePage({ rooms }: { rooms: ClassroomSummary[] }) {
             <TabsTrigger value="classrooms">Classrooms</TabsTrigger>
             <TabsTrigger value="issues">Issues</TabsTrigger>
             <TabsTrigger value="tasks">Tasks</TabsTrigger>
+            <TabsTrigger value="hotline">Hotline</TabsTrigger>
             <TabsTrigger value="builder">Shift Builder</TabsTrigger>
             {canAccessAdminPanel && <TabsTrigger value="admin">Admin Panel</TabsTrigger>}
           </TabsList>
@@ -46,6 +48,7 @@ export default function HomePage({ rooms }: { rooms: ClassroomSummary[] }) {
             </div>
           </TabsContent>
 
+          {/* TODO edit the CSS for appearing/disappearing bug / reloading cache bug */}
           <TabsContent value="issues" forceMount className="mt-0 flex min-h-0 flex-1 overflow-hidden data-[state=inactive]:hidden">
             <div className="flex w-full flex-1 overflow-hidden p-5">
               <IssuesFeed />
@@ -55,6 +58,12 @@ export default function HomePage({ rooms }: { rooms: ClassroomSummary[] }) {
           <TabsContent value="tasks" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
             <div className="flex w-full flex-1 overflow-hidden p-5">
               <TasksFeed />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="hotline" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
+            <div className="flex w-full flex-1 items-center justify-center overflow-hidden p-5">
+              <HotlinePage />
             </div>
           </TabsContent>
 
