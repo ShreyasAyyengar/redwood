@@ -34,7 +34,7 @@
 - [ ] "WARNING: the availability CSV has not been updated on over a week. "
 - 'labs' -> some way for maintenace logs
 - wepa labs printer status (apparently it has an API), would integrate with labs view.
-
+- add keyboard shortcuts for common actions (esp menu actions)
 
 ### Peripherals
 - [ ] hosting capabilities and transferring ownership
