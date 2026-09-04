@@ -4,7 +4,6 @@ import "@redwood/shad-ui/globals.css";
 import { Suspense } from "react";
 import { env } from "../env";
 import { getToken } from "../lib/auth-server";
-import ActionMenu from "./_components/action-menu/action-menu";
 import AuthLayer from "./_components/auth-layer";
 import NavigatorCommand from "./_components/navigate/navigator-command";
 import Providers from "./_components/providers";
@@ -44,7 +43,6 @@ export default async function RootLayout({
             <NavigatorCommand />
           </div>
 
-          <ActionMenu />
           {children}
         </body>
       </Providers>

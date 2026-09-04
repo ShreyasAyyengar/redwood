@@ -1,5 +1,7 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@redwood/shad-ui/components/tabs";
-import Image from "next/image";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@redwood/shad-ui/components/sidebar";
+import { Tabs, TabsContent } from "@redwood/shad-ui/components/tabs";
+import { useEffect, useState } from "react";
+import { type AppPane, AppSidebar } from "#/app/_components/app-sidebar.tsx";
 import AdminPanel from "#/features/admin/components/admin-panel.tsx";
 import { HotlinePage } from "#/features/hotline/hotline.tsx";
 import { IssuesFeed } from "#/features/issues/components/feed/issues-feed.tsx";
@@ -19,32 +21,73 @@ export default function HomePage({ rooms }: { rooms: ClassroomSummary[] }) {
   const canAccessAdminPanel = hasSupervisorAccess(session.user.role);
   const isAdmin = hasAdminAccess(session.user.role);
 
-  const storeLastTab = (tab: string) => localStorage.setItem("lastTab", tab);
-  const storedTab = localStorage.getItem("lastTab");
-  const lastTab = storedTab === "admin" && !canAccessAdminPanel ? "classrooms" : (storedTab ?? "classrooms");
+  const [activePane, setActivePane] = useState<AppPane>("classrooms");
+
+  useEffect(() => {
+    const storedPane = localStorage.getItem("lastTab") as AppPane | null;
+    const validPanes: AppPane[] = ["classrooms", "issues", "tasks", "builder", "hotline", "admin"];
+
+    if (storedPane && validPanes.includes(storedPane) && (storedPane !== "admin" || canAccessAdminPanel)) {
+      setActivePane(storedPane);
+    }
+  }, [canAccessAdminPanel]);
+
+  useEffect(() => {
+    const panesByShortcut: Record<string, AppPane> = {
+      "1": "classrooms",
+      "2": "issues",
+      "3": "tasks",
+      "4": "builder",
+      "5": "hotline",
+      "6": "admin",
+    };
+
+    const handleShortcut = (event: KeyboardEvent) => {
+      if (!(event.metaKey || event.ctrlKey) || event.altKey || event.shiftKey) return;
+      const pane = panesByShortcut[event.key];
+      if (!pane || (pane === "admin" && !canAccessAdminPanel)) return;
+      event.preventDefault();
+      setActivePane(pane);
+      localStorage.setItem("lastTab", pane);
+    };
+
+    window.addEventListener("keydown", handleShortcut);
+    return () => window.removeEventListener("keydown", handleShortcut);
+  }, [canAccessAdminPanel]);
+
+  const selectPane = (pane: AppPane) => {
+    setActivePane(pane);
+    localStorage.setItem("lastTab", pane);
+  };
+
   return (
-    <>
-      {/* Desktop Layout - Hidden below lg */}
-      <div className="hidden h-screen flex-col items-center justify-center font-sans text-white lg:flex">
-        <div className="my-5 flex items-center gap-5">
-          <Image src="/redwood-icon.png" alt="Redwood Logo" className="h-8 w-8" height={32} width={32} />
-          <p className="text-center font-bold text-3xl">Redwood</p>
-        </div>
+    <SidebarProvider defaultOpen>
+      <AppSidebar activePane={activePane} canAccessAdminPanel={canAccessAdminPanel} onPaneChange={selectPane} />
+      <SidebarInset className="h-svh min-w-0 overflow-hidden font-sans text-white">
+        <header className="flex h-14 shrink-0 items-center gap-3 border-border/70 border-b px-4 md:hidden">
+          <SidebarTrigger className="size-8" />
+          <span className="font-semibold capitalize">
+            {activePane === "builder" ? "Shift Builder" : activePane === "admin" ? "Admin Panel" : activePane}
+          </span>
+          {activePane === "classrooms" && (
+            <div className="ml-auto">
+              <CompactFilters />
+            </div>
+          )}
+        </header>
 
-        <Tabs defaultValue={lastTab} className="flex h-full w-full flex-1 flex-col overflow-hidden" onValueChange={storeLastTab}>
-          <TabsList className="mx-auto shrink-0">
-            <TabsTrigger value="classrooms">Classrooms</TabsTrigger>
-            <TabsTrigger value="issues">Issues</TabsTrigger>
-            <TabsTrigger value="tasks">Tasks</TabsTrigger>
-            <TabsTrigger value="hotline">Hotline</TabsTrigger>
-            <TabsTrigger value="builder">Shift Builder</TabsTrigger>
-            {canAccessAdminPanel && <TabsTrigger value="admin">Admin Panel</TabsTrigger>}
-          </TabsList>
-
+        <Tabs
+          value={activePane}
+          className="flex min-h-0 w-full flex-1 flex-col overflow-hidden"
+          onValueChange={(value) => selectPane(value as AppPane)}
+        >
           <TabsContent value="classrooms" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
-            <div className="flex w-full flex-1 items-center justify-center overflow-hidden p-5 pt-0">
+            <div className="hidden w-full flex-1 items-center justify-center overflow-hidden p-5 lg:flex">
               <Filters />
               <RoomTable data={rooms} columns={columns} />
+            </div>
+            <div className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto p-4 lg:hidden">
+              <RoomList data={rooms} />
             </div>
           </TabsContent>
 
@@ -81,24 +124,8 @@ export default function HomePage({ rooms }: { rooms: ClassroomSummary[] }) {
             </TabsContent>
           )}
         </Tabs>
-      </div>
-
-      {/* Mobile Layout - Hidden on lg and above */}
-      <div className="flex h-screen flex-col p-4 font-sans text-white lg:hidden">
-        <div className="mb-5 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-          <div className="col-start-2 flex min-w-0 items-center gap-3">
-            <Image src="/redwood-icon.png" alt="Redwood Logo" className="h-8 w-8" height={32} width={32} />
-            <p className="truncate font-bold text-3xl">Redwood</p>
-          </div>
-          <div className="col-start-3 justify-self-end">
-            <CompactFilters />
-          </div>
-        </div>
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-          <RoomList data={rooms} />
-        </div>
-      </div>
-    </>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
 
