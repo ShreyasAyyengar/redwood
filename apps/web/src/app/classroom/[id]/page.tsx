@@ -29,12 +29,12 @@ export default function Page() {
         <div className="mb-2 flex items-center justify-between gap-3">
           <div
             className="flex w-fit cursor-pointer items-center gap-3 rounded-xl p-2 text-zinc-400 transition-all duration-150 hover:bg-zinc-900 active:scale-90 active:transform"
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/classrooms")}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
                 e.stopPropagation();
-                router.push("/");
+                router.push("/classrooms");
               }
             }}
           >
@@ -63,7 +63,7 @@ export default function Page() {
 
       <div className="mt-5 mr-30 ml-30 hidden xl:block">
         <div className="mb-2 flex items-center justify-between gap-3">
-          <Button variant="ghost" className="w-fit text-zinc-400 hover:bg-zinc-900" onClick={() => router.push("/")}>
+          <Button variant="ghost" className="w-fit text-zinc-400 hover:bg-zinc-900" onClick={() => router.push("/classrooms")}>
             <CornerUpLeft className="size-5" />
             Back to Classrooms
           </Button>

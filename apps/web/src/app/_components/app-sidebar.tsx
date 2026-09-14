@@ -45,51 +45,43 @@ import {
   WandSparkles,
 } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { env } from "#/env.ts";
 import FeedbackDialog from "#/features/feedback/components/dialogs/feedback-dialog.tsx";
 import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { hasSupervisorAccess } from "#/lib/permissions.ts";
 import { AccountAvatar } from "./action-menu/account-avatar";
 import type { DeviceSession } from "./action-menu/types";
 
-export type AppPane = "classrooms" | "issues" | "tasks" | "builder" | "hotline" | "admin";
+export type AppPane = "classrooms" | "issues" | "tasks" | "shift-builder" | "hotline" | "admin";
 
 type NavigationItem = {
   id: AppPane;
+  href: `/${AppPane}`;
   label: string;
   shortcut: number;
   icon: typeof School;
 };
 
 const maintenanceItems: NavigationItem[] = [
-  { id: "classrooms", label: "Classrooms", shortcut: 1, icon: School },
-  { id: "issues", label: "Issues", shortcut: 2, icon: TriangleAlert },
-  { id: "tasks", label: "Tasks", shortcut: 3, icon: ClipboardCheck },
-  { id: "builder", label: "Shift Builder", shortcut: 4, icon: WandSparkles },
+  { id: "classrooms", href: "/classrooms", label: "Classrooms", shortcut: 1, icon: School },
+  { id: "issues", href: "/issues", label: "Issues", shortcut: 2, icon: TriangleAlert },
+  { id: "tasks", href: "/tasks", label: "Tasks", shortcut: 3, icon: ClipboardCheck },
+  { id: "shift-builder", href: "/shift-builder", label: "Shift Builder", shortcut: 4, icon: WandSparkles },
 ];
 
 const managementItems: NavigationItem[] = [
-  { id: "hotline", label: "Hotline", shortcut: 5, icon: PhoneCall },
-  { id: "admin", label: "Admin Panel", shortcut: 6, icon: ShieldCheck },
+  { id: "hotline", href: "/hotline", label: "Hotline", shortcut: 5, icon: PhoneCall },
+  { id: "admin", href: "/admin", label: "Admin Panel", shortcut: 6, icon: ShieldCheck },
 ];
 
-function NavigationGroup({
-  activePane,
-  items,
-  label,
-  onPaneChange,
-}: {
-  activePane: AppPane;
-  items: NavigationItem[];
-  label: string;
-  onPaneChange: (pane: AppPane) => void;
-}) {
-  const { setOpenMobile } = useSidebar();
+const PREFETCH_DELAY_MS = 250;
+type ActiveSession = NonNullable<ReturnType<typeof authClientWeb.useSession>["data"]>;
 
-  const selectPane = (pane: AppPane) => {
-    onPaneChange(pane);
-    setOpenMobile(false);
-  };
+function NavigationGroup({ items, label, pathname }: { items: NavigationItem[]; label: string; pathname: string }) {
+  const { setOpenMobile } = useSidebar();
 
   return (
     <SidebarGroup>
@@ -99,14 +91,15 @@ function NavigationGroup({
           {items.map((item) => (
             <SidebarMenuItem key={item.id}>
               <SidebarMenuButton
-                type="button"
-                isActive={activePane === item.id}
-                tooltip={`${item.label} (⌘${item.shortcut})`}
+                asChild
+                isActive={pathname === item.href}
+                tooltip={`${item.label} (${formatForDisplay(`mod+${item.shortcut}`)})`}
                 className="h-9"
-                onClick={() => selectPane(item.id)}
               >
-                <item.icon />
-                <span>{item.label}</span>
+                <Link href={item.href} prefetch onClick={() => setOpenMobile(false)}>
+                  <item.icon />
+                  <span>{item.label}</span>
+                </Link>
               </SidebarMenuButton>
               <SidebarMenuBadge className="text-[15px] text-sidebar-foreground/45">
                 <Kbd>{formatForDisplay(`mod+${item.shortcut}`)}</Kbd>
@@ -119,13 +112,12 @@ function NavigationGroup({
   );
 }
 
-function AccountMenu() {
+function AccountMenu({ session }: { session: ActiveSession }) {
   const [deviceSessions, setDeviceSessions] = useState<DeviceSession[]>([]);
   const [isLoadingSessions, setIsLoadingSessions] = useState(false);
   const { isMobile } = useSidebar();
-  const { data: session } = authClientWeb.useSession();
-  const user = session?.user;
-  const activeSessionToken = session?.session.token;
+  const { user, session: activeSession } = session;
+  const activeSessionToken = activeSession.token;
 
   const loadDeviceSessions = async () => {
     setIsLoadingSessions(true);
@@ -233,16 +225,39 @@ function AccountMenu() {
   );
 }
 
-export function AppSidebar({
-  activePane,
-  canAccessAdminPanel,
-  onPaneChange,
-}: {
-  activePane: AppPane;
-  canAccessAdminPanel: boolean;
-  onPaneChange: (pane: AppPane) => void;
-}) {
-  const visibleManagementItems = canAccessAdminPanel ? managementItems : managementItems.filter((item) => item.id !== "admin");
+export function AppSidebar({ session }: { session: ActiveSession }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { setOpenMobile } = useSidebar();
+  const canAccessAdminPanel = hasSupervisorAccess(session.user.role);
+  const visibleManagementItems = useMemo(
+    () => (canAccessAdminPanel ? managementItems : managementItems.filter((item) => item.id !== "admin")),
+    [canAccessAdminPanel]
+  );
+  const visibleRoutes = useMemo(() => [...maintenanceItems, ...visibleManagementItems], [visibleManagementItems]);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      for (const route of visibleRoutes) router.prefetch(route.href);
+    }, PREFETCH_DELAY_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [router, visibleRoutes]);
+
+  useEffect(() => {
+    const routesByShortcut = new Map(visibleRoutes.map((item) => [String(item.shortcut), item.href]));
+    const handleShortcut = (event: KeyboardEvent) => {
+      if (!(event.metaKey || event.ctrlKey) || event.altKey || event.shiftKey || event.repeat) return;
+      const href = routesByShortcut.get(event.key);
+      if (!href) return;
+      event.preventDefault();
+      setOpenMobile(false);
+      router.push(href);
+    };
+
+    window.addEventListener("keydown", handleShortcut);
+    return () => window.removeEventListener("keydown", handleShortcut);
+  }, [router, setOpenMobile, visibleRoutes]);
 
   return (
     <Sidebar collapsible="icon" className="border-sidebar-border/80">
@@ -255,21 +270,25 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarSeparator />
       <SidebarContent className="pt-2">
-        <NavigationGroup label="Maintenance" items={maintenanceItems} activePane={activePane} onPaneChange={onPaneChange} />
-        <NavigationGroup label="Management" items={visibleManagementItems} activePane={activePane} onPaneChange={onPaneChange} />
+        <NavigationGroup label="Maintenance" items={maintenanceItems} pathname={pathname} />
+        <NavigationGroup label="Management" items={visibleManagementItems} pathname={pathname} />
       </SidebarContent>
+
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
             <FeedbackDialog>
-              <SidebarMenuButton type="button" tooltip="Feedback" className="h-9">
+              <SidebarMenuButton type="button" className="h-9">
                 <MessageSquareText />
+                <span>Feedback</span>
               </SidebarMenuButton>
             </FeedbackDialog>
           </SidebarMenuItem>
         </SidebarMenu>
-        <AccountMenu />
+
+        <AccountMenu session={session} />
       </SidebarFooter>
+
       <SidebarRail resizable />
     </Sidebar>
   );

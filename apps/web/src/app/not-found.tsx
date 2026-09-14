@@ -42,7 +42,7 @@ export default function NotFoundPage() {
             <div className="mt-10 flex flex-col gap-x-4 gap-y-3 sm:flex-row sm:items-center sm:justify-center">
               <BackButton />
               <Button className="-order-1 sm:order-0" asChild>
-                <Link href="/">
+                <Link href="/classrooms">
                   <Home className="size-5" />
                   Home
                 </Link>
