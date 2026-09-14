@@ -273,18 +273,22 @@ export function AppSidebar({ session }: { session: ActiveSession }) {
         <NavigationGroup label="Maintenance" items={maintenanceItems} pathname={pathname} />
         <NavigationGroup label="Management" items={visibleManagementItems} pathname={pathname} />
       </SidebarContent>
+
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
             <FeedbackDialog>
-              <SidebarMenuButton type="button" tooltip="Feedback" className="h-9">
+              <SidebarMenuButton type="button" className="h-9">
                 <MessageSquareText />
+                <span>Feedback</span>
               </SidebarMenuButton>
             </FeedbackDialog>
           </SidebarMenuItem>
         </SidebarMenu>
+
         <AccountMenu session={session} />
       </SidebarFooter>
+
       <SidebarRail resizable />
     </Sidebar>
   );

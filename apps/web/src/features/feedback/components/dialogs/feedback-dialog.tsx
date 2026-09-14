@@ -2,13 +2,12 @@
 
 import { Button } from "@redwood/shad-ui/components/button";
 import { Dialog, DialogContent, DialogTrigger } from "@redwood/shad-ui/components/dialog";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwood/shad-ui/components/tooltip";
 import { MessageSquareText } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import FeedbackForm from "../forms/feedback-form";
 
-export default function FeedbackDialog({ children }: { children?: ReactNode; showTooltip?: boolean }) {
+export default function FeedbackDialog({ children }: { children?: ReactNode }) {
   const [open, setOpen] = useState(false);
   const trigger = (
     <DialogTrigger asChild>
@@ -27,15 +26,7 @@ export default function FeedbackDialog({ children }: { children?: ReactNode; sho
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>{trigger}</TooltipTrigger>
-          <TooltipContent side="left" tooltipArrowClassName="bg-white fill-white" className="text-xl">
-            Feedback
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-
+      {trigger}
       <DialogContent className="border-zinc-700 bg-zinc-800 p-3">
         <FeedbackForm onSuccess={() => setOpen(false)} />
       </DialogContent>
