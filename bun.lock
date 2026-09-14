@@ -47,6 +47,7 @@
         "better-auth": "^1.6.27",
         "canvas-confetti": "^1.9.4",
         "convex": "^1.43.0",
+        "convex-helpers": "^0.1.123",
         "framer-motion": "^13.1.0",
         "lucide-react": "^1.31.0",
         "next": "^16.3.0",
