@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "@backend/convex/_generated/api";
-import { usePaginatedQuery, useQuery } from "convex/react";
+import { usePaginatedQuery, useQuery } from "convex-helpers/react/cache/hooks";
 import { useCallback } from "react";
 import { FeedEmptyState, FeedLoadingState, VirtualizedFeedList } from "#/features/feed/components/feed-list-layout.tsx";
 import { type IssueFeedFilterValue, toIssueFeedFilters } from "../../model/issue-filters";

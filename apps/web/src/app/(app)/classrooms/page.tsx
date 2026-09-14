@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "@backend/convex/_generated/api";
-import { useQuery } from "convex/react";
+import { useQuery } from "convex-helpers/react/cache/hooks";
 import HomePage from "#/features/classrooms/components/home-page.tsx";
 
 export default function ClassroomsPage() {

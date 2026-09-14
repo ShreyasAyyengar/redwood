@@ -5,7 +5,7 @@ import type { Doc } from "@backend/convex/_generated/dataModel";
 import { Button } from "@redwood/shad-ui/components/button";
 import { Kbd } from "@redwood/shad-ui/components/kbd";
 import { useHotkey } from "@tanstack/react-hotkeys";
-import { useQuery } from "convex/react";
+import { useQuery } from "convex-helpers/react/cache/hooks";
 import { Phone, Plus } from "lucide-react";
 import { useCallback, useState } from "react";
 import { authClientWeb } from "#/lib/auth-client-web.ts";
