@@ -19,7 +19,7 @@ import { LoaderCircle, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 export function RowActionsCell({ entry, onEdit }: { entry: Doc<"hotline">; onEdit: (entry: Doc<"hotline">) => void }) {
-  const deleteEntry = useMutation(api.core.hotline.service.deleteHotlineEntry);
+  const deleteEntry = useMutation(api.core.hotline.log.service.deleteHotlineEntry);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteError, setDeleteError] = useState<string>();
   const [isDeleting, setIsDeleting] = useState(false);

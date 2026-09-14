@@ -21,8 +21,8 @@ export function HotlinePage() {
   const { data: session } = authClientWeb.useSession();
   const isAdmin = hasAdminAccess(session?.user.role);
   const canManageCategories = hasSupervisorAccess(session?.user.role);
-  const entries = useQuery(api.core.hotline.service.getHotlineEntries, {});
-  const categories = useQuery(api.core.hotline.service.getHotlineCategories, {}) ?? EMPTY_CATEGORIES;
+  const entries = useQuery(api.core.hotline.log.service.getHotlineEntries, {});
+  const categories = useQuery(api.core.hotline.log.service.getHotlineCategories, {}) ?? EMPTY_CATEGORIES;
   const classrooms = useQuery(api.core.classrooms.service.getClassroomLookup, {}) ?? EMPTY_CLASSROOMS;
   const users = useQuery(api.core.users.service.getUsers, isAdmin ? {} : "skip") ?? EMPTY_USERS;
   const [activeTab, setActiveTab] = useState("log");

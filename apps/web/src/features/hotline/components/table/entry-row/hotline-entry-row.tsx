@@ -51,12 +51,13 @@ export function HotlineEntryRow({
   onSuccess,
   users,
 }: HotlineEntryRowProps) {
-  const createEntry = useMutation(api.core.hotline.service.createHotlineEntry);
-  const updateEntry = useMutation(api.core.hotline.service.updateHotlineEntry);
+  const createEntry = useMutation(api.core.hotline.log.service.createHotlineEntry);
+  const updateEntry = useMutation(api.core.hotline.log.service.updateHotlineEntry);
   const [submitError, setSubmitError] = useState<string>();
   const mediaCodeCategory = categories.find(
     (category) => category.label.trim().localeCompare(MEDIA_CODE_CATEGORY_LABEL, undefined, { sensitivity: "accent" }) === 0
   );
+
   const form = useForm({
     defaultValues: getHotlineFormValues(existingEntry, classrooms, currentUserEmail),
     validators: {
