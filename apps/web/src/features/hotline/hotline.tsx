@@ -7,10 +7,11 @@ import { Kbd } from "@redwood/shad-ui/components/kbd";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@redwood/shad-ui/components/tabs";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useQuery } from "convex-helpers/react/cache/hooks";
-import { ClipboardList, Phone, Plus } from "lucide-react";
+import { Phone, Plus } from "lucide-react";
 import { useCallback, useState } from "react";
 import { authClientWeb } from "#/lib/auth-client-web.ts";
 import { hasAdminAccess, hasSupervisorAccess } from "#/lib/permissions.ts";
+import { DutiesAvailabilityEditor } from "./components/duties/duties-availability-editor.tsx";
 import { HotlineTable } from "./components/table/hotline-table.tsx";
 
 const EMPTY_CATEGORIES: Doc<"hotlineCategories">[] = [];
@@ -106,16 +107,8 @@ export function HotlinePage() {
         />
       </TabsContent>
 
-      <TabsContent value="duties" className="mt-0 flex min-h-0 flex-1 items-center justify-center">
-        <div className="flex max-w-sm flex-col items-center gap-3 px-6 text-center">
-          <div className="flex size-12 items-center justify-center rounded-2xl border border-zinc-700 bg-zinc-800/60 text-zinc-400">
-            <ClipboardList className="size-5" />
-          </div>
-          <div>
-            <h3 className="font-medium text-zinc-200">No duties yet</h3>
-            <p className="mt-1 text-sm text-zinc-500">Hotline duties will appear here.</p>
-          </div>
-        </div>
+      <TabsContent value="duties" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
+        <DutiesAvailabilityEditor defaultName={session?.user.name ?? ""} />
       </TabsContent>
     </Tabs>
   );
