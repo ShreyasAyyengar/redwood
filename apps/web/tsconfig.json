@@ -5,6 +5,8 @@
       "@backend/*": ["../backend/*"]
     },
     "allowImportingTsExtensions": true,
+    "declaration": false,
+    "declarationMap": false,
     "plugins": [
       {
         "name": "next"
