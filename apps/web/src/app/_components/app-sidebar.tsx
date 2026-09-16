@@ -254,7 +254,6 @@ export function AppSidebar({ session }: { session: ActiveSession }) {
       setOpenMobile(false);
       router.push(href);
     };
-
     window.addEventListener("keydown", handleShortcut);
     return () => window.removeEventListener("keydown", handleShortcut);
   }, [router, setOpenMobile, visibleRoutes]);
