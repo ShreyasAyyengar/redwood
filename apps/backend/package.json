@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "convex dev --env-file .env.local",
     "env": "set -e; bunx convex env set --from-file .env.local --force; for var in $(bunx convex env list --names-only); do if ! grep -qE \"^[[:space:]]*(export[[:space:]]+)?${var}[[:space:]]*=\" .env.local; then bunx convex env remove \"$var\"; fi; done; bunx convex env list",
-    "generate-auth-schema": "cd convex/betterAuth && bunx auth generate"
+    "generate-auth-schema": "cd convex/betterAuth && bunx auth generate",
+    "test": "bun test"
   },
   "dependencies": {
     "@convex-dev/better-auth": "^0.12.5",
