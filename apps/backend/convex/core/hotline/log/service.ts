@@ -1,7 +1,7 @@
 import { ConvexError } from "convex/values";
 import { withSystemFields, zid } from "convex-helpers/server/zod4";
 import { z } from "zod";
-import { protectedMutation, protectedQuery, supervisorMutation } from "../../lib/procedures.ts";
+import { protectedMutation, protectedQuery, supervisorMutation } from "../../../lib/procedures.ts";
 import { hotlineCategory, hotlineEntry } from "./schemas.ts";
 
 export const hotlineEntryDoc = z.object(withSystemFields("hotline", hotlineEntry.shape));

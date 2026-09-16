@@ -26,9 +26,9 @@ type CategoryManagerDialogProps = {
 };
 
 export function CategoryManagerDialog({ categories, onOpenChange, open }: CategoryManagerDialogProps) {
-  const createCategory = useMutation(api.core.hotline.service.createHotlineCategory);
-  const updateCategory = useMutation(api.core.hotline.service.updateHotlineCategory);
-  const deleteCategory = useMutation(api.core.hotline.service.deleteHotlineCategory);
+  const createCategory = useMutation(api.core.hotline.log.service.createHotlineCategory);
+  const updateCategory = useMutation(api.core.hotline.log.service.updateHotlineCategory);
+  const deleteCategory = useMutation(api.core.hotline.log.service.deleteHotlineCategory);
   const [newLabel, setNewLabel] = useState("");
   const [editingId, setEditingId] = useState<Id<"hotlineCategories">>();
   const [editingLabel, setEditingLabel] = useState("");
