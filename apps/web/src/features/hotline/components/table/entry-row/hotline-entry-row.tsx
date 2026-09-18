@@ -17,6 +17,7 @@ import {
 import { HOTLINE_COLUMN_WIDTHS } from "../../../model/hotline-table-layout.ts";
 import { CalleeControl } from "./callee-control.tsx";
 import { CategoryControl } from "./category-control.tsx";
+import { DepartmentControl } from "./department-control.tsx";
 import { EntryTextareaCell } from "./entry-textarea-cell.tsx";
 import { InlineDateField } from "./inline-date-field.tsx";
 import { InlineField } from "./inline-field.tsx";
@@ -252,14 +253,7 @@ export function HotlineEntryRow({
           <form.Field name="department">
             {(field) => (
               <InlineField width={HOTLINE_COLUMN_WIDTHS.department} className="border-r-0">
-                <InlineToggle
-                  value={field.state.value}
-                  onChange={(value) => field.handleChange(value as "INSTRUCTION" | "EVENTS")}
-                  options={[
-                    { label: "Instruction", value: "INSTRUCTION" },
-                    { label: "Events", value: "EVENTS" },
-                  ]}
-                />
+                <DepartmentControl value={field.state.value} onChange={field.handleChange} />
               </InlineField>
             )}
           </form.Field>

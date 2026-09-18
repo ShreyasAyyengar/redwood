@@ -1,4 +1,5 @@
 import type { Doc, Id } from "@backend/convex/_generated/dataModel";
+import { departments } from "@backend/convex/core/hotline/log/schemas.ts";
 import { z } from "zod";
 
 const MILLISECONDS_PER_MINUTE = 60_000;
@@ -10,7 +11,7 @@ export const hotlineFormSchema = z.object({
   callerLocation: z.string().trim().min(1, "Enter a caller location."),
   callerIssueDescription: z.string().trim().min(1, "Describe why the caller contacted the hotline."),
   callerIdentifier: z.string().trim().min(1, "Enter a caller ID."),
-  department: z.enum(["INSTRUCTION", "EVENTS"]),
+  department: departments,
   calleeResolution: z.string().trim().min(1, "Describe the resolution given to the caller."),
   hotlineCategory: z.string().min(1, "Choose a hotline category."),
   serviceLocation: z.enum(["ON-SITE", "PHONE"]),
