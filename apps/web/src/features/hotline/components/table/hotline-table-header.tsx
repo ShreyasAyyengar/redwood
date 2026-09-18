@@ -13,8 +13,7 @@ export function HotlineTableHeader({ table }: { table: ReactTable<typeof hotline
             className={cn(
               "flex h-11 items-center border-zinc-800/80 border-r px-3 font-semibold text-[10px] text-zinc-500 uppercase tracking-[0.16em] last:border-r-0",
               COMPACT_COLUMN_IDS.has(header.column.id) && "px-2",
-              GROWING_COLUMN_IDS.has(header.column.id) ? "min-w-0 shrink grow" : "shrink-0",
-              header.column.id === "actions" && "px-1"
+              GROWING_COLUMN_IDS.has(header.column.id) ? "min-w-0 shrink grow" : "shrink-0"
             )}
             style={{ width: header.getSize() }}
           >

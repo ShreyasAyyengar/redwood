@@ -88,184 +88,185 @@ export function HotlineEntryRow({
 
   return (
     <div className="relative z-10 w-full border-sky-500/40 border-b bg-sky-500/[0.045] shadow-[inset_3px_0_0_rgb(56_189_248)]">
-      <div className="flex h-9 items-center gap-2 border-zinc-800/70 border-b px-3">
-        <span className="font-semibold text-[10px] text-zinc-500 uppercase tracking-[0.14em]">Quick fill</span>
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          className="h-7 border-zinc-700 bg-zinc-900 px-2.5 text-xs"
-          disabled={!mediaCodeCategory}
-          onClick={applyMediaCodeTemplate}
-          title={mediaCodeCategory ? "Apply the Media Code template" : `Create the “${MEDIA_CODE_CATEGORY_LABEL}” category first`}
-        >
-          <Hash className="size-3.5" />
-          Media Code
-        </Button>
-      </div>
-
       <form
-        className="flex min-h-36 items-stretch"
         onSubmit={(event) => {
           event.preventDefault();
           event.stopPropagation();
           form.handleSubmit();
         }}
       >
-        <form.Field name="dateOfCall">
-          {(dateField) => (
-            <InlineField width={HOTLINE_COLUMN_WIDTHS.call}>
-              <InlineDateField value={dateField.state.value} onBlur={dateField.handleBlur} onChange={dateField.handleChange} />
-              <form.Field name="takenBy">
-                {(calleeField) => (
-                  <CalleeControl
-                    invalid={calleeField.state.meta.isTouched && !calleeField.state.meta.isValid}
-                    isAdmin={isAdmin}
-                    onChange={calleeField.handleChange}
-                    users={users}
-                    value={calleeField.state.value}
-                  />
-                )}
-              </form.Field>
-            </InlineField>
-          )}
-        </form.Field>
-
-        <form.Field name="callerLocation">
-          {(field) => {
-            const invalid = field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <InlineField width={HOTLINE_COLUMN_WIDTHS.location} invalid={invalid} errors={field.state.meta.errors}>
-                <InlineLocationField
-                  classrooms={classrooms}
-                  value={field.state.value}
-                  onChange={field.handleChange}
-                  onBlur={field.handleBlur}
-                  invalid={invalid}
-                />
-              </InlineField>
-            );
-          }}
-        </form.Field>
-
-        <form.Field name="callerIdentifier">
-          {(field) => (
-            <EntryTextareaCell
-              label="Caller ID"
-              placeholder="Caller ID"
-              width={HOTLINE_COLUMN_WIDTHS.identifier}
-              value={field.state.value}
-              invalid={field.state.meta.isTouched && !field.state.meta.isValid}
-              errors={field.state.meta.errors}
-              onBlur={field.handleBlur}
-              onChange={field.handleChange}
-            />
-          )}
-        </form.Field>
-
-        <form.Field name="callerIssueDescription">
-          {(field) => (
-            <EntryTextareaCell
-              flexible
-              label="Caller issue"
-              placeholder="Describe the caller's issue"
-              width={HOTLINE_COLUMN_WIDTHS.issue}
-              value={field.state.value}
-              invalid={field.state.meta.isTouched && !field.state.meta.isValid}
-              errors={field.state.meta.errors}
-              onBlur={field.handleBlur}
-              onChange={field.handleChange}
-            />
-          )}
-        </form.Field>
-
-        <form.Field name="calleeResolution">
-          {(field) => (
-            <EntryTextareaCell
-              flexible
-              label="Resolution"
-              placeholder="Describe the resolution"
-              width={HOTLINE_COLUMN_WIDTHS.resolution}
-              value={field.state.value}
-              invalid={field.state.meta.isTouched && !field.state.meta.isValid}
-              errors={field.state.meta.errors}
-              onBlur={field.handleBlur}
-              onChange={field.handleChange}
-            />
-          )}
-        </form.Field>
-
-        <form.Field name="hotlineCategory">
-          {(field) => {
-            const invalid = field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <InlineField width={categoryColumnWidth} invalid={invalid} errors={field.state.meta.errors}>
-                <CategoryControl categories={categories} invalid={invalid} onChange={field.handleChange} value={field.state.value} />
-              </InlineField>
-            );
-          }}
-        </form.Field>
-
-        <form.Field name="serviceLocation">
-          {(field) => (
-            <InlineField width={HOTLINE_COLUMN_WIDTHS.serviceLocation}>
-              <InlineToggle
-                value={field.state.value}
-                onChange={(value) => field.handleChange(value as "ON-SITE" | "PHONE")}
-                options={[
-                  { label: "On-site", value: "ON-SITE" },
-                  { label: "Phone", value: "PHONE" },
-                ]}
-              />
-            </InlineField>
-          )}
-        </form.Field>
-
-        <form.Field name="department">
-          {(field) => (
-            <InlineField width={HOTLINE_COLUMN_WIDTHS.department}>
-              <InlineToggle
-                value={field.state.value}
-                onChange={(value) => field.handleChange(value as "INSTRUCTION" | "EVENTS")}
-                options={[
-                  { label: "Instruction", value: "INSTRUCTION" },
-                  { label: "Events", value: "EVENTS" },
-                ]}
-              />
-            </InlineField>
-          )}
-        </form.Field>
-
-        <InlineField width={HOTLINE_COLUMN_WIDTHS.actions} className="flex-row items-center justify-start gap-1 border-r-0 px-1">
-          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-            {([canSubmit, isSubmitting]) => (
-              <Button
-                type="submit"
-                size="icon-sm"
-                disabled={!canSubmit || isSubmitting}
-                className="bg-sky-500 text-sky-950 hover:bg-sky-400 disabled:bg-neutral-500"
-                aria-label={existingEntry ? "Save hotline entry changes" : "Save new hotline entry"}
-                title={existingEntry ? "Save changes" : "Save new entry"}
-              >
-                {isSubmitting ? <LoaderCircle className="size-4 animate-spin" /> : <Check className="size-4" />}
-              </Button>
-            )}
-          </form.Subscribe>
+        <div className="flex h-10 items-center gap-2 border-zinc-800/70 border-b px-3">
+          <span className="font-semibold text-[10px] text-zinc-500 uppercase tracking-[0.14em]">Quick fill</span>
           <Button
             type="button"
-            size="icon-sm"
-            variant="ghost"
-            className="bg-red-700/30"
-            onClick={onCancel}
-            aria-label={existingEntry ? "Cancel editing hotline entry" : "Cancel new hotline entry"}
-            title="Cancel"
+            size="sm"
+            variant="outline"
+            className="h-7 border-zinc-700 bg-zinc-900 px-2.5 text-xs"
+            disabled={!mediaCodeCategory}
+            onClick={applyMediaCodeTemplate}
+            title={mediaCodeCategory ? "Apply the Media Code template" : `Create the “${MEDIA_CODE_CATEGORY_LABEL}” category first`}
           >
-            <X className="size-4" />
+            <Hash className="size-3.5" />
+            Media Code
           </Button>
-        </InlineField>
-      </form>
 
-      {submitError && <p className="border-sky-500/20 border-t bg-red-500/10 px-3 py-1.5 text-red-300 text-xs">{submitError}</p>}
+          <div className="ml-auto flex items-center gap-1">
+            <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+              {([canSubmit, isSubmitting]) => (
+                <Button
+                  type="submit"
+                  size="icon-sm"
+                  disabled={!canSubmit || isSubmitting}
+                  className="bg-sky-500 text-sky-950 hover:bg-sky-400 disabled:bg-neutral-500"
+                  aria-label={existingEntry ? "Save hotline entry changes" : "Save new hotline entry"}
+                  title={existingEntry ? "Save changes" : "Save new entry"}
+                >
+                  {isSubmitting ? <LoaderCircle className="size-4 animate-spin" /> : <Check className="size-4" />}
+                </Button>
+              )}
+            </form.Subscribe>
+            <Button
+              type="button"
+              size="icon-sm"
+              variant="ghost"
+              className="bg-red-700/30"
+              onClick={onCancel}
+              aria-label={existingEntry ? "Cancel editing hotline entry" : "Cancel new hotline entry"}
+              title="Cancel"
+            >
+              <X className="size-4" />
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex min-h-36 items-stretch">
+          <form.Field name="dateOfCall">
+            {(dateField) => (
+              <InlineField width={HOTLINE_COLUMN_WIDTHS.call}>
+                <InlineDateField value={dateField.state.value} onBlur={dateField.handleBlur} onChange={dateField.handleChange} />
+                <form.Field name="takenBy">
+                  {(calleeField) => (
+                    <CalleeControl
+                      invalid={calleeField.state.meta.isTouched && !calleeField.state.meta.isValid}
+                      isAdmin={isAdmin}
+                      onChange={calleeField.handleChange}
+                      users={users}
+                      value={calleeField.state.value}
+                    />
+                  )}
+                </form.Field>
+              </InlineField>
+            )}
+          </form.Field>
+
+          <form.Field name="callerLocation">
+            {(field) => {
+              const invalid = field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <InlineField width={HOTLINE_COLUMN_WIDTHS.location} invalid={invalid} errors={field.state.meta.errors}>
+                  <InlineLocationField
+                    classrooms={classrooms}
+                    value={field.state.value}
+                    onChange={field.handleChange}
+                    onBlur={field.handleBlur}
+                    invalid={invalid}
+                  />
+                </InlineField>
+              );
+            }}
+          </form.Field>
+
+          <form.Field name="callerIdentifier">
+            {(field) => (
+              <EntryTextareaCell
+                label="Caller ID"
+                placeholder="Caller ID"
+                width={HOTLINE_COLUMN_WIDTHS.identifier}
+                value={field.state.value}
+                invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                errors={field.state.meta.errors}
+                onBlur={field.handleBlur}
+                onChange={field.handleChange}
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="callerIssueDescription">
+            {(field) => (
+              <EntryTextareaCell
+                flexible
+                label="Caller issue"
+                placeholder="Describe the caller's issue"
+                width={HOTLINE_COLUMN_WIDTHS.issue}
+                value={field.state.value}
+                invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                errors={field.state.meta.errors}
+                onBlur={field.handleBlur}
+                onChange={field.handleChange}
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="calleeResolution">
+            {(field) => (
+              <EntryTextareaCell
+                flexible
+                label="Resolution"
+                placeholder="Describe the resolution"
+                width={HOTLINE_COLUMN_WIDTHS.resolution}
+                value={field.state.value}
+                invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                errors={field.state.meta.errors}
+                onBlur={field.handleBlur}
+                onChange={field.handleChange}
+              />
+            )}
+          </form.Field>
+
+          <form.Field name="hotlineCategory">
+            {(field) => {
+              const invalid = field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <InlineField width={categoryColumnWidth} invalid={invalid} errors={field.state.meta.errors}>
+                  <CategoryControl categories={categories} invalid={invalid} onChange={field.handleChange} value={field.state.value} />
+                </InlineField>
+              );
+            }}
+          </form.Field>
+
+          <form.Field name="serviceLocation">
+            {(field) => (
+              <InlineField width={HOTLINE_COLUMN_WIDTHS.serviceLocation}>
+                <InlineToggle
+                  value={field.state.value}
+                  onChange={(value) => field.handleChange(value as "ON-SITE" | "PHONE")}
+                  options={[
+                    { label: "On-site", value: "ON-SITE" },
+                    { label: "Phone", value: "PHONE" },
+                  ]}
+                />
+              </InlineField>
+            )}
+          </form.Field>
+
+          <form.Field name="department">
+            {(field) => (
+              <InlineField width={HOTLINE_COLUMN_WIDTHS.department} className="border-r-0">
+                <InlineToggle
+                  value={field.state.value}
+                  onChange={(value) => field.handleChange(value as "INSTRUCTION" | "EVENTS")}
+                  options={[
+                    { label: "Instruction", value: "INSTRUCTION" },
+                    { label: "Events", value: "EVENTS" },
+                  ]}
+                />
+              </InlineField>
+            )}
+          </form.Field>
+        </div>
+
+        {submitError && <p className="border-sky-500/20 border-t bg-red-500/10 px-3 py-1.5 text-red-300 text-xs">{submitError}</p>}
+      </form>
     </div>
   );
 }

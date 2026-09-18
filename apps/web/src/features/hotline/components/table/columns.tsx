@@ -74,11 +74,5 @@ export function createHotlineColumns({
       size: HOTLINE_COLUMN_WIDTHS.department,
       cell: ({ getValue }) => <DepartmentCell value={getValue()} />,
     }),
-    columnHelper.display({
-      id: "actions",
-      header: "",
-      size: HOTLINE_COLUMN_WIDTHS.actions,
-      cell: () => null,
-    }),
   ]);
 }

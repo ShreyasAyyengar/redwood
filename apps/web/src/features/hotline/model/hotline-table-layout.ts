@@ -7,7 +7,6 @@ export const HOTLINE_COLUMN_WIDTHS = {
   category: 100,
   serviceLocation: 105,
   department: 115,
-  actions: 76,
 } as const;
 
 const CATEGORY_BADGE_AND_CELL_SPACE = 52;

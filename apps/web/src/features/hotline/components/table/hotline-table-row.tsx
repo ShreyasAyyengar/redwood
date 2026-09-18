@@ -78,14 +78,19 @@ export function HotlineTableRow({
             "flex items-center overflow-hidden border-zinc-800/60 border-r px-3 py-1.5 last:border-r-0",
             COMPACT_COLUMN_IDS.has(cell.column.id) && "px-2",
             GROWING_COLUMN_IDS.has(cell.column.id) ? "min-w-0 shrink grow" : "shrink-0",
-            cell.column.id === "identifier" && "p-1",
-            cell.column.id === "actions" && "px-1"
+            cell.column.id === "identifier" && "p-1"
           )}
           style={{ width: cell.column.getSize() }}
         >
-          {cell.column.id === "actions" ? <RowActionsCell entry={entry} onEdit={onEdit} /> : <table.FlexRender cell={cell} />}
+          <table.FlexRender cell={cell} />
         </div>
       ))}
+
+      <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center opacity-0 transition-opacity group-focus-within/row:opacity-100 group-hover/row:opacity-100">
+        <div className="pointer-events-auto rounded-lg border border-zinc-700/80 bg-zinc-900/95 p-0.5 shadow-black/30 shadow-lg backdrop-blur-sm">
+          <RowActionsCell entry={entry} onEdit={onEdit} />
+        </div>
+      </div>
     </div>
   );
 }
