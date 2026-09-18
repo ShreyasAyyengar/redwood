@@ -132,7 +132,7 @@ export function CategoryManagerDialog({ categories, onOpenChange, open }: Catego
                 {categories.length}
               </Badge>
             </div>
-            <ScrollArea className="max-h-80">
+            <ScrollArea type="always" className="h-80 [&_[data-slot=scroll-area-thumb]]:bg-zinc-600/90">
               <div className="divide-y divide-zinc-800">
                 {categories.length === 0 ? (
                   <p className="px-4 py-8 text-center text-sm text-zinc-500">No categories have been configured.</p>
