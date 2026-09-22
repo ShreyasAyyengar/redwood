@@ -5,7 +5,7 @@ import type { Doc } from "@backend/convex/_generated/dataModel";
 import { Button } from "@redwood/shad-ui/components/button";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "convex/react";
-import { Check, Hash, LoaderCircle, X } from "lucide-react";
+import { Check, CircleArrowOutUpLeft, Hash, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import {
   getHotlineFormValues,
@@ -135,7 +135,7 @@ export function HotlineEntryRow({
               aria-label={existingEntry ? "Cancel editing hotline entry" : "Cancel new hotline entry"}
               title="Cancel"
             >
-              <X className="size-4" />
+              <CircleArrowOutUpLeft className="size-4" />
             </Button>
           </div>
         </div>

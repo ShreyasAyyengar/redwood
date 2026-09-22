@@ -1,3 +1,4 @@
+import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { createColumnHelper } from "@tanstack/react-table";
 import { HOTLINE_COLUMN_WIDTHS } from "../../model/hotline-table-layout.ts";
@@ -11,6 +12,14 @@ import { ServiceCell } from "./cells/service-cell.tsx";
 import type { HotlineTableItem, hotlineTableFeatures } from "./table-types.ts";
 
 const columnHelper = createColumnHelper<typeof hotlineTableFeatures, HotlineTableItem>();
+
+function ScrollableTextCell({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <ScrollArea type="auto" className="h-[3.75rem] w-full [&_[data-slot=scroll-area-thumb]]:bg-zinc-600/80">
+      <p className={cn("whitespace-pre-wrap break-words pr-3 text-sm leading-5", className)}>{children}</p>
+    </ScrollArea>
+  );
+}
 
 export function createHotlineColumns({
   canManageCategories,
@@ -44,16 +53,16 @@ export function createHotlineColumns({
       id: "issue",
       header: "Caller issue",
       size: HOTLINE_COLUMN_WIDTHS.issue,
-      cell: ({ getValue }) => <p className="line-clamp-3 whitespace-pre-wrap text-sm text-zinc-300 leading-5">{getValue()}</p>,
+      cell: ({ getValue }) => <ScrollableTextCell className="text-zinc-300">{getValue()}</ScrollableTextCell>,
     }),
     columnHelper.accessor((item) => item.entry.calleeResolution, {
       id: "resolution",
       header: "Resolution",
       size: HOTLINE_COLUMN_WIDTHS.resolution,
       cell: ({ getValue }) => (
-        <p className={cn("line-clamp-3 whitespace-pre-wrap text-sm leading-5", getValue() ? "text-zinc-300" : "text-zinc-600")}>
+        <ScrollableTextCell className={getValue() ? "text-zinc-300" : "text-zinc-600"}>
           {getValue() || "No resolution recorded"}
-        </p>
+        </ScrollableTextCell>
       ),
     }),
     columnHelper.accessor("categoryLabel", {
