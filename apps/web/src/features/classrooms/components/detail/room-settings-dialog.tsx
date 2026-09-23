@@ -21,6 +21,7 @@ import { useMutation, useQuery } from "convex/react";
 import { Loader2, Settings } from "lucide-react";
 import type React from "react";
 import { useEffect, useMemo, useState } from "react";
+import { optimisticallyPatchClassrooms } from "../../model/classroom-optimistic-updates";
 import type { ClassroomSummary } from "../../model/classroom-types";
 
 type Room = ClassroomSummary;
@@ -43,7 +44,14 @@ export function RoomSettingsDialog({ room }: { room: Room }) {
 
   const attributes = useQuery(api.core.attributes.service.getAllAttributes, open ? {} : "skip");
   const groups = useQuery(api.core.groups.service.getGroups, open ? {} : "skip");
-  const updateRoom = useMutation(api.core.classrooms.service.updateRoomMetadata);
+  const updateRoom = useMutation(api.core.classrooms.service.updateRoomMetadata).withOptimisticUpdate((localStore, args) => {
+    const metadata = {
+      ...(args.metadata.groupKey !== undefined ? { groupKey: args.metadata.groupKey } : {}),
+      ...(args.metadata.attributes !== undefined ? { attributes: args.metadata.attributes as Id<"attributes">[] } : {}),
+      ...(args.metadata.captioning !== undefined ? { captioning: args.metadata.captioning } : {}),
+    };
+    optimisticallyPatchClassrooms(localStore, new Map([[args.classroomId as Id<"classrooms">, metadata]]));
+  });
 
   const groupOptions = useMemo(() => {
     const labels = groups?.map((group) => group.label) ?? [];
@@ -65,6 +73,7 @@ export function RoomSettingsDialog({ room }: { room: Room }) {
     setIsSaving(true);
     setSaveError(null);
     try {
+      setOpen(false); // TODO errors need to be displayed somewhere
       await updateRoom({
         classroomId: room._id,
         metadata: {
@@ -80,7 +89,6 @@ export function RoomSettingsDialog({ room }: { room: Room }) {
             : {}),
         },
       });
-      setOpen(false);
     } catch (error) {
       setSaveError(error instanceof Error ? error : new Error("Unable to save room settings."));
     } finally {
