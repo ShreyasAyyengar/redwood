@@ -1,8 +1,9 @@
 "use client"
 
 import * as React from "react"
+// TODO Keep Select on the direct, pinned package until Radix fixes its production typeahead state update.
+import * as SelectPrimitive from "@radix-ui/react-select"
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
-import { Select as SelectPrimitive } from "radix-ui"
 
 import { cn } from "@redwood/shad-ui/lib/utils"
 
