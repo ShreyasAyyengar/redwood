@@ -6,7 +6,10 @@ import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useMutation, useQuery } from "convex/react";
 import { Trash2 } from "lucide-react";
+import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { hasAdminAccess } from "#/lib/permissions.ts";
 import { getTaskFormValues, serializeTaskFormValues, taskFormSchema } from "../../model/task-form-schema";
+import { optimisticallyCreateTask, optimisticallyEditTask } from "../../model/task-optimistic-updates";
 import { DeleteTaskDialog } from "../dialogs/delete-task-dialog";
 import { type TaskFormValues, taskAppForm } from "./task-form-context";
 import { TaskFormFields } from "./task-form-fields";
@@ -23,8 +26,18 @@ export function TaskForm({
   onSuccess?: () => void;
 }) {
   const thisRoom = useQuery(api.core.classrooms.service.getRoom, { id: roomId });
-  const createTask = useMutation(api.core.tasks.service.addTask);
-  const editTask = useMutation(api.core.tasks.service.editTask);
+  const { data: session } = authClientWeb.useSession();
+  const currentUserEmail = session?.user.email;
+  const isAdmin = hasAdminAccess(session?.user.role);
+
+  const createTask = useMutation(api.core.tasks.service.addTask).withOptimisticUpdate((localStore, args) => {
+    if (!currentUserEmail) return;
+    optimisticallyCreateTask(localStore, args, { email: currentUserEmail, isAdmin, roomGroupKey: thisRoom?.groupKey });
+  });
+  const editTask = useMutation(api.core.tasks.service.editTask).withOptimisticUpdate((localStore, args) => {
+    if (!existingTask || !currentUserEmail) return;
+    optimisticallyEditTask(localStore, args, existingTask, { email: currentUserEmail, isAdmin, roomGroupKey: thisRoom?.groupKey });
+  });
 
   const form = taskAppForm({
     defaultValues: getTaskFormValues(existingTask),
@@ -32,6 +45,8 @@ export function TaskForm({
       onChange: taskFormSchema,
     },
     onSubmit: async ({ value }: { value: TaskFormValues }) => {
+      onSuccess?.();
+
       const serializedValue = serializeTaskFormValues(value);
       if (existingTask) {
         await editTask({
@@ -44,7 +59,6 @@ export function TaskForm({
           classroomId: roomId,
         });
       }
-      onSuccess?.();
     },
   });
 

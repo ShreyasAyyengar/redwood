@@ -1,12 +1,11 @@
 "use client";
 
 import { api } from "@backend/convex/_generated/api";
-import type { Doc } from "@backend/convex/_generated/dataModel";
+import type { Doc, Id } from "@backend/convex/_generated/dataModel";
 import { Button } from "@redwood/shad-ui/components/button";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "convex/react";
-import { Check, CircleArrowOutUpLeft, Hash, LoaderCircle } from "lucide-react";
-import { useState } from "react";
+import { Check, CircleArrowOutUpLeft, Hash } from "lucide-react";
 import {
   getHotlineFormValues,
   hotlineFormSchema,
@@ -36,11 +35,6 @@ type HotlineEntryRowProps = {
   users: Array<{ email: string }>;
 };
 
-function getErrorMessage(error: unknown) {
-  if (error instanceof Error) return error.message;
-  return "Something went wrong. Please try again.";
-}
-
 export function HotlineEntryRow({
   categories,
   categoryColumnWidth,
@@ -52,9 +46,50 @@ export function HotlineEntryRow({
   onSuccess,
   users,
 }: HotlineEntryRowProps) {
-  const createEntry = useMutation(api.core.hotline.log.service.createHotlineEntry);
-  const updateEntry = useMutation(api.core.hotline.log.service.updateHotlineEntry);
-  const [submitError, setSubmitError] = useState<string>();
+  const createEntry = useMutation(api.core.hotline.log.service.createHotlineEntry).withOptimisticUpdate((localStore, args) => {
+    const entries = localStore.getQuery(api.core.hotline.log.service.getHotlineEntries, {});
+    if (!entries) return;
+    const entry: Doc<"hotline"> = {
+      ...args,
+      _id: crypto.randomUUID() as Id<"hotline">,
+      _creationTime: Date.now(),
+      hotlineCategory: args.hotlineCategory as Id<"hotlineCategories">,
+    };
+    localStore.setQuery(api.core.hotline.log.service.getHotlineEntries, {}, [entry, ...entries]);
+  });
+  const updateEntry = useMutation(api.core.hotline.log.service.updateHotlineEntry).withOptimisticUpdate((localStore, args) => {
+    const entries = localStore.getQuery(api.core.hotline.log.service.getHotlineEntries, {});
+    if (entries) {
+      localStore.setQuery(
+        api.core.hotline.log.service.getHotlineEntries,
+        {},
+        entries.map((entry) =>
+          entry._id === args._id
+            ? {
+                ...entry,
+                ...args,
+                _id: entry._id,
+                hotlineCategory: (args.hotlineCategory ?? entry.hotlineCategory) as Id<"hotlineCategories">,
+              }
+            : entry
+        )
+      );
+    }
+
+    const entryId = args._id as Id<"hotline">;
+    const detailEntry = localStore.getQuery(api.core.hotline.log.service.getHotlineEntry, { _id: entryId });
+    if (detailEntry)
+      localStore.setQuery(
+        api.core.hotline.log.service.getHotlineEntry,
+        { _id: entryId },
+        {
+          ...detailEntry,
+          ...args,
+          _id: entryId,
+          hotlineCategory: (args.hotlineCategory ?? detailEntry.hotlineCategory) as Id<"hotlineCategories">,
+        }
+      );
+  });
   const mediaCodeCategory = categories.find(
     (category) => category.label.trim().localeCompare(MEDIA_CODE_CATEGORY_LABEL, undefined, { sensitivity: "accent" }) === 0
   );
@@ -66,15 +101,10 @@ export function HotlineEntryRow({
       onMount: hotlineFormSchema,
     },
     onSubmit: async ({ value }) => {
-      setSubmitError(undefined);
-      try {
-        const serialized = serializeHotlineFormValues(value, classrooms);
-        if (existingEntry) await updateEntry({ _id: existingEntry._id, ...serialized });
-        else await createEntry(serialized);
-        onSuccess();
-      } catch (error) {
-        setSubmitError(getErrorMessage(error));
-      }
+      const serialized = serializeHotlineFormValues(value, classrooms);
+      onSuccess();
+      if (existingEntry) await updateEntry({ _id: existingEntry._id, ...serialized });
+      else await createEntry(serialized);
     },
   });
 
@@ -112,17 +142,17 @@ export function HotlineEntryRow({
           </Button>
 
           <div className="ml-auto flex items-center gap-1">
-            <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-              {([canSubmit, isSubmitting]) => (
+            <form.Subscribe selector={(state) => state.canSubmit}>
+              {(canSubmit) => (
                 <Button
                   type="submit"
                   size="icon-sm"
-                  disabled={!canSubmit || isSubmitting}
+                  disabled={!canSubmit}
                   className="bg-sky-500 text-sky-950 hover:bg-sky-400 disabled:bg-neutral-500"
                   aria-label={existingEntry ? "Save hotline entry changes" : "Save new hotline entry"}
                   title={existingEntry ? "Save changes" : "Save new entry"}
                 >
-                  {isSubmitting ? <LoaderCircle className="size-4 animate-spin" /> : <Check className="size-4" />}
+                  <Check className="size-4" />
                 </Button>
               )}
             </form.Subscribe>
@@ -258,8 +288,6 @@ export function HotlineEntryRow({
             )}
           </form.Field>
         </div>
-
-        {submitError && <p className="border-sky-500/20 border-t bg-red-500/10 px-3 py-1.5 text-red-300 text-xs">{submitError}</p>}
       </form>
     </div>
   );

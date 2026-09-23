@@ -31,9 +31,33 @@ export default function UserEditor() {
   const [newRole, setNewRole] = useState<(typeof roles)[number]>("employee");
   const [pendingAction, setPendingAction] = useState<string>();
 
-  const addUser = useMutation(api.core.users.service.addUser);
-  const removeUser = useMutation(api.core.users.service.removeUser);
-  const changeRole = useMutation(api.core.users.service.changeRole);
+  const addUser = useMutation(api.core.users.service.addUser).withOptimisticUpdate((localStore, args) => {
+    const currentUsers = localStore.getQuery(api.core.users.service.getUsers, {});
+    if (!currentUsers) return;
+    localStore.setQuery(
+      api.core.users.service.getUsers,
+      {},
+      [...currentUsers, args].sort((left, right) => left.email.localeCompare(right.email))
+    );
+  });
+  const removeUser = useMutation(api.core.users.service.removeUser).withOptimisticUpdate((localStore, args) => {
+    const currentUsers = localStore.getQuery(api.core.users.service.getUsers, {});
+    if (currentUsers)
+      localStore.setQuery(
+        api.core.users.service.getUsers,
+        {},
+        currentUsers.filter((user) => user.email !== args.email)
+      );
+  });
+  const changeRole = useMutation(api.core.users.service.changeRole).withOptimisticUpdate((localStore, args) => {
+    const currentUsers = localStore.getQuery(api.core.users.service.getUsers, {});
+    if (!currentUsers) return;
+    localStore.setQuery(
+      api.core.users.service.getUsers,
+      {},
+      currentUsers.map((user) => (user.email === args.email ? { ...user, role: args.newRole } : user))
+    );
+  });
 
   const handleAddUser = async () => {
     if (!newCruzid) return;
@@ -150,18 +174,15 @@ export default function UserEditor() {
                     <TableCell className="py-4 pl-4 font-medium text-zinc-200">{user.email}</TableCell>
                     <TableCell className="py-4">
                       <Select
-                        defaultValue={user.role}
-                        onValueChange={(value) =>
-                          // TODO investigate `void` usage
-                          void (async () => {
-                            setPendingAction(`role:${user.email}`);
-                            try {
-                              await changeRole({ email: user.email, newRole: value as (typeof roles)[number] });
-                            } finally {
-                              setPendingAction(undefined);
-                            }
-                          })()
-                        }
+                        value={user.role}
+                        onValueChange={async (value) => {
+                          setPendingAction(`role:${user.email}`);
+                          try {
+                            await changeRole({ email: user.email, newRole: value as (typeof roles)[number] });
+                          } finally {
+                            setPendingAction(undefined);
+                          }
+                        }}
                         disabled={pendingAction === `role:${user.email}`}
                       >
                         <SelectTrigger className="w-[140px] border-white/10 bg-zinc-900 text-zinc-200 transition-colors hover:bg-zinc-800">
@@ -199,16 +220,14 @@ export default function UserEditor() {
                             <Button
                               variant="default"
                               className="w-full bg-red-600 font-bold text-white hover:bg-red-900 sm:w-auto"
-                              onClick={() =>
-                                void (async () => {
-                                  setPendingAction(`remove:${user.email}`);
-                                  try {
-                                    await removeUser({ email: user.email });
-                                  } finally {
-                                    setPendingAction(undefined);
-                                  }
-                                })()
-                              }
+                              onClick={async () => {
+                                setPendingAction(`remove:${user.email}`);
+                                try {
+                                  await removeUser({ email: user.email });
+                                } finally {
+                                  setPendingAction(undefined);
+                                }
+                              }}
                               disabled={pendingAction === `remove:${user.email}`}
                             >
                               {pendingAction === `remove:${user.email}` ? (

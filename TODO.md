@@ -15,6 +15,7 @@
 - [ ] maintenance fields linked to attributes.
 
 ### High Priority
+- [ ] standardise issue/task pagination across lists 
 - [ ] statistics view
 - [ ] shift building
 - [ ] Room Captioning *
@@ -26,6 +27,9 @@
 - [ ] Proper error handling for API calls in the UI. infra is there, use it.
 - [ ] filtering by attributes
 - [ ] Take care of CSV ingestion direct from coursedog, eliminate the middle-man python script
+- [ ] standardise delete button styles
+- [ ] keyboard shortcuts for 'committing' actions CMD + Enter
+
 
 ## Low Priority
 - [ ] email notifications / weekly reports for supervisors (maybe explore Rsend 'like')

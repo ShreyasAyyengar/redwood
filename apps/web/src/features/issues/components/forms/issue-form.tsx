@@ -6,7 +6,10 @@ import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useMutation, useQuery } from "convex/react";
 import { Trash2 } from "lucide-react";
+import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { hasAdminAccess } from "#/lib/permissions.ts";
 import { getIssueFormValues, issueFormSchema, serializeIssueFormValues } from "../../model/issue-form-schema";
+import { optimisticallyCreateIssue, optimisticallyEditIssue } from "../../model/issue-optimistic-updates";
 import { DeleteIssueDialog } from "../dialogs/delete-issue-dialog";
 import { type IssueFormValues, issueAppForm } from "./issue-form-context";
 import { IssueFormFields } from "./issue-form-fields";
@@ -23,8 +26,18 @@ export function IssueForm({
   existingIssue?: Doc<"issues">;
 }) {
   const thisRoom = useQuery(api.core.classrooms.service.getRoom, { id: roomId });
-  const createIssue = useMutation(api.core.issues.service.createIssue);
-  const editIssue = useMutation(api.core.issues.service.editIssue);
+  const { data: session } = authClientWeb.useSession();
+  const currentUserEmail = session?.user.email;
+  const isAdmin = hasAdminAccess(session?.user.role);
+
+  const createIssue = useMutation(api.core.issues.service.createIssue).withOptimisticUpdate((localStore, args) => {
+    if (!currentUserEmail) return;
+    optimisticallyCreateIssue(localStore, args, { email: currentUserEmail, isAdmin, roomGroupKey: thisRoom?.groupKey });
+  });
+  const editIssue = useMutation(api.core.issues.service.editIssue).withOptimisticUpdate((localStore, args) => {
+    if (!existingIssue || !currentUserEmail) return;
+    optimisticallyEditIssue(localStore, args, existingIssue, { email: currentUserEmail, isAdmin, roomGroupKey: thisRoom?.groupKey });
+  });
 
   const form = issueAppForm({
     defaultValues: getIssueFormValues(existingIssue),
@@ -33,6 +46,8 @@ export function IssueForm({
     },
 
     onSubmit: async ({ value }: { value: IssueFormValues }) => {
+      onSuccess?.();
+
       const serializedValue = serializeIssueFormValues(value);
       if (existingIssue) {
         await editIssue({
@@ -45,7 +60,6 @@ export function IssueForm({
           classroomId: roomId,
         });
       }
-      onSuccess?.();
     },
   });
 
