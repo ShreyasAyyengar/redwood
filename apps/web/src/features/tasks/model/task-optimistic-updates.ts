@@ -4,6 +4,7 @@ import type { OptimisticLocalStore } from "convex/browser";
 import type { FunctionArgs } from "convex/server";
 
 type AddTaskArgs = FunctionArgs<typeof api.core.tasks.service.addTask>;
+type BulkAddTaskArgs = FunctionArgs<typeof api.core.tasks.service.bulkAddTasks>;
 type EditTaskArgs = FunctionArgs<typeof api.core.tasks.service.editTask>;
 type TaskFeedQueryArgs = Omit<FunctionArgs<typeof api.core.tasks.service.getTasks>, "paginationOpts">;
 
@@ -126,8 +127,13 @@ function updateTaskRoomSummaries(localStore: OptimisticLocalStore, classroomId: 
 
 function updateTaskCaches(localStore: OptimisticLocalStore, task: Doc<"tasks">, previousTask: Doc<"tasks"> | undefined, roomGroupKey?: string) {
   const classroomTasks = updateClassroomTasks(localStore, task, previousTask);
+  const cachedRoomGroupKey =
+    roomGroupKey ??
+    localStore.getQuery(api.core.classrooms.service.getRoom, { id: task.classroomId })?.groupKey ??
+    localStore.getQuery(api.core.classrooms.service.getAllRooms, {})?.find((room) => room._id === task.classroomId)?.groupKey ??
+    localStore.getQuery(api.core.classrooms.service.getClassroomLookup, {})?.find((room) => room._id === task.classroomId)?.groupKey;
   updateOpenTaskQueries(localStore, task, previousTask);
-  updateTaskFeedQueries(localStore, task, previousTask, roomGroupKey);
+  updateTaskFeedQueries(localStore, task, previousTask, cachedRoomGroupKey);
   if (classroomTasks) updateTaskRoomSummaries(localStore, task.classroomId, classroomTasks);
 }
 
@@ -155,6 +161,28 @@ export function optimisticallyCreateTask(localStore: OptimisticLocalStore, args:
   };
 
   updateTaskCaches(localStore, task, undefined, user.roomGroupKey);
+}
+
+export function optimisticallyCreateTasks(
+  localStore: OptimisticLocalStore,
+  args: BulkAddTaskArgs,
+  classroomIds: Id<"classrooms">[],
+  user: OptimisticTaskUser
+) {
+  const classroomsWithoutTaskCache = new Set(
+    classroomIds.filter((classroomId) => localStore.getQuery(api.core.tasks.service.getClassroomTasks, { classroomId }) === undefined)
+  );
+  for (const classroomId of classroomIds) optimisticallyCreateTask(localStore, { ...args, classroomId }, user);
+
+  const visibleAt = args.visibleAt ? Date.parse(args.visibleAt) : undefined;
+  if (visibleAt !== undefined && visibleAt > Date.now()) return;
+  const rooms = localStore.getQuery(api.core.classrooms.service.getAllRooms, {});
+  if (!rooms) return;
+  localStore.setQuery(
+    api.core.classrooms.service.getAllRooms,
+    {},
+    rooms.map((room) => (classroomsWithoutTaskCache.has(room._id) ? { ...room, openTasksCount: room.openTasksCount + 1 } : room))
+  );
 }
 
 export function optimisticallyEditTask(
