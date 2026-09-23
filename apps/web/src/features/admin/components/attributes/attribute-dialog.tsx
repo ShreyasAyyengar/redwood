@@ -1,5 +1,5 @@
 import { api } from "@backend/convex/_generated/api";
-import type { Doc } from "@backend/convex/_generated/dataModel";
+import type { Doc, Id } from "@backend/convex/_generated/dataModel";
 import { attributeFormSchema } from "@backend/convex/core/attributes/schemas";
 import { Button } from "@redwood/shad-ui/components/button";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@redwood/shad-ui/components/dialog";
@@ -21,9 +21,40 @@ export const { useAppForm } = createFormHook({
 });
 
 export function AttributeForm({ existingAttribute, onSuccess }: { existingAttribute?: Doc<"attributes">; onSuccess?: () => void }) {
-  const addAttribute = useMutation(api.core.attributes.service.addAttribute);
-  const updateAttribute = useMutation(api.core.attributes.service.updateAttribute);
-  const deleteAttribute = useMutation(api.core.attributes.service.deleteAttribute);
+  const addAttribute = useMutation(api.core.attributes.service.addAttribute).withOptimisticUpdate((localQueryStore, args) => {
+    const currentValue = localQueryStore.getQuery(api.core.attributes.service.getAllAttributes, {});
+
+    const optimisticAttribute: Doc<"attributes"> = {
+      _id: "" as Id<"attributes">,
+      _creationTime: Date.now(),
+      label: args.label,
+      color: args.color,
+    };
+
+    localQueryStore.setQuery(api.core.attributes.service.getAllAttributes, {}, [...(currentValue ?? []), optimisticAttribute]);
+  });
+
+  const updateAttribute = useMutation(api.core.attributes.service.updateAttribute).withOptimisticUpdate((localQueryStore, args) => {
+    const existingLocalAttribute = localQueryStore.getQuery(api.core.attributes.service.getAllAttributes, {});
+
+    if (!existingLocalAttribute) return;
+    const optimisticAttribute = existingLocalAttribute.find((item) => item._id === args._id);
+
+    if (!optimisticAttribute) return;
+    if (args.label) optimisticAttribute.label = args.label;
+    if (args.color) optimisticAttribute.color = args.color;
+  });
+
+  const deleteAttribute = useMutation(api.core.attributes.service.deleteAttribute).withOptimisticUpdate((localQueryStore, args) => {
+    const existingAttributes = localQueryStore.getQuery(api.core.attributes.service.getAllAttributes, {});
+    if (!existingAttributes) return;
+    localQueryStore.setQuery(
+      api.core.attributes.service.getAllAttributes,
+      {},
+      existingAttributes.filter((item) => item._id !== args._id)
+    );
+  });
+
   const [isDeleting, setIsDeleting] = useState(false);
 
   const form = useAppForm({
@@ -36,9 +67,10 @@ export function AttributeForm({ existingAttribute, onSuccess }: { existingAttrib
       onMount: attributeFormSchema,
     },
     onSubmit: async ({ value }) => {
+      onSuccess?.();
+
       if (existingAttribute) await updateAttribute({ _id: existingAttribute._id, label: value.label, color: value.color });
       else await addAttribute({ label: value.label, color: value.color });
-      onSuccess?.();
     },
   });
 
@@ -128,8 +160,8 @@ export function AttributeForm({ existingAttribute, onSuccess }: { existingAttrib
               onClick={async () => {
                 setIsDeleting(true);
                 try {
-                  await deleteAttribute({ _id: existingAttribute._id });
                   onSuccess?.();
+                  await deleteAttribute({ _id: existingAttribute._id });
                 } finally {
                   setIsDeleting(false);
                 }
@@ -154,7 +186,7 @@ export function AttributeForm({ existingAttribute, onSuccess }: { existingAttrib
                   onClick={form.handleSubmit}
                   disabled={!canSubmit || isSubmitting || (existingAttribute && !isDirty)}
                 >
-                  {isSubmitting ? (existingAttribute ? "Saving..." : "Creating...") : existingAttribute ? "Save Changes" : "Create Attribute"}
+                  {existingAttribute ? "Save Changes" : "Create Attribute"}
                 </Button>
               )}
             </form.Subscribe>
