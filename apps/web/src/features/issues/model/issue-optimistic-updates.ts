@@ -4,6 +4,7 @@ import type { OptimisticLocalStore } from "convex/browser";
 import type { FunctionArgs } from "convex/server";
 
 type CreateIssueArgs = FunctionArgs<typeof api.core.issues.service.createIssue>;
+type BulkCreateIssueArgs = FunctionArgs<typeof api.core.issues.service.createBulkIssues>;
 type EditIssueArgs = FunctionArgs<typeof api.core.issues.service.editIssue>;
 type IssueFeedQueryArgs = Omit<FunctionArgs<typeof api.core.issues.service.getIssues>, "paginationOpts">;
 
@@ -134,7 +135,12 @@ function updateIssueCaches(
   roomGroupKey?: string
 ) {
   const classroomIssues = updateClassroomIssues(localStore, issue, previousIssue);
-  updateIssueFeedQueries(localStore, issue, previousIssue, roomGroupKey);
+  const cachedRoomGroupKey =
+    roomGroupKey ??
+    localStore.getQuery(api.core.classrooms.service.getRoom, { id: issue.classroomId })?.groupKey ??
+    localStore.getQuery(api.core.classrooms.service.getAllRooms, {})?.find((room) => room._id === issue.classroomId)?.groupKey ??
+    localStore.getQuery(api.core.classrooms.service.getClassroomLookup, {})?.find((room) => room._id === issue.classroomId)?.groupKey;
+  updateIssueFeedQueries(localStore, issue, previousIssue, cachedRoomGroupKey);
   if (classroomIssues) updateIssueRoomSummaries(localStore, issue.classroomId, classroomIssues);
 }
 
@@ -161,6 +167,35 @@ export function optimisticallyCreateIssue(localStore: OptimisticLocalStore, args
   };
 
   updateIssueCaches(localStore, issue, undefined, user.roomGroupKey);
+}
+
+export function optimisticallyCreateIssues(
+  localStore: OptimisticLocalStore,
+  args: BulkCreateIssueArgs,
+  classroomIds: Id<"classrooms">[],
+  user: OptimisticIssueUser
+) {
+  const classroomsWithoutIssueCache = new Set(
+    classroomIds.filter((classroomId) => localStore.getQuery(api.core.issues.service.getClassroomIssues, { classroomId }) === undefined)
+  );
+  for (const classroomId of classroomIds) optimisticallyCreateIssue(localStore, { ...args, classroomId }, user);
+
+  const rooms = localStore.getQuery(api.core.classrooms.service.getAllRooms, {});
+  if (!rooms) return;
+  const isActive = !(args.onHold ?? false);
+  localStore.setQuery(
+    api.core.classrooms.service.getAllRooms,
+    {},
+    rooms.map((room) => {
+      if (!classroomsWithoutIssueCache.has(room._id)) return room;
+      if (!isActive) return room.roomStatus === "GOOD" ? { ...room, roomStatus: "ON HOLD" as const } : room;
+      return {
+        ...room,
+        activeIssuesCount: room.activeIssuesCount + 1,
+        roomStatus: args.urgent || room.roomStatus === "NEEDS URGENT ATTENTION" ? "NEEDS URGENT ATTENTION" : "NEEDS ATTENTION",
+      };
+    })
+  );
 }
 
 export function optimisticallyEditIssue(

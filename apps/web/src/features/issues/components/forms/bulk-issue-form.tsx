@@ -7,7 +7,10 @@ import { cn } from "@redwood/shad-ui/lib/utils";
 import { useMutation, useQuery } from "convex/react";
 import { useMemo, useState } from "react";
 import { BulkTargetSelector } from "#/features/classrooms/components/bulk-target-selector.tsx";
+import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { hasAdminAccess } from "#/lib/permissions.ts";
 import { issueFormSchema, serializeIssueFormValues } from "../../model/issue-form-schema";
+import { optimisticallyCreateIssues } from "../../model/issue-optimistic-updates";
 import { type IssueFormValues, issueAppForm } from "./issue-form-context";
 import { IssueFormFields } from "./issue-form-fields";
 
@@ -15,8 +18,7 @@ export function BulkIssueForm({ onSuccess }: { onSuccess?: () => void }) {
   const fetchedRooms = useQuery(api.core.classrooms.service.getAllRooms, {}) ?? [];
   const [selectedAttributeIds, setSelectedAttributeIds] = useState<string[]>([]);
   const [selectedClassroomIds, setSelectedClassroomIds] = useState<string[]>([]);
-
-  const bulkCreateIssues = useMutation(api.core.issues.service.createBulkIssues);
+  const { data: session } = authClientWeb.useSession();
 
   const targetClassroomIds = useMemo(() => {
     const classroomIds = new Set(selectedClassroomIds);
@@ -25,6 +27,14 @@ export function BulkIssueForm({ onSuccess }: { onSuccess?: () => void }) {
       .filter((room) => classroomIds.has(room._id) || room.attributes.some((attributeId) => attributeIds.has(attributeId)))
       .map((room) => room._id);
   }, [fetchedRooms, selectedAttributeIds, selectedClassroomIds]);
+
+  const bulkCreateIssues = useMutation(api.core.issues.service.createBulkIssues).withOptimisticUpdate((localStore, args) => {
+    if (!session?.user.email) return;
+    optimisticallyCreateIssues(localStore, args, targetClassroomIds, {
+      email: session.user.email,
+      isAdmin: hasAdminAccess(session.user.role),
+    });
+  });
 
   const form = issueAppForm({
     defaultValues: {
@@ -41,12 +51,12 @@ export function BulkIssueForm({ onSuccess }: { onSuccess?: () => void }) {
     onSubmit: async ({ value }) => {
       if (targetClassroomIds.length === 0) return;
 
+      onSuccess?.();
       await bulkCreateIssues({
         ...serializeIssueFormValues(value),
         attributeIds: selectedAttributeIds as Id<"attributes">[],
         classroomIds: selectedClassroomIds as Id<"classrooms">[],
       });
-      onSuccess?.();
     },
   });
 
