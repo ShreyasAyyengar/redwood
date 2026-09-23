@@ -6,10 +6,11 @@ import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { Separator } from "@redwood/shad-ui/components/separator";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
-import { useMutation } from "convex/react";
+import { insertAtPosition, useMutation } from "convex/react";
 import { useState } from "react";
 import { IssueDialog } from "#/features/issues/components/dialogs/issue-dialog.tsx";
 import { TaskDialog } from "#/features/tasks/components/dialogs/task-dialog.tsx";
+import { authClientWeb } from "#/lib/auth-client-web.ts";
 import { type MaintenanceFormValues, maintenanceFormSchema, serializeMaintenanceFormValues } from "../../model/maintenance-form-schema";
 import { MaintenanceAideDialog } from "../dialogs/maintenance-aide-dialog";
 import DateField from "./fields/date-field";
@@ -53,7 +54,34 @@ export default function MaintenanceForm({
     setAideOpen(true);
   };
 
-  const createMaintenanceLog = useMutation(api.core.maintenance.service.addMaintenanceEntry);
+  const { data: session } = authClientWeb.useSession();
+
+  const createMaintenanceLog = useMutation(api.core.maintenance.service.addMaintenanceEntry).withOptimisticUpdate((localQueryStore, args) => {
+    const currentUserEmail = session?.user.email;
+    if (!currentUserEmail) return;
+
+    const now = Date.now();
+    const optimisticMaintenanceLog: Doc<"maintenance"> = {
+      _id: crypto.randomUUID() as Id<"maintenance">,
+      _creationTime: now,
+      classroomId: args.classroomId as Id<"classrooms">,
+      date: args.date,
+      completedBy: currentUserEmail,
+      surfacesWiped: args.surfacesWiped,
+      equipmentChecked: args.equipmentChecked,
+      microphone: args.microphone,
+      dten: args.dten,
+    };
+
+    insertAtPosition({
+      paginatedQuery: api.core.maintenance.service.getHistory,
+      argsToMatch: { classroomId: args.classroomId },
+      sortOrder: "desc",
+      sortKeyFromItem: (entry) => [entry.date, entry._creationTime],
+      localQueryStore,
+      item: optimisticMaintenanceLog,
+    });
+  });
 
   const form = useAppForm({
     defaultValues: {} as FormValues,
@@ -61,11 +89,12 @@ export default function MaintenanceForm({
       onChange: maintenanceFormSchema,
     },
     onSubmit: async ({ value }) => {
+      onSuccess?.();
+
       await createMaintenanceLog({
         ...serializeMaintenanceFormValues(value),
         classroomId: roomId,
       });
-      onSuccess?.();
     },
   });
 
