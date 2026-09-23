@@ -1,5 +1,5 @@
 import { api } from "@backend/convex/_generated/api";
-import type { Doc } from "@backend/convex/_generated/dataModel";
+import type { Doc, Id } from "@backend/convex/_generated/dataModel";
 import { groupFormSchema } from "@backend/convex/core/groups/schemas";
 import { Button } from "@redwood/shad-ui/components/button";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@redwood/shad-ui/components/dialog";
@@ -12,6 +12,7 @@ import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { useMutation } from "convex/react";
 import { useState } from "react";
 import type { z } from "zod";
+import { optimisticallyPatchClassroomsInGroup } from "#/features/classrooms/model/classroom-optimistic-updates.ts";
 
 export type GroupFormValues = z.infer<typeof groupFormSchema>;
 export const { fieldContext, formContext, useFieldContext } = createFormHookContexts();
@@ -23,9 +24,43 @@ export const { useAppForm } = createFormHook({
 });
 
 export function GroupForm({ existingGroup, onSuccess }: { existingGroup?: Doc<"groups">; onSuccess?: () => void }) {
-  const addGroup = useMutation(api.core.groups.service.addGroup);
-  const updateGroup = useMutation(api.core.groups.service.updateGroup);
-  const deleteGroup = useMutation(api.core.groups.service.deleteGroup);
+  const addGroup = useMutation(api.core.groups.service.addGroup).withOptimisticUpdate((localStore, args) => {
+    const groups = localStore.getQuery(api.core.groups.service.getGroups, {});
+    if (!groups) return;
+    const group: Doc<"groups"> = {
+      _id: crypto.randomUUID() as Id<"groups">,
+      _creationTime: Date.now(),
+      label: args.label,
+    };
+    localStore.setQuery(
+      api.core.groups.service.getGroups,
+      {},
+      [...groups, group].sort((left, right) => left.label.localeCompare(right.label))
+    );
+  });
+  const updateGroup = useMutation(api.core.groups.service.updateGroup).withOptimisticUpdate((localStore, args) => {
+    const groups = localStore.getQuery(api.core.groups.service.getGroups, {});
+    if (groups) {
+      localStore.setQuery(
+        api.core.groups.service.getGroups,
+        {},
+        groups
+          .map((group) => (group._id === args._id ? { ...group, label: args.label } : group))
+          .sort((left, right) => left.label.localeCompare(right.label))
+      );
+    }
+    if (existingGroup) optimisticallyPatchClassroomsInGroup(localStore, existingGroup.label, args.label);
+  });
+  const deleteGroup = useMutation(api.core.groups.service.deleteGroup).withOptimisticUpdate((localStore, args) => {
+    const groups = localStore.getQuery(api.core.groups.service.getGroups, {});
+    if (groups)
+      localStore.setQuery(
+        api.core.groups.service.getGroups,
+        {},
+        groups.filter((group) => group._id !== args.id)
+      );
+    if (existingGroup) optimisticallyPatchClassroomsInGroup(localStore, existingGroup.label, "Ungrouped");
+  });
   const [isDeleting, setIsDeleting] = useState(false);
 
   const form = useAppForm({
@@ -37,9 +72,9 @@ export function GroupForm({ existingGroup, onSuccess }: { existingGroup?: Doc<"g
       onMount: groupFormSchema,
     },
     onSubmit: async ({ value }) => {
+      onSuccess?.();
       if (existingGroup) await updateGroup({ _id: existingGroup._id, label: value.label });
       else await addGroup({ label: value.label });
-      onSuccess?.();
     },
   });
 
@@ -101,8 +136,8 @@ export function GroupForm({ existingGroup, onSuccess }: { existingGroup?: Doc<"g
               onClick={async () => {
                 setIsDeleting(true);
                 try {
-                  await deleteGroup({ id: existingGroup._id });
                   onSuccess?.();
+                  await deleteGroup({ id: existingGroup._id });
                 } finally {
                   setIsDeleting(false);
                 }
