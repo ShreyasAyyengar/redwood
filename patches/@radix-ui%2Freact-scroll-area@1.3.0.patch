@@ -1,0 +1,44 @@
+diff --git a/dist/index.js b/dist/index.js
+index 4518bfed5baf9409464d48baf1d9cedb00d72e1f..ec41730535d8da65e26295c91472baa148d88893 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -821,14 +821,15 @@ var addUnlinkedScrollListener = /* @__PURE__ */ __name((node, handler = () => {
+ }) => {
+   let prevPosition = { left: node.scrollLeft, top: node.scrollTop };
+   let rAF = 0;
+-  (/* @__PURE__ */ __name((function loop() {
++  function loop() {
+     const position = { left: node.scrollLeft, top: node.scrollTop };
+     const isHorizontalScroll = prevPosition.left !== position.left;
+     const isVerticalScroll = prevPosition.top !== position.top;
+     if (isHorizontalScroll || isVerticalScroll) handler();
+     prevPosition = position;
+     rAF = window.requestAnimationFrame(loop);
+-  }), "loop"))();
++  }
++  loop();
+   return () => window.cancelAnimationFrame(rAF);
+ }, "addUnlinkedScrollListener");
+ function useDebounceCallback(callback, delay) {
+diff --git a/dist/index.mjs b/dist/index.mjs
+index 5a5c61b5f9f438c83f975c794bc8ee2979e4a1aa..1c320f8a863eff00cd4403723b3adc70792d3c82 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -775,14 +775,15 @@ var addUnlinkedScrollListener = /* @__PURE__ */ __name((node, handler = () => {
+ }) => {
+   let prevPosition = { left: node.scrollLeft, top: node.scrollTop };
+   let rAF = 0;
+-  (/* @__PURE__ */ __name((function loop() {
++  function loop() {
+     const position = { left: node.scrollLeft, top: node.scrollTop };
+     const isHorizontalScroll = prevPosition.left !== position.left;
+     const isVerticalScroll = prevPosition.top !== position.top;
+     if (isHorizontalScroll || isVerticalScroll) handler();
+     prevPosition = position;
+     rAF = window.requestAnimationFrame(loop);
+-  }), "loop"))();
++  }
++  loop();
+   return () => window.cancelAnimationFrame(rAF);
+ }, "addUnlinkedScrollListener");
+ function useDebounceCallback(callback, delay) {
