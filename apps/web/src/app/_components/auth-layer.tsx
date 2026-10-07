@@ -1,19 +1,20 @@
 "use client";
 
+import { useConvexAuth } from "convex/react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { env } from "#/env.ts";
 import { authClientWeb } from "#/lib/auth-client-web.ts";
 
 export default function AuthLayer() {
-  const { data, isPending } = authClientWeb.useSession();
+  const { isAuthenticated, isLoading } = useConvexAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const isAuthErrorPage = pathname === "/auth/error";
 
   useEffect(() => {
-    if (!isPending && !data && !isAuthErrorPage) {
+    if (!isLoading && !isAuthenticated && !isAuthErrorPage) {
       const search = searchParams.toString();
       const currentUrl = `${window.location.origin}${pathname}${search ? `?${search}` : ""}`;
 
@@ -23,7 +24,7 @@ export default function AuthLayer() {
         errorCallbackURL: `${env.NEXT_PUBLIC_WEBSITE_URL}/auth/error`,
       });
     }
-  }, [isPending, data, pathname, searchParams, isAuthErrorPage]);
+  }, [isLoading, isAuthenticated, pathname, searchParams, isAuthErrorPage]);
 
   return null;
 }

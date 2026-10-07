@@ -10,7 +10,7 @@ import { insertAtPosition, useMutation } from "convex/react";
 import { useState } from "react";
 import { IssueDialog } from "#/features/issues/components/dialogs/issue-dialog.tsx";
 import { TaskDialog } from "#/features/tasks/components/dialogs/task-dialog.tsx";
-import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { useCurrentUser } from "#/lib/current-user.tsx";
 import { type MaintenanceFormValues, maintenanceFormSchema, serializeMaintenanceFormValues } from "../../model/maintenance-form-schema";
 import { MaintenanceAideDialog } from "../dialogs/maintenance-aide-dialog";
 import DateField from "./fields/date-field";
@@ -54,10 +54,10 @@ export default function MaintenanceForm({
     setAideOpen(true);
   };
 
-  const { data: session } = authClientWeb.useSession();
+  const user = useCurrentUser();
 
   const createMaintenanceLog = useMutation(api.core.maintenance.service.addMaintenanceEntry).withOptimisticUpdate((localQueryStore, args) => {
-    const currentUserEmail = session?.user.email;
+    const currentUserEmail = user.email;
     if (!currentUserEmail) return;
 
     const now = Date.now();

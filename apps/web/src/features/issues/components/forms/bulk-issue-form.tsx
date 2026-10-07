@@ -7,7 +7,7 @@ import { cn } from "@redwood/shad-ui/lib/utils";
 import { useMutation, useQuery } from "convex/react";
 import { useMemo, useState } from "react";
 import { BulkTargetSelector } from "#/features/classrooms/components/bulk-target-selector.tsx";
-import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { useCurrentUser } from "#/lib/current-user.tsx";
 import { hasAdminAccess } from "#/lib/permissions.ts";
 import { issueFormSchema, serializeIssueFormValues } from "../../model/issue-form-schema";
 import { optimisticallyCreateIssues } from "../../model/issue-optimistic-updates";
@@ -18,7 +18,7 @@ export function BulkIssueForm({ onSuccess }: { onSuccess?: () => void }) {
   const fetchedRooms = useQuery(api.core.classrooms.service.getAllRooms, {}) ?? [];
   const [selectedAttributeIds, setSelectedAttributeIds] = useState<string[]>([]);
   const [selectedClassroomIds, setSelectedClassroomIds] = useState<string[]>([]);
-  const { data: session } = authClientWeb.useSession();
+  const user = useCurrentUser();
 
   const targetClassroomIds = useMemo(() => {
     const classroomIds = new Set(selectedClassroomIds);
@@ -29,10 +29,10 @@ export function BulkIssueForm({ onSuccess }: { onSuccess?: () => void }) {
   }, [fetchedRooms, selectedAttributeIds, selectedClassroomIds]);
 
   const bulkCreateIssues = useMutation(api.core.issues.service.createBulkIssues).withOptimisticUpdate((localStore, args) => {
-    if (!session?.user.email) return;
+    if (!user.email) return;
     optimisticallyCreateIssues(localStore, args, targetClassroomIds, {
-      email: session.user.email,
-      isAdmin: hasAdminAccess(session.user.role),
+      email: user.email,
+      isAdmin: hasAdminAccess(user.role),
     });
   });
 

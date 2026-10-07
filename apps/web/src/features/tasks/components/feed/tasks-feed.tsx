@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@redwood/shad-ui/compo
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { FeedRoomFilter, type FeedRoomFilterValue } from "#/features/classrooms/components/feed-room-filter.tsx";
-import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { useCurrentUser } from "#/lib/current-user.tsx";
 import { hasSupervisorAccess } from "#/lib/permissions.ts";
 import type { TaskFeedFilterValue } from "../../model/task-filters";
 import { BulkTaskDialog } from "../dialogs/bulk-task-dialog";
@@ -15,8 +15,8 @@ import { TaskFeedList } from "./task-feed-list";
 export function TasksFeed() {
   const [roomFilter, setRoomFilter] = useState<FeedRoomFilterValue | undefined>();
   const [feedFilter, setFeedFilter] = useState<TaskFeedFilterValue>({});
-  const { data: session } = authClientWeb.useSession();
-  const canBulkCreate = hasSupervisorAccess(session?.user.role);
+  const user = useCurrentUser();
+  const canBulkCreate = hasSupervisorAccess(user.role);
   const taskFilter = useMemo(
     () => ({
       ...feedFilter,

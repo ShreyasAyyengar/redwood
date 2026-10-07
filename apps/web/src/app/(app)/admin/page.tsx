@@ -3,23 +3,23 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import AdminPanel from "#/features/admin/components/admin-panel.tsx";
-import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { useCurrentUser } from "#/lib/current-user.tsx";
 import { hasAdminAccess, hasSupervisorAccess } from "#/lib/permissions.ts";
 
 export default function AdminPage() {
   const router = useRouter();
-  const { data: session } = authClientWeb.useSession();
-  const canAccessAdminPanel = hasSupervisorAccess(session?.user.role);
+  const user = useCurrentUser();
+  const canAccessAdminPanel = hasSupervisorAccess(user.role);
 
   useEffect(() => {
-    if (session && !canAccessAdminPanel) router.replace("/classrooms");
-  }, [router, session, canAccessAdminPanel]);
+    if (!canAccessAdminPanel) router.replace("/classrooms");
+  }, [router, canAccessAdminPanel]);
 
   if (!canAccessAdminPanel) return null;
 
   return (
     <div className="flex min-h-0 w-full flex-1 justify-center overflow-hidden p-5">
-      <AdminPanel isAdmin={hasAdminAccess(session?.user.role)} />
+      <AdminPanel isAdmin={hasAdminAccess(user.role)} />
     </div>
   );
 }

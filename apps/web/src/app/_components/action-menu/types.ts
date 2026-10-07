@@ -10,5 +10,5 @@ export type DeviceSession = {
   session: {
     token: string;
   };
-  user: AccountProfile;
+  user: AccountProfile & { id: string };
 };

@@ -11,7 +11,7 @@ import { cn } from "@redwood/shad-ui/lib/utils";
 import { useQuery } from "convex/react";
 import { CalendarDays } from "lucide-react";
 import { useState } from "react";
-import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { useCurrentUser } from "#/lib/current-user.tsx";
 import { hasAdminAccess } from "#/lib/permissions.ts";
 import { type IssueFormValues, useFieldContext } from "../issue-form-context";
 
@@ -25,12 +25,10 @@ export default function ResolutionField({
   const field = useFieldContext<IssueFormValues["resolution"]>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 
-  const { data } = authClientWeb.useSession();
-  // biome-ignore lint/style/noNonNullAssertion: user must be logged in to see this page
-  const session = data!;
+  const currentUser = useCurrentUser();
 
-  const isAdmin = hasAdminAccess(session.user.role);
-  const defaultResolvedBy = existingValue?.resolvedBy ?? session.user.email;
+  const isAdmin = hasAdminAccess(currentUser.role);
+  const defaultResolvedBy = existingValue?.resolvedBy ?? currentUser.email;
 
   // local values of the resolution
   const [localValue, setLocalValue] = useState(existingValue?.comment ?? "");

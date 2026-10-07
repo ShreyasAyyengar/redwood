@@ -2,15 +2,15 @@ import { api } from "@backend/convex/_generated/api";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@redwood/shad-ui/components/select";
 import { useQuery } from "convex/react";
 import { useState } from "react";
-import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { useCurrentUser } from "#/lib/current-user.tsx";
 import { hasAdminAccess } from "#/lib/permissions.ts";
 import { type IssueFormValues, useFieldContext } from "../issue-form-context";
 
 export default function ReportedByFieldSelector({ existingValue }: { existingValue?: string }) {
   const field = useFieldContext<IssueFormValues["reportedBy"]>();
 
-  const { data: session } = authClientWeb.useSession();
-  const isAdmin = hasAdminAccess(session?.user.role);
+  const currentUser = useCurrentUser();
+  const isAdmin = hasAdminAccess(currentUser.role);
   const [selectedUser, setSelectedUser] = useState<string | undefined>(existingValue);
 
   const fetchedUsers = useQuery(api.core.users.service.getUsers, isAdmin ? {} : "skip") ?? [];

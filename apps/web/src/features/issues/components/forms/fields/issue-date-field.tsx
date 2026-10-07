@@ -5,7 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@redwood/shad-ui/compon
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { CalendarDays, ChevronDownIcon } from "lucide-react";
 import { useState } from "react";
-import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { useCurrentUser } from "#/lib/current-user.tsx";
 import { hasAdminAccess } from "#/lib/permissions.ts";
 import { useFieldContext } from "../issue-form-context";
 
@@ -13,8 +13,8 @@ export default function IssueDateField({ existingDate }: { existingDate: Date })
   const field = useFieldContext<Date>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
   const [date, setDate] = useState<Date | undefined>(existingDate);
-  const { data: session } = authClientWeb.useSession();
-  const isAdmin = hasAdminAccess(session?.user.role);
+  const user = useCurrentUser();
+  const isAdmin = hasAdminAccess(user.role);
 
   return (
     <Field data-invalid={isInvalid}>

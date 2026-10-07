@@ -6,7 +6,7 @@ import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useMutation, useQuery } from "convex/react";
 import { Trash2 } from "lucide-react";
-import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { useCurrentUser } from "#/lib/current-user.tsx";
 import { hasAdminAccess } from "#/lib/permissions.ts";
 import { getTaskFormValues, serializeTaskFormValues, taskFormSchema } from "../../model/task-form-schema";
 import { optimisticallyCreateTask, optimisticallyEditTask } from "../../model/task-optimistic-updates";
@@ -26,9 +26,9 @@ export function TaskForm({
   onSuccess?: () => void;
 }) {
   const thisRoom = useQuery(api.core.classrooms.service.getRoom, { id: roomId });
-  const { data: session } = authClientWeb.useSession();
-  const currentUserEmail = session?.user.email;
-  const isAdmin = hasAdminAccess(session?.user.role);
+  const user = useCurrentUser();
+  const currentUserEmail = user.email;
+  const isAdmin = hasAdminAccess(user.role);
 
   const createTask = useMutation(api.core.tasks.service.addTask).withOptimisticUpdate((localStore, args) => {
     if (!currentUserEmail) return;
