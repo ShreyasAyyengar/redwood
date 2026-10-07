@@ -12,7 +12,7 @@ export default function ClassroomNameCell({ row }: { row: Row<ClassroomSummary> 
   if (row.original.captioning?.isCaptioningThisQuarter) {
     captioningIcon = (
       <Popover>
-        <PopoverTrigger>
+        <PopoverTrigger asChild>
           <Button
             variant="ghost"
             aria-label="Captioning device info"

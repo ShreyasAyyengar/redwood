@@ -3,6 +3,14 @@
 import { api } from "@backend/convex/_generated/api";
 import { Button } from "@redwood/shad-ui/components/button";
 import { Label } from "@redwood/shad-ui/components/label";
+import {
+  MultiSelect,
+  MultiSelectContent,
+  MultiSelectGroup,
+  MultiSelectItem,
+  MultiSelectTrigger,
+  MultiSelectValue,
+} from "@redwood/shad-ui/components/multi-select";
 import { Popover, PopoverContent, PopoverTrigger } from "@redwood/shad-ui/components/popover";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@redwood/shad-ui/components/select";
@@ -11,7 +19,7 @@ import { Switch } from "@redwood/shad-ui/components/switch";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useQuery } from "convex/react";
 import { motion } from "framer-motion";
-import { CalendarClock, Clock, Info, LayoutGrid, ListFilter, RotateCcw, SquareCheckBig, TriangleAlert } from "lucide-react";
+import { CalendarClock, Captions, Clock, Info, LayoutGrid, ListFilter, RotateCcw, SquareCheckBig, Tags, TriangleAlert } from "lucide-react";
 import { useState } from "react";
 import { getActiveFilterCount, useActiveFiltersStore } from "../../model/active-filters";
 import type { RoomStatus } from "../../model/classroom-types";
@@ -20,49 +28,71 @@ function useFiltersController() {
   const {
     exclusive,
     status,
+    attributeIds,
     hasIssues,
     incompleteTasks,
     overdueTasks,
     availableNow,
+    activeCaptioning,
     group,
     setExclusive,
     setStatus,
+    setAttributeIds,
     setHasIssues,
     setIncompleteTasks,
     setOverdueTasks,
     setAvailableNow,
+    setActiveCaptioning,
     setGroup,
   } = useActiveFiltersStore();
 
   const groups = useQuery(api.core.groups.service.getGroups, {});
+  const attributes = useQuery(api.core.attributes.service.getAllAttributes, {});
 
   const resetFilters = () => {
     setExclusive(false);
     setStatus(undefined);
+    setAttributeIds([]);
     setHasIssues(false);
     setIncompleteTasks(false);
     setOverdueTasks(false);
     setAvailableNow(false);
+    setActiveCaptioning(false);
     setGroup(undefined);
   };
 
-  const activeCount = getActiveFilterCount({ exclusive, status, hasIssues, incompleteTasks, overdueTasks, availableNow, group });
-
-  return {
+  const activeCount = getActiveFilterCount({
     exclusive,
     status,
+    attributeIds,
     hasIssues,
     incompleteTasks,
     overdueTasks,
     availableNow,
+    activeCaptioning,
+    group,
+  });
+
+  return {
+    exclusive,
+    status,
+    attributeIds,
+    hasIssues,
+    incompleteTasks,
+    overdueTasks,
+    availableNow,
+    activeCaptioning,
     group,
     groups,
+    attributes,
     setExclusive,
     setStatus,
+    setAttributeIds,
     setHasIssues,
     setIncompleteTasks,
     setOverdueTasks,
     setAvailableNow,
+    setActiveCaptioning,
     setGroup,
     resetFilters,
     activeCount,
@@ -75,22 +105,28 @@ function FilterControls({ controller, idPrefix, compact = false }: { controller:
   const {
     exclusive,
     status,
+    attributeIds,
     hasIssues,
     incompleteTasks,
     overdueTasks,
     availableNow,
+    activeCaptioning,
     group,
     groups,
+    attributes,
     setExclusive,
     setStatus,
+    setAttributeIds,
     setHasIssues,
     setIncompleteTasks,
     setOverdueTasks,
     setAvailableNow,
+    setActiveCaptioning,
     setGroup,
   } = controller;
 
   const sortedGroups = groups ? [...groups].sort((a, b) => a.label.localeCompare(b.label)) : [];
+  const sortedAttributes = attributes ? [...attributes].sort((a, b) => a.label.localeCompare(b.label)) : [];
 
   return (
     <div className="flex flex-col gap-5">
@@ -119,6 +155,45 @@ function FilterControls({ controller, idPrefix, compact = false }: { controller:
               <SelectItem value="Ungrouped">Ungrouped</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="flex flex-col gap-2.5">
+          <div className="flex items-center gap-2 px-1">
+            <Tags className="size-3.5 text-neutral-500" />
+            <h3 className="font-bold text-[10px] text-neutral-600 uppercase tracking-[0.2em]">Room Attributes</h3>
+          </div>
+          <MultiSelect values={attributeIds} onValuesChange={setAttributeIds}>
+            <MultiSelectTrigger
+              className={cn(
+                "h-10 w-full min-w-0 flex-nowrap border-white/5 bg-neutral-800/40 shadow-sm transition-colors hover:bg-neutral-800/60",
+                compact ? "max-w-none" : "max-w-[11rem]"
+              )}
+            >
+              <MultiSelectValue placeholder="All Attributes" overflowBehavior="cutoff" />
+            </MultiSelectTrigger>
+            <MultiSelectContent
+              className="border-white/10 bg-neutral-900 text-neutral-200"
+              search={{ placeholder: "Search attributes...", emptyMessage: "No attributes found." }}
+            >
+              <MultiSelectGroup>
+                {sortedAttributes.map((attribute) => (
+                  <MultiSelectItem
+                    key={attribute._id}
+                    value={attribute._id}
+                    badgeLabel={
+                      <span className="flex min-w-0 items-center gap-1.5">
+                        <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: attribute.color }} />
+                        <span className="truncate">{attribute.label}</span>
+                      </span>
+                    }
+                  >
+                    <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: attribute.color }} />
+                    <span className="truncate">{attribute.label}</span>
+                  </MultiSelectItem>
+                ))}
+              </MultiSelectGroup>
+            </MultiSelectContent>
+          </MultiSelect>
         </div>
 
         <div className="flex flex-col gap-2.5">
@@ -160,6 +235,16 @@ function FilterControls({ controller, idPrefix, compact = false }: { controller:
               </Label>
             </div>
             <Switch id={`${idPrefix}-available-now`} checked={availableNow} onCheckedChange={setAvailableNow} />
+          </div>
+
+          <div className="flex items-center justify-between rounded-lg p-1 px-2 transition-colors hover:bg-white/5">
+            <div className="flex items-center gap-3">
+              <Captions className="size-4 text-violet-400/80" />
+              <Label htmlFor={`${idPrefix}-active-captioning`} className="cursor-pointer text-neutral-300 text-sm">
+                Active Captioning
+              </Label>
+            </div>
+            <Switch id={`${idPrefix}-active-captioning`} checked={activeCaptioning} onCheckedChange={setActiveCaptioning} />
           </div>
 
           <div className="flex items-center justify-between rounded-lg p-1 px-2 transition-colors hover:bg-white/5">
