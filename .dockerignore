@@ -1,0 +1,14 @@
+.git
+.idea
+.codex
+.agents
+.DS_Store
+**/node_modules
+**/.next
+**/.turbo
+**/coverage
+**/*.tsbuildinfo
+**/*.log
+**/.env
+**/.env.*
+!**/.env.example
