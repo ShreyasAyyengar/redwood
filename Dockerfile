@@ -13,8 +13,12 @@ COPY apps/backend/package.json ./apps/backend/package.json
 COPY packages/ui/package.json ./packages/ui/package.json
 COPY packages/typescript-config/package.json ./packages/typescript-config/package.json
 COPY patches ./patches
-RUN --mount=type=cache,id=redwood-bun,target=/root/.bun/install/cache \
-    bun install --frozen-lockfile
+# Start a fresh cache after the failed tarball/integrity checks, and serialize
+# writers. Limit downloads to reduce pressure on the deployment server.
+RUN --mount=type=cache,id=redwood-bun-v2,target=/root/.bun/install/cache,sharing=locked \
+    bun install --frozen-lockfile --network-concurrency=4 \
+    || { install_status=$?; df -h /app /root/.bun/install/cache; \
+         df -i /app /root/.bun/install/cache; exit "$install_status"; }
 
 FROM dependencies AS build
 COPY . .
