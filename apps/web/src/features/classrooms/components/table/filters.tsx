@@ -165,7 +165,7 @@ function FilterControls({ controller, idPrefix, compact = false }: { controller:
           <MultiSelect values={attributeIds} onValuesChange={setAttributeIds}>
             <MultiSelectTrigger
               className={cn(
-                "h-10 w-full min-w-0 flex-nowrap border-white/5 bg-neutral-800/40 shadow-sm transition-colors hover:bg-neutral-800/60",
+                "h-10 w-full min-w-0 flex-nowrap border-white/5 bg-neutral-800/40 shadow-sm transition-colors hover:bg-neutral-800/60 [&>span]:text-white",
                 compact ? "max-w-none" : "max-w-[11rem]"
               )}
             >
