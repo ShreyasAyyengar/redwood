@@ -51,7 +51,6 @@ import { useEffect, useMemo, useState } from "react";
 import { env } from "#/env.ts";
 import FeedbackDialog from "#/features/feedback/components/dialogs/feedback-dialog.tsx";
 import { authClientWeb } from "#/lib/auth-client-web.ts";
-import type { CurrentUser } from "#/lib/current-user.tsx";
 import { hasSupervisorAccess } from "#/lib/permissions.ts";
 import { AccountAvatar } from "./action-menu/account-avatar";
 import type { DeviceSession } from "./action-menu/types";
@@ -79,6 +78,7 @@ const managementItems: NavigationItem[] = [
 ];
 
 const PREFETCH_DELAY_MS = 250;
+type ActiveSession = NonNullable<ReturnType<typeof authClientWeb.useSession>["data"]>;
 
 function NavigationGroup({ items, label, pathname }: { items: NavigationItem[]; label: string; pathname: string }) {
   const { setOpenMobile } = useSidebar();
@@ -112,10 +112,12 @@ function NavigationGroup({ items, label, pathname }: { items: NavigationItem[]; 
   );
 }
 
-function AccountMenu({ user }: { user: CurrentUser }) {
+function AccountMenu({ session }: { session: ActiveSession }) {
   const [deviceSessions, setDeviceSessions] = useState<DeviceSession[]>([]);
   const [isLoadingSessions, setIsLoadingSessions] = useState(false);
   const { isMobile } = useSidebar();
+  const { user, session: activeSession } = session;
+  const activeSessionToken = activeSession.token;
 
   const loadDeviceSessions = async () => {
     setIsLoadingSessions(true);
@@ -129,9 +131,9 @@ function AccountMenu({ user }: { user: CurrentUser }) {
     }
   };
 
-  const switchToSession = async (deviceSession: DeviceSession) => {
-    if (deviceSession.user.id === user._id) return;
-    await authClientWeb.multiSession.setActive({ sessionToken: deviceSession.session.token });
+  const switchToSession = async (sessionToken: string) => {
+    if (sessionToken === activeSessionToken) return;
+    await authClientWeb.multiSession.setActive({ sessionToken });
     window.location.reload();
   };
 
@@ -188,13 +190,13 @@ function AccountMenu({ user }: { user: CurrentUser }) {
                   <DropdownMenuItem disabled>Loading accounts…</DropdownMenuItem>
                 ) : (
                   deviceSessions.map((deviceSession) => {
-                    const isActive = deviceSession.user.id === user._id;
+                    const isActive = deviceSession.session.token === activeSessionToken;
                     const label = deviceSession.user.name ?? deviceSession.user.email ?? "Account";
                     return (
                       <DropdownMenuItem
                         key={deviceSession.session.token}
                         className="gap-2"
-                        onSelect={() => switchToSession(deviceSession).catch(() => undefined)}
+                        onSelect={() => switchToSession(deviceSession.session.token).catch(() => undefined)}
                       >
                         <div className="size-6 shrink-0 overflow-hidden rounded-md">
                           <AccountAvatar account={deviceSession.user} imageAlt={label} />
@@ -223,11 +225,11 @@ function AccountMenu({ user }: { user: CurrentUser }) {
   );
 }
 
-export function AppSidebar({ user }: { user: CurrentUser }) {
+export function AppSidebar({ session }: { session: ActiveSession }) {
   const pathname = usePathname();
   const router = useRouter();
   const { setOpenMobile } = useSidebar();
-  const canAccessAdminPanel = hasSupervisorAccess(user.role);
+  const canAccessAdminPanel = hasSupervisorAccess(session.user.role);
   const visibleManagementItems = useMemo(
     () => (canAccessAdminPanel ? managementItems : managementItems.filter((item) => item.id !== "admin")),
     [canAccessAdminPanel]
@@ -283,7 +285,7 @@ export function AppSidebar({ user }: { user: CurrentUser }) {
           </SidebarMenuItem>
         </SidebarMenu>
 
-        <AccountMenu user={user} />
+        <AccountMenu session={session} />
       </SidebarFooter>
 
       <SidebarRail resizable />

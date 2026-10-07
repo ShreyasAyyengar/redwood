@@ -6,7 +6,7 @@ import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useMutation, useQuery } from "convex/react";
 import { Trash2 } from "lucide-react";
-import { useCurrentUser } from "#/lib/current-user.tsx";
+import { authClientWeb } from "#/lib/auth-client-web.ts";
 import { hasAdminAccess } from "#/lib/permissions.ts";
 import { getIssueFormValues, issueFormSchema, serializeIssueFormValues } from "../../model/issue-form-schema";
 import { optimisticallyCreateIssue, optimisticallyEditIssue } from "../../model/issue-optimistic-updates";
@@ -26,9 +26,9 @@ export function IssueForm({
   existingIssue?: Doc<"issues">;
 }) {
   const thisRoom = useQuery(api.core.classrooms.service.getRoom, { id: roomId });
-  const user = useCurrentUser();
-  const currentUserEmail = user.email;
-  const isAdmin = hasAdminAccess(user.role);
+  const { data: session } = authClientWeb.useSession();
+  const currentUserEmail = session?.user.email;
+  const isAdmin = hasAdminAccess(session?.user.role);
 
   const createIssue = useMutation(api.core.issues.service.createIssue).withOptimisticUpdate((localStore, args) => {
     if (!currentUserEmail) return;

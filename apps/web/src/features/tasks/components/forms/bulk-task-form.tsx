@@ -11,7 +11,7 @@ import { cn } from "@redwood/shad-ui/lib/utils";
 import { useMutation, useQuery } from "convex/react";
 import { useMemo, useState } from "react";
 import { BulkTargetSelector, resolveBulkTargetClassroomIds } from "#/features/classrooms/components/bulk-target-selector.tsx";
-import { useCurrentUser } from "#/lib/current-user.tsx";
+import { authClientWeb } from "#/lib/auth-client-web.ts";
 import { hasAdminAccess } from "#/lib/permissions.ts";
 import { serializeTaskFormValues, taskFormSchema } from "../../model/task-form-schema";
 import { optimisticallyCreateTasks } from "../../model/task-optimistic-updates";
@@ -23,7 +23,7 @@ export function BulkTaskForm({ onSuccess }: { onSuccess?: () => void }) {
   const [selectedAttributeIds, setSelectedAttributeIds] = useState<string[]>([]);
   const [selectedClassroomIds, setSelectedClassroomIds] = useState<string[]>([]);
   const [allClassroomsSelected, setAllClassroomsSelected] = useState(false);
-  const user = useCurrentUser();
+  const { data: session } = authClientWeb.useSession();
 
   const targetSummary = useMemo(
     () =>
@@ -37,10 +37,10 @@ export function BulkTaskForm({ onSuccess }: { onSuccess?: () => void }) {
   );
 
   const bulkAddTasks = useMutation(api.core.tasks.service.bulkAddTasks).withOptimisticUpdate((localStore, args) => {
-    if (!user.email) return;
+    if (!session?.user.email) return;
     optimisticallyCreateTasks(localStore, args, targetSummary.targetClassroomIds as Id<"classrooms">[], {
-      email: user.email,
-      isAdmin: hasAdminAccess(user.role),
+      email: session.user.email,
+      isAdmin: hasAdminAccess(session.user.role),
     });
   });
 

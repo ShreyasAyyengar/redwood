@@ -9,7 +9,7 @@ import { useHotkey } from "@tanstack/react-hotkeys";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 import { Phone, Plus } from "lucide-react";
 import { useCallback, useState } from "react";
-import { useCurrentUser } from "#/lib/current-user.tsx";
+import { authClientWeb } from "#/lib/auth-client-web.ts";
 import { hasAdminAccess, hasSupervisorAccess } from "#/lib/permissions.ts";
 import { DutiesAvailabilityEditor } from "./components/duties/duties-availability-editor.tsx";
 import { HotlineTable } from "./components/table/hotline-table.tsx";
@@ -19,9 +19,9 @@ const EMPTY_CLASSROOMS: Doc<"classrooms">[] = [];
 const EMPTY_USERS: Array<{ email: string }> = [];
 
 export function HotlinePage() {
-  const user = useCurrentUser();
-  const isAdmin = hasAdminAccess(user.role);
-  const canManageCategories = hasSupervisorAccess(user.role);
+  const { data: session } = authClientWeb.useSession();
+  const isAdmin = hasAdminAccess(session?.user.role);
+  const canManageCategories = hasSupervisorAccess(session?.user.role);
   const entries = useQuery(api.core.hotline.log.service.getHotlineEntries, {});
   const categories = useQuery(api.core.hotline.log.service.getHotlineCategories, {}) ?? EMPTY_CATEGORIES;
   const classrooms = useQuery(api.core.classrooms.service.getClassroomLookup, {}) ?? EMPTY_CLASSROOMS;
@@ -95,7 +95,7 @@ export function HotlinePage() {
           categories={categories}
           classrooms={classrooms}
           users={users}
-          currentUserEmail={user.email ?? ""}
+          currentUserEmail={session?.user.email ?? ""}
           editingEntry={editingEntry}
           isAdmin={isAdmin}
           isCreating={isCreating}
@@ -108,7 +108,7 @@ export function HotlinePage() {
       </TabsContent>
 
       <TabsContent value="duties" className="mt-0 flex min-h-0 flex-1 overflow-hidden">
-        <DutiesAvailabilityEditor canRecomputeSchedule={canManageCategories} defaultName={user.name ?? ""} />
+        <DutiesAvailabilityEditor canRecomputeSchedule={canManageCategories} defaultName={session?.user.name ?? ""} />
       </TabsContent>
     </Tabs>
   );

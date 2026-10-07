@@ -4,7 +4,6 @@ import "@redwood/shad-ui/globals.css";
 import { Suspense } from "react";
 import { env } from "../env";
 import { getToken } from "../lib/auth-server";
-import { CurrentUserProvider } from "#/lib/current-user.tsx";
 import AuthLayer from "./_components/auth-layer";
 import NavigatorCommand from "./_components/navigate/navigator-command";
 import Providers from "./_components/providers";
@@ -34,21 +33,19 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <head>{reactScanEnabled && <script crossOrigin="anonymous" src="//unpkg.com/react-scan/dist/auto.global.js" />}</head>
-      <body className={`${geistSans.variable} ${geistMono.variable} dark`}>
-        <Providers initialToken={initialToken}>
-          <Suspense fallback={null}>
-            <AuthLayer />
-          </Suspense>
-          <CurrentUserProvider>
-            <div className="fixed bottom-4 left-4 z-50 lg:hidden">
-              <NavigatorCommand />
-            </div>
+      <Providers initialToken={initialToken}>
+        <Suspense fallback={null}>
+          <AuthLayer />
+        </Suspense>
+        <head>{reactScanEnabled && <script crossOrigin="anonymous" src="//unpkg.com/react-scan/dist/auto.global.js" />}</head>
+        <body className={`${geistSans.variable} ${geistMono.variable} dark`}>
+          <div className="fixed bottom-4 left-4 z-50 lg:hidden">
+            <NavigatorCommand />
+          </div>
 
-            {children}
-          </CurrentUserProvider>
-        </Providers>
-      </body>
+          {children}
+        </body>
+      </Providers>
     </html>
   );
 }

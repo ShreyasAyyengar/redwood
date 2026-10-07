@@ -17,8 +17,6 @@ export const authComponent = createClient<DataModel, typeof authSchema>(componen
   },
 });
 
-export const { getAuthUser } = authComponent.clientApi();
-
 type Role = (typeof roles)[number];
 
 async function getRoleForEmail(ctx: GenericCtx<DataModel>, email: string): Promise<Role> {
