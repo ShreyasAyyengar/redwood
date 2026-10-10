@@ -8,7 +8,7 @@ import { Fragment, type ReactNode, useCallback, useEffect, useState } from "reac
 import { useInView } from "react-intersection-observer";
 
 const FEED_LIST_SHELL_CLASS = "flex h-full w-full min-w-0 justify-center overflow-hidden";
-const FEED_SCROLL_AREA_CLASS = "h-full w-1/2 min-w-0 p-4";
+const FEED_SCROLL_AREA_CLASS = "h-full w-[70%] min-w-0 p-4";
 const STACKED_FEED_LIST_CLASS = "flex min-w-0 flex-col gap-2";
 const VIRTUAL_FEED_ROW_CLASS = "absolute top-0 left-0 w-full min-w-0 pb-2";
 const INTERSECTION_ROOT_MARGIN = "160px 0px";

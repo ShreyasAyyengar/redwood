@@ -53,6 +53,7 @@ function matchesSearch(task: Doc<"tasks">, filters: NonNullable<TaskFeedQueryArg
 }
 
 function taskMatchesFeed(task: Doc<"tasks">, { filters, view }: TaskFeedQueryArgs, roomGroupKey: string | undefined) {
+  if (task.task.visibleAt && Date.parse(task.task.visibleAt) > Date.now()) return false;
   if (view === "OPEN" && task.completion) return false;
   if (!filters) return true;
   return matchesScope(task, filters, roomGroupKey) && matchesState(task, filters) && matchesFlags(task, filters) && matchesSearch(task, filters);

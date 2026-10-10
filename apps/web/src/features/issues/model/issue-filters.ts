@@ -31,6 +31,7 @@ export function toIssueFeedFilters(value: IssueFeedFilterValue | undefined) {
     ...(value.classroomId ? { classroomId: value.classroomId } : {}),
     ...(value.group ? { group: value.group } : {}),
     ...(value.search ? { search: value.search } : {}),
+    ...(value.status ? { status: value.status } : {}),
     ...(created ? { created } : {}),
     ...(resolved ? { resolved } : {}),
     ...(value.urgent !== undefined ? { urgent: value.urgent } : {}),
