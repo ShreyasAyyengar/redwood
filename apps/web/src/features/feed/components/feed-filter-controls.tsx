@@ -1,5 +1,6 @@
 "use client";
 
+import { api } from "@backend/convex/_generated/api";
 import { Badge } from "@redwood/shad-ui/components/badge";
 import { Button } from "@redwood/shad-ui/components/button";
 import { Calendar } from "@redwood/shad-ui/components/calendar";
@@ -7,8 +8,10 @@ import { Checkbox } from "@redwood/shad-ui/components/checkbox";
 import { Input } from "@redwood/shad-ui/components/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@redwood/shad-ui/components/popover";
 import { cn } from "@redwood/shad-ui/lib/utils";
+import { useQuery } from "convex-helpers/react/cache/hooks";
 import { CalendarDays, CheckCircle2, Filter, RotateCcw, Search, ShieldAlert, X } from "lucide-react";
 import type React from "react";
+import { FeedRoomFilter } from "#/features/classrooms/components/feed-room-filter.tsx";
 import type { IssueFeedFilterValue } from "#/features/issues/model/issue-filters.ts";
 import type { TaskFeedFilterValue } from "#/features/tasks/model/task-filters.ts";
 
@@ -36,7 +39,9 @@ type ActiveFilter = {
 };
 
 export function FeedFilterControls(props: FeedFilterControlsProps) {
-  const activeFilters = getActiveFilters(props);
+  const classrooms = useQuery(api.core.classrooms.service.getClassroomLookup, props.value.classroomId ? {} : "skip");
+  const classroomName = classrooms?.find((classroom) => classroom._id === props.value.classroomId)?.displayName;
+  const activeFilters = getActiveFilters(props, classroomName);
   const activeCount = activeFilters.length;
   const searchPlaceholder = props.kind === "tasks" ? "Search task or completion text..." : "Search issue or resolution text...";
 
@@ -89,6 +94,18 @@ export function FeedFilterControls(props: FeedFilterControlsProps) {
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="w-[min(92vw,42rem)] border-white/10 bg-neutral-950 p-4 text-neutral-200">
+              <div className="mb-5 border-white/10 border-b pb-4">
+                <FeedRoomFilter
+                  value={{ group: props.value.group, classroomId: props.value.classroomId }}
+                  onChange={(roomFilter) =>
+                    props.onChange({
+                      ...props.value,
+                      group: roomFilter?.group,
+                      classroomId: roomFilter?.classroomId,
+                    } as never)
+                  }
+                />
+              </div>
               <div className="grid gap-5 md:grid-cols-[1.25fr_1fr]">
                 <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-1">
                   <DateRangePicker
@@ -243,11 +260,25 @@ function CheckboxOption({ checked, label, onChange }: { checked: boolean; label:
   );
 }
 
-function getActiveFilters(props: FeedFilterControlsProps): ActiveFilter[] {
+function getActiveFilters(props: FeedFilterControlsProps, classroomName?: string): ActiveFilter[] {
   const filters: ActiveFilter[] = [];
   const setValue = (next: TaskFeedFilterValue | IssueFeedFilterValue) => props.onChange(next as never);
   const { value } = props;
 
+  if (value.group) {
+    filters.push({
+      key: "group",
+      label: `Room group: ${value.group}`,
+      remove: () => setValue({ ...value, group: undefined, classroomId: undefined }),
+    });
+  }
+  if (value.classroomId) {
+    filters.push({
+      key: "classroomId",
+      label: `Classroom: ${classroomName ?? "Selected classroom"}`,
+      remove: () => setValue({ ...value, classroomId: undefined }),
+    });
+  }
   if (value.search?.trim()) {
     filters.push({ key: "search", label: `Text: ${value.search.trim()}`, remove: () => setValue({ ...value, search: undefined }) });
   }

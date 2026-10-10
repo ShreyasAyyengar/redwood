@@ -4,6 +4,7 @@ import { stream } from "convex-helpers/server/stream";
 import { withSystemFields } from "convex-helpers/server/zod";
 import { convexToZod, zid } from "convex-helpers/server/zod4";
 import { z } from "zod";
+import type { QueryCtx } from "../../_generated/server";
 import { authComponent } from "../../auth.ts";
 import { protectedMutation, protectedQuery, supervisorMutation } from "../../lib/procedures.ts";
 import schema from "../../schema.ts";
@@ -21,6 +22,8 @@ export const issueDoc = z.object(withSystemFields("issues", issueSchema.shape));
 type Issue = z.infer<typeof issueSchema>;
 type IssueFeedFilter = z.infer<typeof issueFeedFilterSchema>;
 type IssueFeedDateRangeFilter = z.infer<typeof issueFeedDateRangeFilterSchema>;
+const MAX_FEED_ROWS_READ = 1000;
+const MAX_FEED_BYTES_READ = 4_194_304;
 
 function isInDateRange(value: string | undefined, range: IssueFeedDateRangeFilter | undefined) {
   if (!range) return true;
@@ -86,55 +89,70 @@ function matchesIssue(issue: Issue, view: "ACTIVE" | "ALL", filters: IssueFeedFi
   );
 }
 
-// ACTIVE: returns paginated unresolved issues, excluding held issues
-// ALL: returns all issues
+const issueFeedArgs = z.object({
+  view: z.enum(["ACTIVE", "ALL"]),
+  filters: issueFeedFilterSchema.optional(),
+  paginationOpts: convexToZod(paginationOptsValidator),
+});
+
+// Keep rows, counts, and exports on the same indexed and filtered query.
+async function getIssueFeedPage(ctx: QueryCtx, args: z.infer<typeof issueFeedArgs>) {
+  const { filters, view } = args;
+  const classroomId = filters?.classroomId;
+
+  let groupClassroomIds: Set<string> | undefined;
+  if (filters?.group && !classroomId) {
+    const { group } = filters;
+    const classrooms = await ctx.db
+      .query("classrooms")
+      .withIndex("byGroupKey", (query) => query.eq("groupKey", group))
+      .collect();
+    groupClassroomIds = new Set(classrooms.map((classroom) => classroom._id));
+  }
+
+  const inferredStatus = filters?.status ?? (filters?.resolved || filters?.hasFindings ? "RESOLVED" : undefined);
+  const indexedStatus = view === "ACTIVE" ? "UNRESOLVED" : inferredStatus;
+  const issues = stream(ctx.db, schema);
+
+  const orderedIssues = classroomId
+    ? indexedStatus
+      ? issues
+          .query("issues")
+          .withIndex("byClassroomIdAndFeed", (query) => query.eq("classroomId", classroomId).eq("feedStatus", indexedStatus))
+          .order("desc")
+      : issues
+          .query("issues")
+          .withIndex("byClassroomIdAndFeed", (query) => query.eq("classroomId", classroomId))
+          .order("desc")
+    : indexedStatus
+      ? issues
+          .query("issues")
+          .withIndex("byFeed", (query) => query.eq("feedStatus", indexedStatus))
+          .order("desc")
+      : issues.query("issues").withIndex("byFeed").order("desc");
+
+  return orderedIssues
+    .filterWith(async (issue) => matchesIssue(issue, view, filters, groupClassroomIds))
+    .paginate({
+      ...args.paginationOpts,
+      maximumRowsRead: MAX_FEED_ROWS_READ,
+      maximumBytesRead: MAX_FEED_BYTES_READ,
+    });
+}
+
+// ACTIVE: returns paginated unresolved issues, excluding held issues.
 export const getIssues = protectedQuery({
-  args: z.object({
-    view: z.enum(["ACTIVE", "ALL"]),
-    filters: issueFeedFilterSchema.optional(),
-    paginationOpts: convexToZod(paginationOptsValidator),
-  }),
+  args: issueFeedArgs,
+  handler: getIssueFeedPage,
+});
 
+// Count pages stay reactive, but only send a tiny marker for each match.
+// Consumers scan these separately from the lazily loaded document pages.
+export const getIssueCount = protectedQuery({
+  args: issueFeedArgs,
   handler: async (ctx, args) => {
-    const { filters, view } = args;
-    const classroomId = filters?.classroomId;
-
-    let groupClassroomIds: Set<string> | undefined;
-    if (filters?.group && !classroomId) {
-      const { group } = filters;
-      const classrooms = await ctx.db
-        .query("classrooms")
-        .withIndex("byGroupKey", (query) => query.eq("groupKey", group))
-        .collect();
-      groupClassroomIds = new Set(classrooms.map((classroom) => classroom._id));
-    }
-
-    const inferredStatus = filters?.status ?? (filters?.resolved || filters?.hasFindings ? "RESOLVED" : undefined);
-    const indexedStatus = view === "ACTIVE" ? "UNRESOLVED" : inferredStatus;
-    const issues = stream(ctx.db, schema);
-
-    const orderedIssues = classroomId
-      ? indexedStatus
-        ? issues
-            .query("issues")
-            .withIndex("byClassroomIdAndFeed", (query) => query.eq("classroomId", classroomId).eq("feedStatus", indexedStatus))
-            .order("desc")
-        : issues
-            .query("issues")
-            .withIndex("byClassroomIdAndFeed", (query) => query.eq("classroomId", classroomId))
-            .order("desc")
-      : indexedStatus
-        ? issues
-            .query("issues")
-            .withIndex("byFeed", (query) => query.eq("feedStatus", indexedStatus))
-            .order("desc")
-        : issues.query("issues").withIndex("byFeed").order("desc");
-
-    return orderedIssues
-      .filterWith(async (issue) => matchesIssue(issue, view, filters, groupClassroomIds))
-      .paginate({
-        ...args.paginationOpts,
-      });
+    const result = await getIssueFeedPage(ctx, args);
+    return { ...result, page: result.page.map(() => 1) };
   },
 });
 
