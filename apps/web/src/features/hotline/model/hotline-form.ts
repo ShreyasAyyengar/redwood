@@ -12,7 +12,7 @@ export const hotlineFormSchema = z.object({
   callerIssueDescription: z.string().trim().min(1, "Describe why the caller contacted the hotline."),
   callerIdentifier: z.string().trim().min(1, "Enter a caller ID."),
   department: departments,
-  calleeResolution: z.string().trim().min(1, "Describe the resolution given to the caller."),
+  calleeResolution: z.string().trim(),
   hotlineCategory: z.string().min(1, "Choose a hotline category."),
   serviceLocation: z.enum(["ON-SITE", "PHONE"]),
 });

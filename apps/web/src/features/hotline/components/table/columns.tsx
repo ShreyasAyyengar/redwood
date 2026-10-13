@@ -60,8 +60,8 @@ export function createHotlineColumns({
       header: "Resolution",
       size: HOTLINE_COLUMN_WIDTHS.resolution,
       cell: ({ getValue }) => (
-        <ScrollableTextCell className={getValue() ? "text-zinc-300" : "text-zinc-600"}>
-          {getValue() || "No resolution recorded"}
+        <ScrollableTextCell className={getValue() ? "text-zinc-300" : "font-bold text-zinc-400"}>
+          <span className={cn(!getValue() && "rounded-full bg-muted px-2 py-1")}>{getValue() || "No resolution recorded"}</span>
         </ScrollableTextCell>
       ),
     }),
