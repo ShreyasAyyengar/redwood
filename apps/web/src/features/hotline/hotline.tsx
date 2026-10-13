@@ -12,6 +12,7 @@ import { useCallback, useState } from "react";
 import { authClientWeb } from "#/lib/auth-client-web.ts";
 import { hasAdminAccess, hasSupervisorAccess } from "#/lib/permissions.ts";
 import { DutiesAvailabilityEditor } from "./components/duties/duties-availability-editor.tsx";
+import { MediaCode } from "./components/media-code/media-code.tsx";
 import { HotlineTable } from "./components/table/hotline-table.tsx";
 
 const EMPTY_CATEGORIES: Doc<"hotlineCategories">[] = [];
@@ -62,14 +63,15 @@ export function HotlinePage() {
       onValueChange={changeTab}
       className="flex h-full min-h-0 w-full flex-col gap-0 overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 shadow-2xl shadow-black/25"
     >
-      <div className="flex shrink-0 items-center justify-between gap-4 border-zinc-800 border-b px-5 py-4">
-        <div className="flex min-w-0 items-center gap-3">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-4 border-zinc-800 border-b px-5 py-4">
+        <div className="flex min-w-0 flex-wrap items-center gap-3">
           <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl border border-sky-500/20 bg-sky-500/10 text-sky-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
             <Phone className="size-5" />
           </div>
           <div className="min-w-0">
             <h2 className="font-bold text-xl text-zinc-100">Hotline</h2>
           </div>
+          <MediaCode canEdit={canManageCategories} />
         </div>
 
         <TabsList className="shrink-0 bg-zinc-950/60">

@@ -5,6 +5,7 @@ import { csvRecordTable } from "./core/csv/table.ts";
 import { groupTable } from "./core/groups/table.ts";
 import { hotlineCategoryTable, hotlineTable } from "./core/hotline/log/table.ts";
 import { hotlineProfileTable, hotlineScheduleStateTable } from "./core/hotline/schedule/table.ts";
+import { hotlineSettingsTable } from "./core/hotline/settings/table.ts";
 import { issueTable } from "./core/issues/table.ts";
 import { maintenanceEntryTable } from "./core/maintenance/table.ts";
 import { taskTable, taskTemplateTable } from "./core/tasks/table.ts";
@@ -26,4 +27,5 @@ export default defineSchema({
   hotlineCategories: hotlineCategoryTable,
   hotlineProfiles: hotlineProfileTable,
   hotlineScheduleState: hotlineScheduleStateTable,
+  hotlineSettings: hotlineSettingsTable,
 });

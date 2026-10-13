@@ -30,6 +30,9 @@ import type * as core_hotline_schedule_runner from "../core/hotline/schedule/run
 import type * as core_hotline_schedule_schemas from "../core/hotline/schedule/schemas.js";
 import type * as core_hotline_schedule_service from "../core/hotline/schedule/service.js";
 import type * as core_hotline_schedule_table from "../core/hotline/schedule/table.js";
+import type * as core_hotline_settings_schemas from "../core/hotline/settings/schemas.js";
+import type * as core_hotline_settings_service from "../core/hotline/settings/service.js";
+import type * as core_hotline_settings_table from "../core/hotline/settings/table.js";
 import type * as core_issues_schemas from "../core/issues/schemas.js";
 import type * as core_issues_service from "../core/issues/service.js";
 import type * as core_issues_table from "../core/issues/table.js";
@@ -79,6 +82,9 @@ declare const fullApi: ApiFromModules<{
   "core/hotline/schedule/schemas": typeof core_hotline_schedule_schemas;
   "core/hotline/schedule/service": typeof core_hotline_schedule_service;
   "core/hotline/schedule/table": typeof core_hotline_schedule_table;
+  "core/hotline/settings/schemas": typeof core_hotline_settings_schemas;
+  "core/hotline/settings/service": typeof core_hotline_settings_service;
+  "core/hotline/settings/table": typeof core_hotline_settings_table;
   "core/issues/schemas": typeof core_issues_schemas;
   "core/issues/service": typeof core_issues_service;
   "core/issues/table": typeof core_issues_table;
