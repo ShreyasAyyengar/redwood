@@ -1,10 +1,11 @@
 import { api } from "@backend/convex/_generated/api";
-import type { Doc } from "@backend/convex/_generated/dataModel";
+import type { Doc, Id } from "@backend/convex/_generated/dataModel";
 import { Button } from "@redwood/shad-ui/components/button";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { useMutation } from "convex/react";
 import { AlertCircle, Loader2, Minus, Plus } from "lucide-react";
 import { useState } from "react";
+import { optimisticallyPatchClassrooms } from "#/features/classrooms/model/classroom-optimistic-updates.ts";
 import { useGroupStore } from "../../model/group-store";
 import GroupDialog from "./group-dialog";
 
@@ -16,7 +17,12 @@ export function GroupSelector({ availableGroups }: { availableGroups: Doc<"group
   const selectedCount = selectedClassroomIds.length;
   const hasSelection = selectedCount > 0;
 
-  const bulkUpdate = useMutation(api.core.groups.service.bulkUpdateClassrooms);
+  const bulkUpdate = useMutation(api.core.groups.service.bulkUpdateClassrooms).withOptimisticUpdate((localStore, args) => {
+    optimisticallyPatchClassrooms(
+      localStore,
+      new Map(args.updates.map(({ classroomId, groupKey }) => [classroomId as Id<"classrooms">, { groupKey }]))
+    );
+  });
 
   const handleApplyBulk = async () => {
     const updates = selectedClassrooms.map((c) => ({

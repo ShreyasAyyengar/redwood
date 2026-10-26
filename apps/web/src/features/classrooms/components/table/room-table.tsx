@@ -33,10 +33,12 @@ export function RoomTable({ data, columns }: { data: ClassroomSummary[]; columns
     useShallow((s) => ({
       exclusive: s.exclusive,
       status: s.status,
+      attributeIds: s.attributeIds,
       hasIssues: s.hasIssues,
       incompleteTasks: s.incompleteTasks,
       overdueTasks: s.overdueTasks,
       availableNow: s.availableNow,
+      activeCaptioning: s.activeCaptioning,
       group: s.group,
     }))
   );

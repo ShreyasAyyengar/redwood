@@ -5,6 +5,7 @@ import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { useMutation } from "convex/react";
 import { AlertCircle, Loader2, Minus, Plus } from "lucide-react";
 import { useState } from "react";
+import { optimisticallyPatchClassrooms } from "#/features/classrooms/model/classroom-optimistic-updates.ts";
 import { useAttributeStore } from "../../model/attribute-store";
 import AttributeDialog from "./attribute-dialog";
 
@@ -16,7 +17,14 @@ export function AttributeSelector({ availableAttributes }: { availableAttributes
   const selectedCount = selectedClassroomIds.length;
   const hasSelection = selectedCount > 0;
 
-  const bulkUpdate = useMutation(api.core.attributes.service.bulkUpdateAttributes);
+  const bulkUpdate = useMutation(api.core.attributes.service.bulkUpdateAttributes).withOptimisticUpdate((localStore, args) => {
+    optimisticallyPatchClassrooms(
+      localStore,
+      new Map(
+        args.updates.map(({ attributes, classroomId }) => [classroomId as Id<"classrooms">, { attributes: attributes as Id<"attributes">[] }])
+      )
+    );
+  });
 
   const handleApplyBulk = async () => {
     const updates = selectedClassrooms.map((c) => ({

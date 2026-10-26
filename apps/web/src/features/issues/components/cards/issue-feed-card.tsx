@@ -1,23 +1,15 @@
 import { api } from "@backend/convex/_generated/api";
 import type { Doc } from "@backend/convex/_generated/dataModel";
+import { toolbox2 } from "@lucide/lab";
 import { Badge } from "@redwood/shad-ui/components/badge";
 import { Card } from "@redwood/shad-ui/components/card";
 import { MultiSelect, MultiSelectContent, MultiSelectItem, MultiSelectTrigger } from "@redwood/shad-ui/components/multi-select";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { useMutation } from "convex/react";
-import {
-  CheckCircle2,
-  ClipboardCheck,
-  Clock3,
-  type LucideIcon,
-  MessageSquare,
-  OctagonPause,
-  TriangleAlert,
-  User,
-  UserCheck,
-} from "lucide-react";
-import { type ReactNode, type RefObject, useEffect, useRef, useState } from "react";
+import { CheckCircle2, ClipboardCheck, Clock3, Drill, Icon, OctagonPause, TriangleAlert, User, UserCheck } from "lucide-react";
+import { type ComponentProps, type RefObject, useEffect, useRef, useState } from "react";
 import { ClassroomAvailabilityPill } from "#/features/classrooms/components/classroom-availability-pill.tsx";
+import { FeedCardDetails, FeedCardMetadata, FeedCardMetadataList, FeedCardNote } from "#/features/feed/components/feed-card-details.tsx";
 import { getDateTimeDisplay } from "#/util/date-time-utils.ts";
 import { urgencyStyle } from "#/util/style-util.ts";
 import { ISSUE_FINDINGS_OPTIONS, type Issue } from "../../model/issue-state";
@@ -27,6 +19,10 @@ type IssueFeedCardIssue = Issue;
 type FindingOption = (typeof ISSUE_FINDINGS_OPTIONS)[number];
 type DateDisplay = ReturnType<typeof getDateTimeDisplay>;
 
+function ToolboxIcon(props: ComponentProps<typeof TriangleAlert>) {
+  return <Icon iconNode={toolbox2} {...props} />;
+}
+
 function areFindingsEqual(a: string[], b: string[]) {
   if (a.length !== b.length) return false;
   const sortedA = [...a].sort();
@@ -34,39 +30,7 @@ function areFindingsEqual(a: string[], b: string[]) {
   return sortedA.every((value, index) => value === sortedB[index]);
 }
 
-function IssueMetaBox({
-  icon: Icon,
-  iconNode,
-  label,
-  value,
-  title,
-  className,
-  iconClassName,
-  valueClassName,
-}: {
-  icon?: LucideIcon;
-  iconNode?: ReactNode;
-  label: string;
-  value: string;
-  title?: string;
-  className?: string;
-  iconClassName?: string;
-  valueClassName?: string;
-}) {
-  return (
-    <div className={cn("flex flex-1 items-center gap-3 rounded-2xl border p-3 text-xs text-zinc-400", className)} title={title}>
-      <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-full", iconClassName)}>
-        {iconNode || (Icon && <Icon className="size-4" />)}
-      </div>
-      <div className="flex min-w-0 flex-col">
-        <span className="font-semibold text-[10px] text-zinc-500 uppercase tracking-[0.18em]">{label}</span>
-        <span className={cn("truncate text-sm text-zinc-300", valueClassName)}>{value}</span>
-      </div>
-    </div>
-  );
-}
-
-function FindingsBox({ issue }: { issue: IssueFeedCardIssue }) {
+function IssueFindingsSelect({ issue }: { issue: IssueFeedCardIssue }) {
   const savedFindings = issue.resolution?.findings ?? [];
   const [selectedFindings, setSelectedFindings] = useState<string[]>(savedFindings);
   const [savingFindings, setSavingFindings] = useState(false);
@@ -98,48 +62,46 @@ function FindingsBox({ issue }: { issue: IssueFeedCardIssue }) {
   };
 
   return (
-    <div className="flex flex-1 items-center gap-3 rounded-2xl border border-emerald-500/10 bg-emerald-500/5 p-3 text-xs text-zinc-400">
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400">
-        <ClipboardCheck className="size-4" />
-      </div>
-      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-        <span className="font-semibold text-[10px] text-emerald-500/70 uppercase tracking-[0.18em]">Findings</span>
-        <MultiSelect
-          modal={false}
-          values={selectedFindings}
-          onValuesChange={setSelectedFindings}
-          onOpenChange={(open) => !open && commitFindings()}
+    <div className="mt-1 min-w-0 max-w-full">
+      <MultiSelect
+        modal={false}
+        values={selectedFindings}
+        onValuesChange={setSelectedFindings}
+        onOpenChange={(open) => !open && commitFindings()}
+      >
+        <MultiSelectTrigger
+          aria-label="Issue findings"
+          title={selectedFindings.length ? selectedFindings.join(", ") : "Select findings"}
+          className="min-h-7 max-w-full gap-1.5 border-zinc-700 bg-zinc-800/40 px-2 py-1 text-[11px] text-zinc-400 hover:bg-zinc-800/70"
+          disabled={savingFindings}
+          onClick={(event) => event.stopPropagation()}
+          onKeyDown={(event) => event.stopPropagation()}
+          onPointerDown={(event) => event.stopPropagation()}
         >
-          <MultiSelectTrigger
-            className="min-h-8 w-full border-emerald-500/10 bg-emerald-500/5 px-2 py-1 text-emerald-100 hover:bg-emerald-500/10"
-            disabled={savingFindings}
-            onClick={(event) => event.stopPropagation()}
-            onKeyDown={(event) => event.stopPropagation()}
-            onPointerDown={(event) => event.stopPropagation()}
-          >
-            {firstFinding ? (
-              <span className="flex min-w-0 flex-1 items-center gap-1.5">
-                <span className="truncate">{firstFinding}</span>
-                {hiddenFindingsCount > 0 && <span className="shrink-0 text-emerald-300/80">+{hiddenFindingsCount}</span>}
-              </span>
-            ) : (
-              <span className="min-w-0 flex-1 truncate text-muted-foreground">Select findings</span>
-            )}
-          </MultiSelectTrigger>
-          <MultiSelectContent
-            search={false}
-            onClick={(event) => event.stopPropagation()}
-            onKeyDown={(event) => event.stopPropagation()}
-            onPointerDown={(event) => event.stopPropagation()}
-          >
-            {ISSUE_FINDINGS_OPTIONS.map((finding) => (
-              <MultiSelectItem key={finding} value={finding}>
-                {finding}
-              </MultiSelectItem>
-            ))}
-          </MultiSelectContent>
-        </MultiSelect>
-      </div>
+          <ClipboardCheck aria-hidden="true" className="size-3.5 shrink-0" />
+          <span className="shrink-0 font-medium">Findings</span>
+          {firstFinding ? (
+            <span className="flex min-w-0 flex-1 items-center gap-1.5">
+              <span className="truncate">{firstFinding}</span>
+              {hiddenFindingsCount > 0 && <span className="shrink-0 text-zinc-500">+{hiddenFindingsCount}</span>}
+            </span>
+          ) : (
+            <span className="min-w-0 flex-1 truncate text-zinc-500">Select findings</span>
+          )}
+        </MultiSelectTrigger>
+        <MultiSelectContent
+          search={false}
+          onClick={(event) => event.stopPropagation()}
+          onKeyDown={(event) => event.stopPropagation()}
+          onPointerDown={(event) => event.stopPropagation()}
+        >
+          {ISSUE_FINDINGS_OPTIONS.map((finding) => (
+            <MultiSelectItem key={finding} value={finding}>
+              {finding}
+            </MultiSelectItem>
+          ))}
+        </MultiSelectContent>
+      </MultiSelect>
     </div>
   );
 }
@@ -154,75 +116,47 @@ function IssueResolutionSection({
   if (!issue.resolution) return null;
 
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-emerald-500/10 bg-emerald-500/5 p-4">
-      {issue.resolution.comment && (
-        <div className="flex items-start gap-3">
-          <MessageSquare className="mt-0.5 size-4 shrink-0 text-emerald-500/50" />
-          <div className="flex flex-col">
-            <span className="font-bold text-[10px] text-emerald-500/70 uppercase tracking-[0.18em]">Resolution Note</span>
-            <p className="text-emerald-200/90 text-sm leading-relaxed">{issue.resolution.comment}</p>
-          </div>
-        </div>
-      )}
-
-      <div className="flex flex-col gap-3 md:flex-row">
-        <IssueMetaBox
-          className="border-emerald-500/10 bg-emerald-500/5"
-          icon={UserCheck}
-          iconClassName="bg-emerald-500/10 text-emerald-400"
-          label="Resolved By"
-          value={issue.resolution.resolvedBy}
-        />
-
+    <FeedCardNote label="Resolution" comment={issue.resolution.comment}>
+      <FeedCardMetadataList>
+        <FeedCardMetadata icon={UserCheck} title={`Resolved by: ${issue.resolution.resolvedBy}`}>
+          <span className="sr-only">Resolved by </span>
+          {issue.resolution.resolvedBy}
+        </FeedCardMetadata>
         {resolutionDateDisplay && (
-          <IssueMetaBox
-            className="border-emerald-500/10 bg-emerald-500/5"
-            icon={Clock3}
-            iconClassName="bg-emerald-500/10 text-emerald-400"
-            label="Resolved"
-            title={`Resolved: ${resolutionDateDisplay.dateAbsolute}`}
-            value={resolutionDateDisplay.dateDaysAgo}
-            valueClassName="text-emerald-200"
-          />
+          <FeedCardMetadata icon={Clock3} title={`Resolved: ${resolutionDateDisplay.dateAbsolute}`}>
+            Resolved {resolutionDateDisplay.dateDaysAgo}
+          </FeedCardMetadata>
         )}
 
-        <FindingsBox issue={issue} />
-      </div>
-    </div>
+        <IssueFindingsSelect issue={issue} />
+      </FeedCardMetadataList>
+    </FeedCardNote>
   );
 }
 
-function getIssueDisplayState(issue: IssueFeedCardIssue) {
-  const isResolved = Boolean(issue.resolution);
+function getOpenIssueStatus(issue: IssueFeedCardIssue) {
+  if (issue.issue.sodId) return { stateText: `Escalated to MSE: ${issue.issue.sodId}`, stateTextClassName: "text-amber-400" };
+  if (issue.issue.cruzfixId) return { stateText: `Escalated to CruzFix: ${issue.issue.cruzfixId}`, stateTextClassName: "text-amber-400" };
+  if (issue.issue.onHold) return { stateText: "On hold", stateTextClassName: "text-zinc-400" };
+}
 
-  if (isResolved) {
+function getIssueDisplayState(issue: IssueFeedCardIssue) {
+  if (issue.resolution) {
     return {
       HeaderIcon: CheckCircle2,
       headerIconClassName: "border-emerald-500/20 bg-emerald-500/10",
       headerIconTextClassName: "text-emerald-400",
-      isResolved,
-      stateIconClassName: "bg-emerald-500/10 text-emerald-400",
-      stateIconNode: <IssueStatusIcon issue={issue} className="size-4" />,
-      stateText: "Closed",
+      stateIconNode: <IssueStatusIcon issue={issue} aria-hidden="true" className="size-3.5 shrink-0" />,
       stateTextClassName: "text-emerald-300",
     };
   }
 
   return {
-    HeaderIcon: issue.issue.onHold ? OctagonPause : TriangleAlert,
+    HeaderIcon: issue.issue.sodId ? ToolboxIcon : issue.issue.cruzfixId ? Drill : issue.issue.onHold ? OctagonPause : TriangleAlert,
     headerIconClassName: issue.issue.urgent ? "border-red-500/20 bg-red-500/10" : "border-amber-500/20 bg-amber-500/10",
     headerIconTextClassName: issue.issue.urgent ? "text-red-400" : "text-amber-400",
-    isResolved,
-    stateIconClassName: issue.issue.urgent ? "bg-red-500/10 text-red-400" : "bg-amber-500/10 text-amber-400",
-    stateIconNode: <IssueStatusIcon issue={issue} className="size-4" />,
-    stateText: issue.issue.sodId
-      ? `Escalated to MSE: ${issue.issue.sodId}`
-      : issue.issue.cruzfixId
-        ? `Escalated to CruzFix: ${issue.issue.cruzfixId}`
-        : issue.issue.urgent
-          ? "Needs Urgent Attention"
-          : "Needs attention",
-    stateTextClassName: issue.issue.sodId ? "text-amber-300" : "text-zinc-200",
+    stateIconNode: <IssueStatusIcon issue={issue} aria-hidden="true" className="size-3.5 shrink-0" />,
+    ...getOpenIssueStatus(issue),
   };
 }
 
@@ -240,8 +174,12 @@ export const IssueFeedCard = ({
 
   const reportedDateDisplay = getDateTimeDisplay(new Date(issue.issue.reportedAt));
   const resolutionDateDisplay = issue.resolution && getDateTimeDisplay(new Date(issue.resolution.resolvedAt));
-  const { HeaderIcon, headerIconClassName, headerIconTextClassName, stateIconClassName, stateIconNode, stateText, stateTextClassName } =
-    getIssueDisplayState(issue);
+  const { HeaderIcon, headerIconClassName, headerIconTextClassName, stateIconNode, stateText, stateTextClassName } = getIssueDisplayState(issue);
+  const statusMetadata = stateText ? (
+    <FeedCardMetadata iconNode={stateIconNode} className={cn("font-medium", stateTextClassName)}>
+      {stateText}
+    </FeedCardMetadata>
+  ) : null;
 
   return (
     <Card
@@ -280,41 +218,24 @@ export const IssueFeedCard = ({
         </div>
       </div>
 
-      <div className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-950/40 p-4">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-zinc-700/70 to-transparent" />
-        <p className="whitespace-pre-wrap text-sm text-zinc-300 leading-relaxed">{issue.issue.description}</p>
-
-        <div className="flex flex-col gap-3 md:flex-row">
-          <IssueMetaBox
-            className="border-zinc-800/80 bg-zinc-950/30"
-            icon={Clock3}
-            iconClassName="bg-zinc-800/80 text-zinc-400"
-            label="Reported At"
-            title={`Reported: ${reportedDateDisplay.dateAbsolute}`}
-            value={reportedDateDisplay.dateDaysAgo}
-            valueClassName="text-indigo-100"
-          />
-
-          <IssueMetaBox
-            className="border-zinc-800/80 bg-zinc-950/30"
-            icon={User}
-            iconClassName="bg-zinc-800/80"
-            label="Reported By"
-            value={issue.issue.reportedBy}
-          />
-
-          <IssueMetaBox
-            className="border-zinc-800/80 bg-zinc-950/30"
-            iconClassName={stateIconClassName}
-            iconNode={stateIconNode}
-            label="Status"
-            value={stateText}
-            valueClassName={cn("font-medium", stateTextClassName)}
-          />
-        </div>
-      </div>
-
-      <IssueResolutionSection issue={issue} resolutionDateDisplay={resolutionDateDisplay || undefined} />
+      <FeedCardDetails
+        label="Issue"
+        description={issue.issue.description}
+        metadata={
+          <FeedCardMetadataList>
+            {!issue.resolution && statusMetadata}
+            <FeedCardMetadata icon={Clock3} title={`Reported: ${reportedDateDisplay.dateAbsolute}`}>
+              Reported {reportedDateDisplay.dateDaysAgo}
+            </FeedCardMetadata>
+            <FeedCardMetadata icon={User} title={`Reported by: ${issue.issue.reportedBy}`}>
+              <span className="sr-only">Reported by </span>
+              {issue.issue.reportedBy}
+            </FeedCardMetadata>
+            {issue.resolution && statusMetadata}
+          </FeedCardMetadataList>
+        }
+        note={issue.resolution && <IssueResolutionSection issue={issue} resolutionDateDisplay={resolutionDateDisplay || undefined} />}
+      />
     </Card>
   );
 };

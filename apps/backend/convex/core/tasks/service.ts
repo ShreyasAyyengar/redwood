@@ -3,6 +3,7 @@ import { ConvexError } from "convex/values";
 import { stream } from "convex-helpers/server/stream";
 import { convexToZod, withSystemFields, zid } from "convex-helpers/server/zod4";
 import { z } from "zod";
+import type { QueryCtx } from "../../_generated/server";
 import { authComponent } from "../../auth.ts";
 import { adminMutation, protectedMutation, protectedQuery, supervisorMutation, supervisorQuery } from "../../lib/procedures.ts";
 import schema from "../../schema.ts";
@@ -21,6 +22,8 @@ export const taskTemplateDoc = z.object(withSystemFields("taskTemplates", taskTe
 type Task = z.infer<typeof taskSchema>;
 type TaskFeedFilter = z.infer<typeof taskFeedFilterSchema>;
 type TaskFeedDateRangeFilter = z.infer<typeof taskFeedDateRangeFilterSchema>;
+const MAX_FEED_ROWS_READ = 1000;
+const MAX_FEED_BYTES_READ = 4_194_304;
 
 function isInDateRange(value: string | undefined, range: TaskFeedDateRangeFilter | undefined) {
   if (!range) return true;
@@ -91,53 +94,70 @@ function completionValuesMatch(left: Task["completion"], right: Task["completion
   return left.completedBy === right.completedBy && left.comment === right.comment && dateValuesMatch(left.completedAt, right.completedAt);
 }
 
+const taskFeedArgs = z.object({
+  view: z.enum(["OPEN", "ALL"]),
+  filters: taskFeedFilterSchema.optional(),
+  paginationOpts: convexToZod(paginationOptsValidator),
+});
+
+async function getTaskFeedPage(ctx: QueryCtx, args: z.infer<typeof taskFeedArgs>) {
+  const { filters, view } = args;
+  const classroomId = filters?.classroomId;
+
+  let groupClassroomIds: Set<string> | undefined;
+  if (filters?.group && !classroomId) {
+    const { group } = filters;
+    const classrooms = await ctx.db
+      .query("classrooms")
+      .withIndex("byGroupKey", (query) => query.eq("groupKey", group))
+      .collect();
+    groupClassroomIds = new Set(classrooms.map((classroom) => classroom._id));
+  }
+
+  const inferredStatus = filters?.status ?? (filters?.completed ? "COMPLETED" : undefined);
+  const indexedStatus = view === "OPEN" ? "OPEN" : inferredStatus;
+  const tasks = stream(ctx.db, schema);
+
+  const orderedTasks = classroomId
+    ? indexedStatus
+      ? tasks
+          .query("tasks")
+          .withIndex("byClassroomIdAndFeed", (query) => query.eq("classroomId", classroomId).eq("feedStatus", indexedStatus))
+          .order("desc")
+      : tasks
+          .query("tasks")
+          .withIndex("byClassroomIdAndFeed", (query) => query.eq("classroomId", classroomId))
+          .order("desc")
+    : indexedStatus
+      ? tasks
+          .query("tasks")
+          .withIndex("byFeed", (query) => query.eq("feedStatus", indexedStatus))
+          .order("desc")
+      : tasks.query("tasks").withIndex("byFeed").order("desc");
+
+  const now = Date.now();
+  return orderedTasks
+    .filterWith(
+      async (task) => (!task.task.visibleAt || Date.parse(task.task.visibleAt) <= now) && matchesTask(task, filters, groupClassroomIds)
+    )
+    .paginate({
+      ...args.paginationOpts,
+      maximumRowsRead: MAX_FEED_ROWS_READ,
+      maximumBytesRead: MAX_FEED_BYTES_READ,
+    });
+}
+
 export const getTasks = protectedQuery({
-  args: z.object({
-    view: z.enum(["OPEN", "ALL"]),
-    filters: taskFeedFilterSchema.optional(),
-    paginationOpts: convexToZod(paginationOptsValidator),
-  }),
+  args: taskFeedArgs,
+  handler: getTaskFeedPage,
+});
 
+// Match the feed's visibility rules as well as its filters when counting.
+export const getTaskCount = protectedQuery({
+  args: taskFeedArgs,
   handler: async (ctx, args) => {
-    const { filters, view } = args;
-    const classroomId = filters?.classroomId;
-
-    let groupClassroomIds: Set<string> | undefined;
-    if (filters?.group && !classroomId) {
-      const { group } = filters;
-      const classrooms = await ctx.db
-        .query("classrooms")
-        .withIndex("byGroupKey", (query) => query.eq("groupKey", group))
-        .collect();
-      groupClassroomIds = new Set(classrooms.map((classroom) => classroom._id));
-    }
-
-    const inferredStatus = filters?.status ?? (filters?.completed ? "COMPLETED" : undefined);
-    const indexedStatus = view === "OPEN" ? "OPEN" : inferredStatus;
-    const tasks = stream(ctx.db, schema);
-
-    const orderedTasks = classroomId
-      ? indexedStatus
-        ? tasks
-            .query("tasks")
-            .withIndex("byClassroomIdAndFeed", (query) => query.eq("classroomId", classroomId).eq("feedStatus", indexedStatus))
-            .order("desc")
-        : tasks
-            .query("tasks")
-            .withIndex("byClassroomIdAndFeed", (query) => query.eq("classroomId", classroomId))
-            .order("desc")
-      : indexedStatus
-        ? tasks
-            .query("tasks")
-            .withIndex("byFeed", (query) => query.eq("feedStatus", indexedStatus))
-            .order("desc")
-        : tasks.query("tasks").withIndex("byFeed").order("desc");
-
-    return orderedTasks
-      .filterWith(async (task) => matchesTask(task, filters, groupClassroomIds))
-      .paginate({
-        ...args.paginationOpts,
-      });
+    const result = await getTaskFeedPage(ctx, args);
+    return { ...result, page: result.page.map(() => 1) };
   },
 });
 

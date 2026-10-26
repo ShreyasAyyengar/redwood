@@ -30,7 +30,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <SidebarTrigger className="size-8" />
           <span className="font-semibold">{pageTitles[pathname] ?? "Redwood"}</span>
         </header>
-        <div className="flex min-h-0 w-full flex-1 overflow-hidden">{children}</div>
+        <div className="flex min-h-0 w-full min-w-0 flex-1 overflow-x-auto overflow-y-hidden [&>*]:min-w-fit">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

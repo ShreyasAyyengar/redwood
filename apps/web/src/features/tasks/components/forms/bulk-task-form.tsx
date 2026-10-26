@@ -11,7 +11,10 @@ import { cn } from "@redwood/shad-ui/lib/utils";
 import { useMutation, useQuery } from "convex/react";
 import { useMemo, useState } from "react";
 import { BulkTargetSelector, resolveBulkTargetClassroomIds } from "#/features/classrooms/components/bulk-target-selector.tsx";
+import { authClientWeb } from "#/lib/auth-client-web.ts";
+import { hasAdminAccess } from "#/lib/permissions.ts";
 import { serializeTaskFormValues, taskFormSchema } from "../../model/task-form-schema";
+import { optimisticallyCreateTasks } from "../../model/task-optimistic-updates";
 import { type TaskFormValues, taskAppForm } from "./task-form-context";
 import { TaskFormFields } from "./task-form-fields";
 
@@ -20,8 +23,7 @@ export function BulkTaskForm({ onSuccess }: { onSuccess?: () => void }) {
   const [selectedAttributeIds, setSelectedAttributeIds] = useState<string[]>([]);
   const [selectedClassroomIds, setSelectedClassroomIds] = useState<string[]>([]);
   const [allClassroomsSelected, setAllClassroomsSelected] = useState(false);
-
-  const bulkAddTasks = useMutation(api.core.tasks.service.bulkAddTasks);
+  const { data: session } = authClientWeb.useSession();
 
   const targetSummary = useMemo(
     () =>
@@ -33,6 +35,14 @@ export function BulkTaskForm({ onSuccess }: { onSuccess?: () => void }) {
       }),
     [allClassroomsSelected, fetchedRooms, selectedAttributeIds, selectedClassroomIds]
   );
+
+  const bulkAddTasks = useMutation(api.core.tasks.service.bulkAddTasks).withOptimisticUpdate((localStore, args) => {
+    if (!session?.user.email) return;
+    optimisticallyCreateTasks(localStore, args, targetSummary.targetClassroomIds as Id<"classrooms">[], {
+      email: session.user.email,
+      isAdmin: hasAdminAccess(session.user.role),
+    });
+  });
 
   const form = taskAppForm({
     defaultValues: {
@@ -46,6 +56,8 @@ export function BulkTaskForm({ onSuccess }: { onSuccess?: () => void }) {
       onChange: taskFormSchema,
     },
     onSubmit: async ({ value }) => {
+      onSuccess?.();
+
       if (targetSummary.targetClassroomIds.length === 0) return;
 
       await bulkAddTasks({
@@ -53,7 +65,6 @@ export function BulkTaskForm({ onSuccess }: { onSuccess?: () => void }) {
         attributeIds: selectedAttributeIds as Id<"attributes">[],
         classroomIds: selectedClassroomIds as Id<"classrooms">[],
       });
-      onSuccess?.();
     },
   });
 
