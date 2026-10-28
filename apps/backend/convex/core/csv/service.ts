@@ -18,6 +18,12 @@ const processClassroomsByCSVArgs = z.object({
 type ProcessClassroomsByCSVArgs = z.infer<typeof processClassroomsByCSVArgs>;
 type CsvActionCtx = Pick<ActionCtx, "runMutation" | "storage">;
 
+const replaceClassroomsFromCSVArgs = z.object({
+  csvFileStorageId: zid("_storage").optional(),
+  fileName: z.string().min(1),
+  rooms: z.array(csvRoomSchema).min(1),
+});
+
 export const generateCSVUploadUrl = supervisorMutation({
   returns: z.string(),
   handler: (ctx) => ctx.storage.generateUploadUrl(),
@@ -36,7 +42,7 @@ async function processClassroomsByCSVFile(ctx: CsvActionCtx, args: ProcessClassr
       relax_quotes: true,
       relax_column_count: true,
     }) as unknown[];
-    const typedRows = z.array(csvRowSchema).parse(parsedRows);
+    const typedRows = z.array(csvRowSchema).min(1, "CSV must contain at least one classroom.").parse(parsedRows);
     const rowsByRoom = new Map<string, z.infer<typeof csvRowSchema>[]>();
 
     for (const row of typedRows) {
@@ -50,12 +56,20 @@ async function processClassroomsByCSVFile(ctx: CsvActionCtx, args: ProcessClassr
       schedule: scheduleSchema.parse(processTimeRanges(rows)),
     }));
 
-    await ctx.runMutation(internal.core.csv.service.replaceClassroomsFromCSV, {
+    const replacement = {
+      csvFileStorageId: args.csvFileStorageId,
       fileName: args.fileName,
       rooms,
-    });
+    };
 
-    await ctx.storage.delete(args.csvFileStorageId);
+    if (args.effectiveOn) {
+      await ctx.runMutation(internal.core.csv.service.scheduleClassroomsFromCSV, {
+        ...replacement,
+        effectiveOn: args.effectiveOn,
+      });
+    } else {
+      await ctx.runMutation(internal.core.csv.service.replaceClassroomsFromCSV, replacement);
+    }
   } catch (error) {
     if (error instanceof ConvexError) throw error;
 
@@ -70,37 +84,41 @@ export const loadClassroomsByCSV = supervisorAction({
   args: processClassroomsByCSVArgs,
   returns: z.object({ success: z.boolean() }),
   handler: async (ctx, args) => {
-    const csvFile = await ctx.storage.get(args.csvFileStorageId);
-    if (!csvFile) throw new ConvexError({ code: "NOT_FOUND", message: "CSV file not found." });
-
-    if (args.effectiveOn) {
-      await ctx.scheduler.runAt(new Date(args.effectiveOn), internal.core.csv.service.processClassroomsByCSV, {
-        csvFileStorageId: args.csvFileStorageId,
-        fileName: args.fileName,
-      });
-
-      return { success: true };
-    }
-
     await processClassroomsByCSVFile(ctx, args);
     return { success: true };
   },
 });
 
+export const scheduleClassroomsFromCSV = internalMutation({
+  args: replaceClassroomsFromCSVArgs.extend({
+    csvFileStorageId: zid("_storage"),
+    effectiveOn: z.iso.datetime(),
+  }),
+  returns: z.null(),
+  handler: async (ctx, { effectiveOn, ...replacement }) => {
+    const effectiveAt = Date.parse(effectiveOn);
+    if (effectiveAt <= Date.now()) {
+      throw new ConvexError({ code: "BAD_REQUEST", message: "Choose a future effective date, or apply the CSV immediately." });
+    }
+
+    // Validate before enqueueing, then let Convex retry the atomic replacement on transient failures.
+    await ctx.scheduler.runAt(effectiveAt, internal.core.csv.service.replaceClassroomsFromCSV, replacement);
+    return null;
+  },
+});
+
+// Keep this entry point for uploads already queued before replacements were scheduled directly.
 export const processClassroomsByCSV = internalAction({
   args: processClassroomsByCSVArgs,
   returns: z.null(),
   handler: async (ctx, args) => {
-    await processClassroomsByCSVFile(ctx, args);
+    await processClassroomsByCSVFile(ctx, { ...args, effectiveOn: undefined });
     return null;
   },
 });
 
 export const replaceClassroomsFromCSV = internalMutation({
-  args: z.object({
-    fileName: z.string().min(1),
-    rooms: z.array(csvRoomSchema),
-  }),
+  args: replaceClassroomsFromCSVArgs,
   returns: z.object({
     created: z.number(),
     updated: z.number(),
@@ -150,6 +168,8 @@ export const replaceClassroomsFromCSV = internalMutation({
       fileName: args.fileName,
       dateUploaded: new Date().toISOString(),
     });
+
+    if (args.csvFileStorageId) await ctx.storage.delete(args.csvFileStorageId);
 
     return { created, updated, deactivated };
   },
