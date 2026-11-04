@@ -1,5 +1,5 @@
 import { api } from "@backend/convex/_generated/api";
-import type { Id } from "@backend/convex/_generated/dataModel";
+import type { Doc, Id } from "@backend/convex/_generated/dataModel";
 import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { Separator } from "@redwood/shad-ui/components/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwood/shad-ui/components/tooltip";
@@ -10,6 +10,7 @@ import { CalendarDays, ClipboardClock, UserCog } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { formatDate, getDateTimeDisplay } from "#/util/date-time-utils.ts";
+import { ChecklistSummary } from "./checklist-controls";
 import MaintenanceDialog from "./dialogs/maintenance-dialog.tsx";
 
 const INTERSECTION_ROOT_MARGIN = "160px 0px";
@@ -59,7 +60,7 @@ export default function MaintenanceHistory({ roomId }: { roomId: Id<"classrooms"
   if (isLoading) return <MaintenanceHistorySkeleton />;
 
   return (
-    <div className="flex h-full flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/80 sm:text-2xl">
+    <div className="flex h-full flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 p-5 text-xl font-bold text-zinc-300/80 shadow-xl/80 sm:text-2xl">
       <div className="flex items-center">
         <ClipboardClock className="mr-2 size-6" />
         <div>Maintenance History</div>
@@ -102,11 +103,33 @@ export default function MaintenanceHistory({ roomId }: { roomId: Id<"classrooms"
               const entry = maintenanceHistory[virtualItem.index];
               if (!entry) return null;
 
+              if (entry.checklist)
+                return (
+                  <div
+                    key={virtualItem.key}
+                    data-index={virtualItem.index}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      transform: `translateY(${virtualItem.start}px)`,
+                      paddingBottom: "8px",
+                    }}
+                    ref={(node) => {
+                      rowVirtualizer.measureElement(node);
+                      if (virtualItem.index === loadMoreIndex) loadMoreRef(node);
+                    }}
+                  >
+                    <ChecklistHistoryCard entry={entry} />
+                  </div>
+                );
+
               const date = new Date(entry.date);
               const formatDateShort = formatDate(date);
               const { dateAbsolute } = getDateTimeDisplay(date);
 
-              const who = entry.completedBy.split("@")[0];
+              const [who] = entry.completedBy.split("@");
 
               const microphoneEntries = entry.microphone ? Object.entries(entry.microphone) : [];
               const dtenEntries = entry.dten ? Object.entries(entry.dten) : [];
@@ -174,15 +197,15 @@ export default function MaintenanceHistory({ roomId }: { roomId: Id<"classrooms"
 
                                   <Tooltip>
                                     <TooltipTrigger asChild>
-                                      <div className="font-semibold text-base text-neutral-100 sm:text-lg">{formatDateShort}</div>
+                                      <div className="text-base font-semibold text-neutral-100 sm:text-lg">{formatDateShort}</div>
                                     </TooltipTrigger>
                                     <TooltipContent className="bg-zinc-900 fill-zinc-900" tooltipArrowClassName="bg-zinc-900 fill-zinc-900">
-                                      <p className="font-bold text-neutral-300 text-sm">{dateAbsolute}</p>
+                                      <p className="text-sm font-bold text-neutral-300">{dateAbsolute}</p>
                                     </TooltipContent>
                                   </Tooltip>
                                 </div>
 
-                                <div className="mt-1 flex items-center gap-2 text-neutral-400 text-xs sm:text-sm">
+                                <div className="mt-1 flex items-center gap-2 text-xs text-neutral-400 sm:text-sm">
                                   <UserCog className="size-5 text-neutral-400" />
                                   <span className="inline-flex h-5 items-center rounded-md bg-neutral-500/15 px-2 font-mono text-neutral-300">
                                     {who}
@@ -192,17 +215,17 @@ export default function MaintenanceHistory({ roomId }: { roomId: Id<"classrooms"
 
                               <div className="flex shrink-0 flex-col flex-wrap items-end justify-end space-y-1">
                                 {!hasIssues && !hasTasks && (
-                                  <span className="rounded-md border border-emerald-500/30 bg-emerald-500/15 px-2 py-0.5 font-semibold text-[11px] text-emerald-300">
+                                  <span className="rounded-md border border-emerald-500/30 bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
                                     clean pass
                                   </span>
                                 )}
 
                                 {hasIssues && (
                                   <div className="flex text-sm">
-                                    <span className="rounded-md rounded-r-none border border-red-500/30 border-r-0 bg-red-500/15 px-2 py-0.5 font-semibold text-[11px] text-red-300">
+                                    <span className="rounded-md rounded-r-none border border-r-0 border-red-500/30 bg-red-500/15 px-2 py-0.5 text-[11px] font-semibold text-red-300">
                                       {issueChecks.length} blocked
                                     </span>
-                                    <span className="rounded-md rounded-l-none border border-red-500/30 bg-red-500/15 px-2 py-0.5 font-semibold text-[11px] text-red-300">
+                                    <span className="rounded-md rounded-l-none border border-red-500/30 bg-red-500/15 px-2 py-0.5 text-[11px] font-semibold text-red-300">
                                       {issueChecks
                                         .slice(0, 1)
                                         .map(([key]) => key)
@@ -214,10 +237,10 @@ export default function MaintenanceHistory({ roomId }: { roomId: Id<"classrooms"
 
                                 {hasTasks && (
                                   <div className="flex text-sm">
-                                    <span className="rounded-md rounded-r-none border border-amber-500/30 border-r-0 bg-amber-500/15 px-2 py-0.5 font-semibold text-[11px] text-amber-300">
+                                    <span className="rounded-md rounded-r-none border border-r-0 border-amber-500/30 bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-300">
                                       {taskChecks.length} follow-up
                                     </span>
-                                    <span className="rounded-md rounded-l-none border border-amber-500/30 bg-amber-500/15 px-2 py-0.5 font-semibold text-[11px] text-amber-300">
+                                    <span className="rounded-md rounded-l-none border border-amber-500/30 bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-300">
                                       {taskChecks
                                         .slice(0, 1)
                                         .map(([key]) => key)
@@ -229,10 +252,10 @@ export default function MaintenanceHistory({ roomId }: { roomId: Id<"classrooms"
 
                                 {hasFixes && (
                                   <div className="flex text-sm">
-                                    <span className="rounded-md rounded-r-none border border-sky-500/30 border-r-0 bg-sky-500/15 px-2 py-0.5 font-semibold text-[11px] text-sky-300">
+                                    <span className="rounded-md rounded-r-none border border-r-0 border-sky-500/30 bg-sky-500/15 px-2 py-0.5 text-[11px] font-semibold text-sky-300">
                                       {fixedChecks.length} corrected
                                     </span>
-                                    <span className="rounded-md rounded-l-none border border-sky-500/30 bg-sky-500/15 px-2 py-0.5 font-semibold text-[11px] text-sky-300">
+                                    <span className="rounded-md rounded-l-none border border-sky-500/30 bg-sky-500/15 px-2 py-0.5 text-[11px] font-semibold text-sky-300">
                                       {fixedChecks
                                         .slice(0, 1)
                                         .map(([key]) => key)
@@ -250,7 +273,7 @@ export default function MaintenanceHistory({ roomId }: { roomId: Id<"classrooms"
                                   <div className="flex items-center gap-2">
                                     <span
                                       className={cn(
-                                        "w-fit rounded-md px-2 py-1 font-semibold text-[11px]",
+                                        "w-fit rounded-md px-2 py-1 text-[11px] font-semibold",
                                         entry.surfacesWiped ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"
                                       )}
                                     >
@@ -258,7 +281,7 @@ export default function MaintenanceHistory({ roomId }: { roomId: Id<"classrooms"
                                     </span>
                                     <span
                                       className={cn(
-                                        "w-fit rounded-md px-2 py-1 font-semibold text-[11px]",
+                                        "w-fit rounded-md px-2 py-1 text-[11px] font-semibold",
                                         entry.equipmentChecked ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"
                                       )}
                                     >
@@ -270,12 +293,12 @@ export default function MaintenanceHistory({ roomId }: { roomId: Id<"classrooms"
                                 {(entry.microphone || entry.dten) && (
                                   <div className="flex items-center gap-2">
                                     {entry.microphone && (
-                                      <span className="w-fit rounded-md bg-neutral-700/70 px-2 py-1 font-semibold text-[11px] text-neutral-200">
+                                      <span className="w-fit rounded-md bg-neutral-700/70 px-2 py-1 text-[11px] font-semibold text-neutral-200">
                                         Mic checked
                                       </span>
                                     )}
                                     {entry.dten && (
-                                      <span className="w-fit rounded-md bg-neutral-700/70 px-2 py-1 font-semibold text-[11px] text-neutral-200">
+                                      <span className="w-fit rounded-md bg-neutral-700/70 px-2 py-1 text-[11px] font-semibold text-neutral-200">
                                         DTEN checked
                                       </span>
                                     )}
@@ -298,9 +321,54 @@ export default function MaintenanceHistory({ roomId }: { roomId: Id<"classrooms"
   );
 }
 
+function ChecklistHistoryCard({ entry }: { entry: Doc<"maintenance"> }) {
+  const { checklist } = entry;
+  if (!checklist) return null;
+  const tone =
+    checklist.summary.status === "blocked"
+      ? "border-red-500/30"
+      : checklist.summary.status === "corrective_actions"
+        ? "border-amber-500/30"
+        : checklist.summary.status === "clean_pass"
+          ? "border-emerald-500/30"
+          : "border-zinc-700";
+  return (
+    <MaintenanceDialog roomId={entry.classroomId} maintenanceEntry={entry}>
+      <button
+        type="button"
+        className={`w-full space-y-3 rounded-xl border bg-neutral-800/70 px-4 py-3 text-left transition hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-indigo-400 ${tone}`}
+      >
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div className="space-y-1">
+            <span className="flex items-center gap-2 text-base font-semibold text-zinc-100">
+              <CalendarDays className="size-4" />
+              {formatDate(new Date(entry.date))}
+            </span>
+            <span className="flex items-center gap-2 text-xs text-zinc-400">
+              <UserCog className="size-4" />
+              {entry.completedBy.split("@")[0]}
+            </span>
+          </div>
+          <ChecklistSummary summary={checklist.summary} />
+        </div>
+        <div className="flex flex-wrap gap-2 text-xs font-normal text-zinc-400">
+          {checklist.sections.map((section) => (
+            <span key={section.id} className="rounded bg-zinc-700/40 px-2 py-1">
+              {section.label}
+            </span>
+          ))}
+          <span className="py-1">
+            {checklist.answers.length} answers · v{checklist.versionNumber}
+          </span>
+        </div>
+      </button>
+    </MaintenanceDialog>
+  );
+}
+
 export function MaintenanceHistorySkeleton() {
   return (
-    <div className="flex h-full flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 p-5 font-bold text-xl text-zinc-300/80 shadow-xl/80 sm:text-2xl">
+    <div className="flex h-full flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-neutral-900/95 p-5 text-xl font-bold text-zinc-300/80 shadow-xl/80 sm:text-2xl">
       <div className="flex items-center">
         <ClipboardClock className="mr-2 size-6" />
         <div>Maintenance History</div>
@@ -329,7 +397,7 @@ function MaintenanceHistoryCardSkeleton() {
           </div>
 
           {/* Completed by row */}
-          <div className="mt-1 flex items-center gap-2 text-neutral-400 text-xs sm:text-sm">
+          <div className="mt-1 flex items-center gap-2 text-xs text-neutral-400 sm:text-sm">
             <UserCog className="size-5 text-neutral-400" />
             <div className="h-5 w-20 animate-pulse rounded-md bg-zinc-700/50" />
           </div>

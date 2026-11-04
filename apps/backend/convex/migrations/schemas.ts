@@ -3,7 +3,7 @@ import { attributeSchema } from "../core/attributes/schemas.ts";
 import { classroomSchema } from "../core/classrooms/schemas.ts";
 import { groupSchema } from "../core/groups/schemas.ts";
 import { issueSchema } from "../core/issues/schemas.ts";
-import { maintenanceEntrySchema } from "../core/maintenance/schemas.ts";
+import { legacyMaintenanceEntrySchema } from "../core/maintenance/schemas.ts";
 import { taskSchema } from "../core/tasks/schemas.ts";
 
 const migrationMetadataSchema = z.object({
@@ -25,7 +25,7 @@ export const taskImportSchema = taskSchema.omit({ classroomId: true }).extend({
   ...migrationMetadataSchema.shape,
   legacyClassroomId: z.string(),
 });
-export const maintenanceImportSchema = maintenanceEntrySchema.omit({ classroomId: true }).extend({
+export const maintenanceImportSchema = legacyMaintenanceEntrySchema.omit({ classroomId: true }).extend({
   ...migrationMetadataSchema.shape,
   legacyClassroomId: z.string(),
 });

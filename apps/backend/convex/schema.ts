@@ -7,7 +7,7 @@ import { hotlineCategoryTable, hotlineTable } from "./core/hotline/log/table.ts"
 import { hotlineProfileTable, hotlineScheduleStateTable } from "./core/hotline/schedule/table.ts";
 import { hotlineSettingsTable } from "./core/hotline/settings/table.ts";
 import { issueTable } from "./core/issues/table.ts";
-import { maintenanceEntryTable } from "./core/maintenance/table.ts";
+import { maintenanceEntryTable, maintenanceTemplateTable, maintenanceTemplateVersionTable } from "./core/maintenance/table.ts";
 import { taskTable, taskTemplateTable } from "./core/tasks/table.ts";
 import { redwoodUserTable } from "./core/users/table.ts";
 import { mongoMigrationIdTable } from "./migrations/table.ts";
@@ -19,6 +19,8 @@ export default defineSchema({
   tasks: taskTable,
   taskTemplates: taskTemplateTable,
   maintenance: maintenanceEntryTable,
+  maintenanceTemplates: maintenanceTemplateTable,
+  maintenanceTemplateVersions: maintenanceTemplateVersionTable,
   attributes: attributeTable,
   redwoodUsers: redwoodUserTable,
   groups: groupTable,

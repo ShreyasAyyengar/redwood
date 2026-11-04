@@ -6,13 +6,15 @@ import { ScrollArea } from "@redwood/shad-ui/components/scroll-area";
 import { Separator } from "@redwood/shad-ui/components/separator";
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
-import { insertAtPosition, useMutation } from "convex/react";
+import { insertAtPosition, useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { IssueDialog } from "#/features/issues/components/dialogs/issue-dialog.tsx";
 import { TaskDialog } from "#/features/tasks/components/dialogs/task-dialog.tsx";
 import { authClientWeb } from "#/lib/auth-client-web.ts";
 import { type MaintenanceFormValues, maintenanceFormSchema, serializeMaintenanceFormValues } from "../../model/maintenance-form-schema";
+import { ChecklistNotice, maintenanceErrorMessage } from "../checklist-controls";
 import { MaintenanceAideDialog } from "../dialogs/maintenance-aide-dialog";
+import { ChecklistRecord, ConfiguredMaintenanceForm } from "./configured-maintenance-form";
 import DateField from "./fields/date-field";
 import DTENField from "./fields/dten-field";
 import EquipmentCheckedField from "./fields/equipment-checked";
@@ -43,6 +45,24 @@ export default function MaintenanceForm({
   maintenanceEntry?: Doc<"maintenance">;
   onSuccess?: () => void;
 }) {
+  const checklist = useQuery(api.core.maintenance.service.getChecklist, maintenanceEntry ? "skip" : { classroomId: roomId });
+  if (maintenanceEntry?.checklist) return <ChecklistRecord entry={maintenanceEntry} />;
+  if (maintenanceEntry) return <LegacyMaintenanceForm roomId={roomId} maintenanceEntry={maintenanceEntry} />;
+  if (checklist === undefined) return <p className="p-4 text-sm text-zinc-400">Loading maintenance checklist…</p>;
+  if (checklist) return <ConfiguredMaintenanceForm roomId={roomId} checklist={checklist} onSuccess={onSuccess} />;
+  return <LegacyMaintenanceForm roomId={roomId} onSuccess={onSuccess} />;
+}
+
+function LegacyMaintenanceForm({
+  roomId,
+  maintenanceEntry,
+  onSuccess,
+}: {
+  roomId: Id<"classrooms">;
+  maintenanceEntry?: Doc<"maintenance">;
+  onSuccess?: () => void;
+}) {
+  const [error, setError] = useState("");
   const [aideOpen, setAideOpen] = useState(false);
   const [aideType, setAideType] = useState<"task" | "issue" | null>(null);
 
@@ -89,12 +109,13 @@ export default function MaintenanceForm({
       onChange: maintenanceFormSchema,
     },
     onSubmit: async ({ value }) => {
-      onSuccess?.();
-
-      await createMaintenanceLog({
-        ...serializeMaintenanceFormValues(value),
-        classroomId: roomId,
-      });
+      setError("");
+      try {
+        await createMaintenanceLog({ ...serializeMaintenanceFormValues(value), classroomId: roomId });
+        onSuccess?.();
+      } catch (failure) {
+        setError(maintenanceErrorMessage(failure));
+      }
     },
   });
 
@@ -120,7 +141,8 @@ export default function MaintenanceForm({
 
   return (
     <>
-      <ScrollArea className="max-h-[calc(100dvh-300px)] rounded-2xl bg-background/40 p-3">
+      {error && <ChecklistNotice error>{error}</ChecklistNotice>}
+      <ScrollArea className="bg-background/40 max-h-[calc(100dvh-300px)] rounded-2xl p-3">
         <div className="my-2 flex flex-col gap-5 px-1">
           {/* Date */}
           <form.AppField name="date">
@@ -136,7 +158,7 @@ export default function MaintenanceForm({
           <Separator className="bg-indigo-500" />
           {/* General Maintenance */}
           <div className="flex flex-col items-start">
-            <h2 className="mb-3 font-semibold text-lg">General Maintenance</h2>
+            <h2 className="mb-3 text-lg font-semibold">General Maintenance</h2>
             <div className="w-full justify-center space-y-3 rounded-md bg-zinc-950/30 p-3 ring-1 ring-white/15">
               <form.AppField name="surfacesWiped">{(field) => <field.SurfacesWipedField existingEntry={maintenanceEntry} />}</form.AppField>
               <form.AppField name="equipmentChecked">
@@ -155,7 +177,7 @@ export default function MaintenanceForm({
             {([canSubmit, isSubmitting]) => (
               <Button
                 className={cn(
-                  `${canSubmit ? "bg-foreground hover:cursor-pointer hover:bg-foreground/50" : "cursor-not-allowed hover:bg-accent"}`,
+                  `${canSubmit ? "bg-foreground hover:bg-foreground/50 hover:cursor-pointer" : "hover:bg-accent cursor-not-allowed"}`,
                   `${isSubmitting ? "cursor-wait" : "cursor-default"}`
                 )}
                 onClick={form.handleSubmit}

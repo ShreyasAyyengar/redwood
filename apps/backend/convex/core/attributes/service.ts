@@ -3,6 +3,7 @@ import { withSystemFields } from "convex-helpers/server/zod";
 import { z } from "zod";
 import { protectedQuery, supervisorMutation } from "../../lib/procedures.ts";
 import { classroomDoc } from "../classrooms/service.ts";
+import type { MaintenanceSection } from "../maintenance/definitions.ts";
 import { attributeSchema } from "./schemas.ts";
 
 export const attributeDoc = z.object(withSystemFields("attributes", attributeSchema.shape));
@@ -37,6 +38,23 @@ export const deleteAttribute = supervisorMutation({
   args: attributeDoc.pick({ _id: true }),
   returns: z.object({ success: z.boolean() }),
   handler: async (ctx, args) => {
+    const template = await ctx.db
+      .query("maintenanceTemplates")
+      .withIndex("byKey", (q) => q.eq("key", "default"))
+      .unique();
+    const version = template?.publishedVersionId ? await ctx.db.get("maintenanceTemplateVersions", template.publishedVersionId) : null;
+    const sections: MaintenanceSection[] = [...(template?.sections ?? []), ...(version?.sections ?? [])];
+    const inUse = sections.some((section) =>
+      [section.visibility, ...section.fields.map((field) => field.visibility.rules)].some((rule) =>
+        [...rule.allAttributeIds, ...rule.anyAttributeIds, ...rule.noneAttributeIds].includes(args._id)
+      )
+    );
+    if (inUse)
+      throw new ConvexError({
+        code: "UNPROCESSABLE_CONTENT",
+        message:
+          "This attribute is used by a maintenance visibility rule. Remove it from the draft and publish those changes before deleting it.",
+      });
     await ctx.db.delete("attributes", args._id);
     return { success: true };
   },

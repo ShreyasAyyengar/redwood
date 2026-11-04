@@ -36,6 +36,9 @@ import type * as core_hotline_settings_table from "../core/hotline/settings/tabl
 import type * as core_issues_schemas from "../core/issues/schemas.js";
 import type * as core_issues_service from "../core/issues/service.js";
 import type * as core_issues_table from "../core/issues/table.js";
+import type * as core_maintenance_checklist from "../core/maintenance/checklist.js";
+import type * as core_maintenance_defaults from "../core/maintenance/defaults.js";
+import type * as core_maintenance_definitions from "../core/maintenance/definitions.js";
 import type * as core_maintenance_schemas from "../core/maintenance/schemas.js";
 import type * as core_maintenance_service from "../core/maintenance/service.js";
 import type * as core_maintenance_table from "../core/maintenance/table.js";
@@ -88,6 +91,9 @@ declare const fullApi: ApiFromModules<{
   "core/issues/schemas": typeof core_issues_schemas;
   "core/issues/service": typeof core_issues_service;
   "core/issues/table": typeof core_issues_table;
+  "core/maintenance/checklist": typeof core_maintenance_checklist;
+  "core/maintenance/defaults": typeof core_maintenance_defaults;
+  "core/maintenance/definitions": typeof core_maintenance_definitions;
   "core/maintenance/schemas": typeof core_maintenance_schemas;
   "core/maintenance/service": typeof core_maintenance_service;
   "core/maintenance/table": typeof core_maintenance_table;

@@ -1,7 +1,8 @@
 import { zid } from "convex-helpers/server/zod4";
 import { z } from "zod";
+import { checklistSnapshotSchema } from "./definitions";
 
-export const maintenanceEntrySchema = z.object({
+export const legacyMaintenanceEntrySchema = z.object({
   classroomId: zid("classrooms"),
   date: z.iso.datetime(),
   completedBy: z.email(),
@@ -32,4 +33,9 @@ export const maintenanceEntrySchema = z.object({
   equipmentChecked: z.boolean(),
 });
 
-export const maintenanceFormSchema = maintenanceEntrySchema.omit({ completedBy: true, classroomId: true });
+export const maintenanceFormSchema = legacyMaintenanceEntrySchema.omit({ completedBy: true, classroomId: true });
+
+// Additive storage format: existing logs and Mongo imports remain readable.
+export const maintenanceEntrySchema = legacyMaintenanceEntrySchema
+  .partial({ microphone: true, dten: true, surfacesWiped: true, equipmentChecked: true })
+  .extend({ checklist: checklistSnapshotSchema.optional() });
