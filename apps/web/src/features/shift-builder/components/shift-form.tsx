@@ -56,7 +56,7 @@ export function ShiftForm({ shiftDate, isLoading, error, summary, onSubmit, onCh
                 </PopoverContent>
               </Popover>
             </div>
-            <div className="grid gap-4">
+            <div className="grid grid-cols-2 items-start gap-3 sm:gap-4">
               <ShiftTimePicker id="shift-start" name="shiftStart" label="Shift starts" onChange={onTimeChange} />
               <ShiftTimePicker id="shift-end" name="shiftEnd" label="Shift ends" onChange={onTimeChange} />
             </div>
