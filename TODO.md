@@ -1,7 +1,4 @@
 ### Before Fall 2026
-- [ ] list view for issues/tasks
-- [ ] exporting / copy / pull out / aggregate of a search
-
 - [ ] Make an MSE role > subset of supervisors with recently files issues on main screen
 
 - [] MIKO is scope-crept right now
@@ -25,7 +22,6 @@
 
 ### Medium Priority
 - [ ] Proper error handling for API calls in the UI. infra is there, use it.
-- [ ] filtering by attributes
 - [ ] Take care of CSV ingestion direct from coursedog, eliminate the middle-man python script
 - [ ] standardise delete button styles
 - [ ] keyboard shortcuts for 'committing' actions CMD + Enter

@@ -2,7 +2,7 @@ import type { Doc } from "@backend/convex/_generated/dataModel";
 import { Button } from "@redwood/shad-ui/components/button";
 import { Separator } from "@redwood/shad-ui/components/separator";
 import { cn } from "@redwood/shad-ui/lib/utils";
-import { GlobeOff } from "lucide-react";
+import { MonitorOff, VideoOff } from "lucide-react";
 import type { IssueFormBodyApi } from "./issue-form-context";
 
 export function IssueFormFields({ form, existingIssue }: { form: IssueFormBodyApi; existingIssue?: Doc<"issues"> }) {
@@ -13,15 +13,25 @@ export function IssueFormFields({ form, existingIssue }: { form: IssueFormBodyAp
     );
   };
 
+  const autoFillYuJa = () => {
+    form.setFieldValue("description", "YuJa showing offline — Please power cycle and radio a supervisor once it self-assigns an IP");
+  };
+
   return (
     <div className="my-2 flex flex-col gap-5 px-1">
       <Separator className={cn(existingIssue ? existingIssue.issue.urgent && "bg-red-500" : "bg-neutral-500")} />
 
       <form.AppField name="description">{(field) => <field.DescriptionField existingValue={existingIssue?.issue.description} />}</form.AppField>
-      <Button className="w-fit active:scale-95 active:transform" onClick={autoFillDTEN}>
-        <GlobeOff className="size-4" />
-        DTEN
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button className="w-fit active:scale-95 active:transform" onClick={autoFillDTEN}>
+          <MonitorOff className="size-4" />
+          DTEN
+        </Button>
+        <Button className="w-fit active:scale-95 active:transform" onClick={autoFillYuJa}>
+          <VideoOff className="size-5" />
+          YuJa
+        </Button>
+      </div>
 
       <Separator className={cn(existingIssue ? existingIssue.issue.urgent && "bg-red-500" : "bg-neutral-500")} />
 
