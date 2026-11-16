@@ -1,25 +1,38 @@
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { CircleAlert, OctagonPause, ThumbsUp, TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { convertMinutesToReadable, dayAvailability, getBlocksForToday, getCaliClock } from "#/util/date-time-utils.ts";
+import {
+  convertMinutesToReadable,
+  dayAvailability,
+  daysAgoNumeric,
+  getBlocksForToday,
+  getCaliClock,
+  getDateTimeDisplay,
+} from "#/util/date-time-utils.ts";
 import { urgencyStyle } from "#/util/style-util.ts";
 import type { ClassroomSummary } from "../../model/classroom-types";
-import { getClassroomMaintenanceDisplay } from "../../model/maintenance-age";
-import { useClassroomMaintenanceDay } from "../classroom-maintenance-day-provider";
 
 export default function RoomCard({ room }: { room: ClassroomSummary }) {
   const router = useRouter();
-  const today = useClassroomMaintenanceDay();
 
   const lastServicedDisplay = () => {
     if (!room.lastMaintenance) return <div className="text-center text-foreground text-lg">No Record Yet</div>;
 
-    const { age, color, status } = getClassroomMaintenanceDisplay(new Date(room.lastMaintenance.date), today);
+    const date = new Date(room.lastMaintenance.date);
+    const daysAgo = daysAgoNumeric(date);
+    const { dateDaysAgo } = getDateTimeDisplay(date);
 
     return (
-      <span className={cn("p rounded-full px-1 py-0.5 text-xs", urgencyStyle(color))}>
-        <span className="capitalize">{age}</span>
-        {` • ${status}`}
+      <span
+        className={cn(
+          "p rounded-full px-1 py-0.5 text-xs",
+          daysAgo < 14 && urgencyStyle("green"),
+          daysAgo >= 14 && daysAgo <= 30 && urgencyStyle("orange"),
+          daysAgo > 30 && urgencyStyle("red")
+        )}
+      >
+        <span className="capitalize">{dateDaysAgo}</span>
+        {` • ${daysAgo < 14 ? "Up to Date" : daysAgo <= 30 ? "Pending" : "Overdue"}`}
       </span>
     );
   };
