@@ -3,9 +3,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@redwo
 import { cn } from "@redwood/shad-ui/lib/utils";
 import { Bug, Building2, Info, SquareCheckBig, Wrench } from "lucide-react";
 import MaintenanceDialog from "#/features/maintenance/components/dialogs/maintenance-dialog.tsx";
-import { daysAgoRelative, formatDateAbsolute } from "#/util/date-time-utils.ts";
+import { formatDateAbsolute } from "#/util/date-time-utils.ts";
 import { urgencyStyle } from "#/util/style-util.ts";
 import type { ClassroomSummary } from "../../model/classroom-types";
+import { getClassroomMaintenanceDisplay } from "../../model/maintenance-age";
+import { useClassroomMaintenanceDay } from "../classroom-maintenance-day-provider";
 
 type LastServiced = {
   lastServicedAbsolute: string;
@@ -13,6 +15,7 @@ type LastServiced = {
 } | null;
 
 export default function RoomSummary({ room }: { room: ClassroomSummary | undefined }) {
+  const today = useClassroomMaintenanceDay();
   if (!room) return <RoomSummarySkeleton />;
 
   let lastServiced: LastServiced = null;
@@ -21,7 +24,7 @@ export default function RoomSummary({ room }: { room: ClassroomSummary | undefin
     const date = new Date(room.lastMaintenance.date);
     lastServiced = {
       lastServicedAbsolute: formatDateAbsolute(date),
-      lastServicedDaysAgo: daysAgoRelative(date),
+      lastServicedDaysAgo: getClassroomMaintenanceDisplay(date, today).age,
     };
   }
 
