@@ -4,6 +4,7 @@ import { Button } from "@redwood/shad-ui/components/button";
 import { useQuery } from "convex/react";
 import { CornerUpLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
+import { ClassroomMaintenanceDayProvider } from "#/features/classrooms/components/classroom-maintenance-day-provider.tsx";
 import Availability from "#/features/classrooms/components/detail/availability.tsx";
 import { RoomSettingsDialog } from "#/features/classrooms/components/detail/room-settings-dialog.tsx";
 import RoomSummary from "#/features/classrooms/components/detail/room-summary.tsx";
@@ -24,7 +25,7 @@ export default function Page() {
   const canManageRoom = hasSupervisorAccess(session?.user.role);
 
   return (
-    <>
+    <ClassroomMaintenanceDayProvider>
       <div className="mx-5 mt-5 xl:hidden">
         <div className="mb-2 flex items-center justify-between gap-3">
           <div
@@ -81,6 +82,6 @@ export default function Page() {
           <OpenTasks room={room} />
         </div>
       </div>
-    </>
+    </ClassroomMaintenanceDayProvider>
   );
 }

@@ -167,10 +167,6 @@ export function getDateTimeDisplay(date: Date): DateTimeDisplay {
   };
 }
 
-export function daysAgoNumeric(date: Date): number {
-  return Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
-}
-
 // TODO return more -> 0-60 seconds, 0-60 mins, 0-24 hours, 0-7 days, 0-30 days, 0-12 months, + years
 export function daysAgoRelative(date: Date): string {
   const now = new Date();
